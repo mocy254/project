@@ -49,15 +49,20 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 
 **API Design:**
 - RESTful endpoints with `/api` prefix
-- Multipart form data handling with Multer for file uploads (10MB limit)
+- Multipart form data handling with Multer for file uploads (100MB limit)
 - Content type validation for document uploads (PDF, DOCX, DOC, TXT, PPT, PPTX)
 - Request/response logging middleware for API debugging
 
 **Content Processing Pipeline:**
 1. Text extraction from uploaded files (PDF, DOCX, TXT, PPT) using pdf-parse and mammoth libraries
+   - File upload limit: 100MB to support large medical textbooks and comprehensive documents
 2. YouTube transcript extraction using youtube-transcript library
-3. Content passed to Gemini AI for flashcard generation
-4. Generated flashcards stored with associated deck metadata
+3. Intelligent chunking for very large documents:
+   - Automatically splits documents >800k tokens into manageable chunks
+   - Processes each chunk separately and merges results
+   - Maintains context boundaries (splits at line breaks)
+4. Content passed to Gemini AI for flashcard generation
+5. Generated flashcards stored with associated deck metadata
 
 **Data Storage:**
 - Currently using in-memory storage (MemStorage class) with Map-based data structures

@@ -15,7 +15,71 @@ export interface GeneratedFlashcard {
   cardType: "qa" | "cloze" | "reverse";
 }
 
+function estimateTokenCount(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+function chunkContent(content: string, maxTokens: number = 800000): string[] {
+  const estimatedTokens = estimateTokenCount(content);
+  
+  if (estimatedTokens <= maxTokens) {
+    return [content];
+  }
+
+  const chunks: string[] = [];
+  const lines = content.split('\n');
+  let currentChunk = '';
+  let currentTokens = 0;
+  
+  for (const line of lines) {
+    const lineTokens = estimateTokenCount(line);
+    
+    if (currentTokens + lineTokens > maxTokens && currentChunk) {
+      chunks.push(currentChunk.trim());
+      currentChunk = line + '\n';
+      currentTokens = lineTokens;
+    } else {
+      currentChunk += line + '\n';
+      currentTokens += lineTokens;
+    }
+  }
+  
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim());
+  }
+  
+  return chunks;
+}
+
 export async function generateFlashcards(
+  options: FlashcardGenerationOptions
+): Promise<GeneratedFlashcard[]> {
+  const { content, cardTypes, granularity, customInstructions } = options;
+
+  const chunks = chunkContent(content);
+  
+  if (chunks.length > 1) {
+    console.log(`Processing large document in ${chunks.length} chunks...`);
+    const allFlashcards: GeneratedFlashcard[] = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`Processing chunk ${i + 1}/${chunks.length}...`);
+      const chunkFlashcards = await generateFlashcardsForChunk({
+        content: chunks[i],
+        cardTypes,
+        granularity,
+        customInstructions
+      });
+      allFlashcards.push(...chunkFlashcards);
+    }
+    
+    return allFlashcards;
+  }
+  
+  return generateFlashcardsForChunk(options);
+}
+
+async function generateFlashcardsForChunk(
   options: FlashcardGenerationOptions
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions } = options;
@@ -87,9 +151,9 @@ STAGE 2 - Filter & Generate:
 **FLASHCARD FORMAT:**
 - Front: focused, standalone question
 - Back: ULTRA-CONCISE answer:
-  • Single fact: 2-5 words or brief phrase
+  • Single fact: brief 
   • Multiple facts: bullet points (• item)
-  • NO complete sentences or paragraphs
+  • NO complete paragraphs
 
 Keep cards atomic — one idea per card.
 Lower coverage levels = dramatically fewer cards.
