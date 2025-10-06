@@ -8,6 +8,8 @@ FlashGenius is an educational productivity application that transforms various c
 
 Preferred communication style: Simple, everyday language.
 
+Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete sentences or paragraphs)
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -89,7 +91,8 @@ Preferred communication style: Simple, everyday language.
   - Multiple card types (Q&A, cloze deletion, reverse cards) can be selected simultaneously
   - Granularity level (1-7 scale) controls content coverage from core principles to every detail
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
-- Structured prompt engineering for hallucination-free, concise flashcards
+- Structured prompt engineering for hallucination-free, ultra-concise flashcards
+- Answer format: bullet points or 2-5 word phrases (no complete sentences or paragraphs)
 - No additional context or explanations added - only information from source material
 
 **Database (Configured but Not Active):**

@@ -35,7 +35,7 @@ export async function generateFlashcards(
   const reverseEnabled = cardTypes.includes("reverse");
   
   if (cardTypes.includes("qa")) {
-    cardTypeDescriptions.push(`- Q&A: One clear question + concise, factual answer`);
+    cardTypeDescriptions.push(`- Q&A: One clear question + ultra-brief answer (few words or bullets)`);
   }
   
   if (cardTypes.includes("cloze")) {
@@ -58,7 +58,11 @@ Read the entire input carefully. Do NOT skip any part.
 Extract every distinct fact, concept, or process that a student should remember (according to the coverage level).
 Convert each fact into a flashcard with:
 - Front: a focused, standalone question or prompt
-- Back: a short, precise answer (one sentence or bullet list). Include essential details, numbers, or exceptions if present
+- Back: CONCISE answer using minimal words:
+  • Single fact: 2-5 words or brief phrase
+  • Multiple facts: bullet points (• item)
+  • NO complete sentences or paragraphs
+  • Include essential numbers/terms only
 
 Keep cards atomic — one idea per card.
 Avoid redundancy or overlapping questions.
@@ -79,7 +83,11 @@ ${cardTypeList}
 
 2. **Coverage:** ${coverageGuidance}
 
-3. **Conciseness:** Keep answers ≤30 words unless explanation is essential. Avoid long sentences, filler, or commentary.
+3. **Conciseness:** Answers must be ULTRA-CONCISE:
+   - Single fact: use 2-5 words or brief phrase (NOT a sentence)
+   - Multiple facts: use bullet points (• item) with no periods
+   - NO paragraphs or complete sentences
+   - Only essential keywords and values
 
 4. **Atomic Cards:** One fact per card. Each card must stand alone without requiring outside context.
 
