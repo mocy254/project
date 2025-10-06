@@ -36,8 +36,8 @@ export default function Editor() {
   const { data: cards, isLoading } = useQuery({
     queryKey: ['/api/decks', deckId, 'cards'],
     queryFn: async () => {
-      const res = await apiRequest(`/api/decks/${deckId}/cards`, "GET");
-      return res as unknown as any[];
+      const res = await apiRequest("GET", `/api/decks/${deckId}/cards`);
+      return await res.json();
     },
     enabled: !!deckId,
   });
@@ -45,8 +45,8 @@ export default function Editor() {
   const { data: deck } = useQuery({
     queryKey: ['/api/decks', deckId],
     queryFn: async () => {
-      const res = await apiRequest(`/api/decks/${deckId}`, "GET");
-      return res as unknown as any;
+      const res = await apiRequest("GET", `/api/decks/${deckId}`);
+      return await res.json();
     },
     enabled: !!deckId,
   });
@@ -55,7 +55,7 @@ export default function Editor() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: { id: string; question: string; answer: string }) => {
-      await apiRequest(`/api/cards/${data.id}`, "PUT", {
+      await apiRequest("PUT", `/api/cards/${data.id}`, {
         question: data.question,
         answer: data.answer,
       });
@@ -78,7 +78,7 @@ export default function Editor() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest(`/api/cards/${id}`, "DELETE");
+      await apiRequest("DELETE", `/api/cards/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/decks', deckId, 'cards'] });

@@ -25,8 +25,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const authMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; name?: string }) => {
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
-      const res = await apiRequest(endpoint, "POST", data);
-      return res as unknown as { userId: string; name: string };
+      const res = await apiRequest("POST", endpoint, data);
+      return await res.json();
     },
     onSuccess: (data) => {
       setUserId(data.userId);

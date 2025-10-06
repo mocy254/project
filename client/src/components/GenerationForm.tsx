@@ -30,8 +30,8 @@ export default function GenerationForm() {
 
   const textMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await apiRequest("/api/generate/text", "POST", data);
-      return res as any;
+      const res = await apiRequest("POST", "/api/generate/text", data);
+      return await res.json();
     },
     onSuccess: (data: any) => {
       toast({
@@ -76,8 +76,8 @@ export default function GenerationForm() {
 
   const youtubeMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await apiRequest("/api/generate/youtube", "POST", data);
-      return res as any;
+      const res = await apiRequest("POST", "/api/generate/youtube", data);
+      return await res.json();
     },
     onSuccess: (data: any) => {
       toast({

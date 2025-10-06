@@ -17,15 +17,15 @@ export default function Dashboard() {
     queryKey: ['/api/decks/user', userId],
     queryFn: async () => {
       if (!userId) return [];
-      const res = await apiRequest(`/api/decks/user/${userId}`, "GET");
-      return res as unknown as any[];
+      const res = await apiRequest("GET", `/api/decks/user/${userId}`);
+      return await res.json();
     },
     enabled: !!userId,
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (deckId: string) => {
-      await apiRequest(`/api/decks/${deckId}`, "DELETE");
+      await apiRequest("DELETE", `/api/decks/${deckId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/decks/user', userId] });
