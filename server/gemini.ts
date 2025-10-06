@@ -22,13 +22,13 @@ export async function generateFlashcards(
 
   // Granularity: 1-7 scale representing content coverage
   const coverageGuidance = 
-    granularity === 1 ? "Include only the most essential core principles and main ideas. Skip minor details and examples." :
-    granularity === 2 ? "Cover key concepts and major topics. Include important facts but omit fine details." :
-    granularity === 3 ? "Include important concepts with some supporting details. Cover main points thoroughly." :
-    granularity === 4 ? "Provide balanced coverage of main topics and subtopics. Include most relevant facts." :
-    granularity === 5 ? "Provide comprehensive coverage. Include every clinically or conceptually relevant fact. Skip only truly minor details." :
-    granularity === 6 ? "Thorough coverage with specific details and examples. Include mechanisms, numbers, and exceptions." :
-    "Exhaustive coverage capturing every detail, example, and nuance. Do not skip any information.";
+    granularity === 1 ? "Level 1 – Core Principles Only: Include only the most essential, high-yield facts and definitions. Skip details, numbers, or examples unless critical for understanding the concept. Focus on 'what' and 'why,' not 'how' or 'when.' Output concise, exam-relevant flashcards." :
+    granularity === 2 ? "Level 2 – Key Concepts: Focus on key mechanisms, main ideas, and high-yield relationships. Exclude most examples and exceptions. Keep cards short — one concept per card, ideal for quick recall." :
+    granularity === 3 ? "Level 3 – Moderate Detail: Cover all main concepts plus one or two clarifying details where needed. Exclude rare exceptions or long lists. Emphasize definitions, functions, and clinical relevance." :
+    granularity === 4 ? "Level 4 – Balanced Summary: Provide a balanced set of cards capturing essential facts and moderate supporting detail. Include relevant examples or numbers that aid understanding but skip excessive minutiae. Ideal for Step 1–style study with efficient retention." :
+    granularity === 5 ? "Level 5 – Detailed Understanding: Include essential facts plus secondary mechanisms, exceptions, and related associations. Capture most details found in the text, while maintaining concise flashcards. Avoid repetition — merge related facts into single well-phrased cards." :
+    granularity === 6 ? "Level 6 – Near-Comprehensive: Include almost every concept, fact, and number in the text. Each fact should appear in at least one flashcard. Use multiple cards per concept if necessary to maintain clarity and conciseness." :
+    "Level 7 – Every Detail: Convert every relevant sentence, fact, number, and concept into flashcards. No detail should be skipped unless it is purely stylistic or non-educational. Use multiple cards per concept if needed. Ensure cards remain readable and logically grouped by theme.";
 
   // Build card type descriptions
   const cardTypeDescriptions: string[] = [];
@@ -51,37 +51,47 @@ export async function generateFlashcards(
     ? `\n\n**Custom Instructions:** ${customInstructions}`
     : '';
 
-  const systemPrompt = `You are an expert educational AI that converts study material into high-yield, exam-ready flashcards.
+  const systemPrompt = `You are a medical education AI that generates concise, complete flashcards from study materials.
+
+**TASK:**
+Read the entire input carefully. Do NOT skip any part.
+Extract every distinct fact, concept, or process that a student should remember (according to the coverage level).
+Convert each fact into a flashcard with:
+- Front: a focused, standalone question or prompt
+- Back: a short, precise answer (one sentence or bullet list). Include essential details, numbers, or exceptions if present
+
+Keep cards atomic — one idea per card.
+Avoid redundancy or overlapping questions.
+Use concise professional wording.
 
 ---
-**User Settings:**
+**USER SETTINGS:**
 Card Types: ${cardTypes.join(", ")}
 ${reverseEnabled ? 'Reverse Mode: ENABLED — Generate bidirectional cards where appropriate' : ''}
-Content Coverage: ${coverageGuidance}${customInstructionsText}
+Coverage Level: ${coverageGuidance}${customInstructionsText}
 ---
 
-**Rules for Flashcard Generation:**
-
-1. **Coverage:** ${coverageGuidance}
-
-2. **Card Structure:**
+**CARD STRUCTURE:**
 ${cardTypeList}
 
-3. **Conciseness:** Use ≤30 words per answer. Bullet points allowed. Avoid redundant or overlapping cards.
+**RULES:**
+1. **Read Entire Input:** Process the ENTIRE content. Do not stop early or skip sections.
 
-4. **Clarity:** Each card must stand alone without requiring outside context. Include essential context in the question if needed.
+2. **Coverage:** ${coverageGuidance}
+
+3. **Conciseness:** Keep answers ≤30 words unless explanation is essential. Avoid long sentences, filler, or commentary.
+
+4. **Atomic Cards:** One fact per card. Each card must stand alone without requiring outside context.
 
 5. **No Hallucination:** Extract information ONLY from the provided content. Never add external knowledge, elaboration, or examples not present in the source.
 
-6. **Consistency:** If the same topic appears multiple times, merge or reword to avoid duplication. Do not create near-identical cards.
+6. **No Redundancy:** If the same topic appears multiple times, merge or reword to avoid duplication. Do not create near-identical cards.
 
-7. **Precision:** Include specific numbers, mechanisms, terms, or exceptions when present in the source material (especially at higher coverage levels).
+7. **Precision:** Include specific numbers, mechanisms, terms, or exceptions when present in the source material.
 
-8. **Style:** Be precise and fact-dense. Questions should be clear and unambiguous. Answers should be direct and concise.
+8. **Completeness:** Do not skip figures, tables, lists, or any factual content (turn them into cards if they contain facts to remember).
 
-**Output Format:** Return a JSON array of flashcard objects with question, answer, and cardType fields.
-
-Generate 5-25 flashcards based on content length and coverage level.`;
+**Output:** Generate as many flashcards as needed to cover the content according to the specified coverage level. There is NO limit on the number of flashcards.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -109,7 +119,7 @@ Generate 5-25 flashcards based on content length and coverage level.`;
           required: ["flashcards"],
         },
       },
-      contents: `Create flashcards from the following content:\n\n${content}`,
+      contents: `Read the ENTIRE content below carefully and create flashcards according to the coverage level. Do not skip any part:\n\n${content}`,
     });
 
     const rawJson = response.text;

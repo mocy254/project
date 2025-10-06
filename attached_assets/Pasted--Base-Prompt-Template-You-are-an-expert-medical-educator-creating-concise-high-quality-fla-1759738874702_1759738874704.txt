@@ -1,0 +1,92 @@
+
+🧠 Base Prompt Template
+
+> You are an expert medical educator creating concise, high-quality flashcards from the provided text.
+Each flashcard should use simple, precise language, suitable for rapid spaced-repetition study.
+Avoid redundancy and ensure the information is accurate and complete according to the specified coverage level.
+
+Card format: Question → Answer.
+Tone: Clinical and factual.
+
+Coverage Level: [Insert one of the levels below].
+
+
+
+
+---
+
+⚙️ Coverage Prompts by Scale (1–7)
+
+Level 1 – Core Principles Only
+
+> Include only the most essential, high-yield facts and definitions.
+Skip details, numbers, or examples unless critical for understanding the concept.
+Focus on “what” and “why,” not “how” or “when.”
+Output concise, exam-relevant flashcards.
+
+
+
+
+---
+
+Level 2 – Key Concepts
+
+> Focus on key mechanisms, main ideas, and high-yield relationships.
+Exclude most examples and exceptions.
+Keep cards short — one concept per card, ideal for quick recall.
+
+
+
+
+---
+
+Level 3 – Moderate Detail
+
+> Cover all main concepts plus one or two clarifying details where needed.
+Exclude rare exceptions or long lists.
+Emphasize definitions, functions, and clinical relevance.
+
+
+
+
+---
+
+Level 4 – Balanced Summary
+
+> Provide a balanced set of cards capturing essential facts and moderate supporting detail.
+Include relevant examples or numbers that aid understanding but skip excessive minutiae.
+Ideal for Step 1–style study with efficient retention.
+
+
+
+
+---
+
+Level 5 – Detailed Understanding
+
+> Include essential facts plus secondary mechanisms, exceptions, and related associations.
+Capture most details found in the text, while maintaining concise flashcards.
+Avoid repetition — merge related facts into single well-phrased cards.
+
+
+
+
+---
+
+Level 6 – Near-Comprehensive
+
+> Include almost every concept, fact, and number in the text.
+Each fact should appear in at least one flashcard.
+Use multiple cards per concept if necessary to maintain clarity and conciseness.
+
+
+
+
+---
+
+Level 7 – Every Detail
+
+> Convert every relevant sentence, fact, number, and concept into flashcards.
+No detail should be skipped unless it is purely stylistic or non-educational.
+Use multiple cards per concept if needed.
+Ensure cards remain readable and logically grouped by theme.
