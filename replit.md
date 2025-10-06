@@ -89,7 +89,11 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - API key required via `GEMINI_API_KEY` environment variable
 - Customizable generation parameters:
   - Multiple card types (Q&A, cloze deletion, reverse cards) can be selected simultaneously
-  - Granularity level (1-7 scale) controls content coverage from core principles to every detail
+  - Granularity level (1-7 scale) controls both content coverage AND number of cards:
+    * Level 1: Absolute essentials only (3-5 cards per major topic)
+    * Levels 2-3: Core concepts with limited detail (5-15 cards per topic)
+    * Levels 4-5: Balanced to detailed coverage (moderate to thorough cards)
+    * Levels 6-7: Near-comprehensive to every detail (extensive cards)
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
 - Structured prompt engineering for hallucination-free, ultra-concise flashcards
 - Answer format: bullet points or 2-5 word phrases (no complete sentences or paragraphs)

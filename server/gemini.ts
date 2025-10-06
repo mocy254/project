@@ -22,11 +22,11 @@ export async function generateFlashcards(
 
   // Granularity: 1-7 scale representing content coverage
   const coverageGuidance = 
-    granularity === 1 ? "Level 1 – Core Principles Only: Include only the most essential, high-yield facts and definitions. Skip details, numbers, or examples unless critical for understanding the concept. Focus on 'what' and 'why,' not 'how' or 'when.' Output concise, exam-relevant flashcards." :
-    granularity === 2 ? "Level 2 – Key Concepts: Focus on key mechanisms, main ideas, and high-yield relationships. Exclude most examples and exceptions. Keep cards short — one concept per card, ideal for quick recall." :
-    granularity === 3 ? "Level 3 – Moderate Detail: Cover all main concepts plus one or two clarifying details where needed. Exclude rare exceptions or long lists. Emphasize definitions, functions, and clinical relevance." :
-    granularity === 4 ? "Level 4 – Balanced Summary: Provide a balanced set of cards capturing essential facts and moderate supporting detail. Include relevant examples or numbers that aid understanding but skip excessive minutiae. Ideal for Step 1–style study with efficient retention." :
-    granularity === 5 ? "Level 5 – Detailed Understanding: Include essential facts plus secondary mechanisms, exceptions, and related associations. Capture most details found in the text, while maintaining concise flashcards. Avoid repetition — merge related facts into single well-phrased cards." :
+    granularity === 1 ? "Level 1 – Absolute Essentials Only: Generate MINIMAL cards (3-5 per major topic). Only include the single most important definition or principle per concept. Skip ALL details, mechanisms, examples, numbers, and subtopics. Ask: 'What is the ONE thing a student must remember?' Create only that card. Be extremely selective." :
+    granularity === 2 ? "Level 2 – Core Concepts Only: Generate LIMITED cards (5-10 per major topic). Include only critical definitions and the most important relationship or mechanism. Skip examples, exceptions, numbers, and secondary details. Focus on foundational knowledge only." :
+    granularity === 3 ? "Level 3 – Key Ideas: Generate MODERATE cards (10-15 per major topic). Cover main concepts and primary mechanisms. Include 1-2 supporting details per concept only if essential. Skip most examples, rare cases, and extensive lists." :
+    granularity === 4 ? "Level 4 – Balanced Coverage: Generate a balanced set of cards. Include essential facts plus moderate supporting detail. Add relevant examples or key numbers that aid understanding but skip excessive minutiae. Ideal for comprehensive yet efficient study." :
+    granularity === 5 ? "Level 5 – Detailed Understanding: Generate thorough cards. Include essential facts plus secondary mechanisms, important exceptions, and related associations. Capture most details found in the text while maintaining clarity. Merge related facts to avoid redundancy." :
     granularity === 6 ? "Level 6 – Near-Comprehensive: Include almost every concept, fact, and number in the text. Each fact should appear in at least one flashcard. Use multiple cards per concept if necessary to maintain clarity and conciseness." :
     "Level 7 – Every Detail: Convert every relevant sentence, fact, number, and concept into flashcards. No detail should be skipped unless it is purely stylistic or non-educational. Use multiple cards per concept if needed. Ensure cards remain readable and logically grouped by theme.";
 
@@ -55,7 +55,7 @@ export async function generateFlashcards(
 
 **TASK:**
 Read the entire input carefully. Do NOT skip any part.
-Extract every distinct fact, concept, or process that a student should remember (according to the coverage level).
+Extract ONLY the facts required by the coverage level (lower levels = fewer cards, higher levels = more cards).
 Convert each fact into a flashcard with:
 - Front: a focused, standalone question or prompt
 - Back: CONCISE answer using minimal words:
@@ -67,6 +67,7 @@ Convert each fact into a flashcard with:
 Keep cards atomic — one idea per card.
 Avoid redundancy or overlapping questions.
 Use concise professional wording.
+IMPORTANT: Lower coverage levels should produce significantly FEWER cards than higher levels.
 
 ---
 **USER SETTINGS:**
@@ -81,10 +82,13 @@ ${cardTypeList}
 **RULES:**
 1. **Read Entire Input:** Process the ENTIRE content. Do not stop early or skip sections.
 
-2. **Coverage:** ${coverageGuidance}
+2. **Coverage & Card Limits:** ${coverageGuidance}
+   - Strictly adhere to the coverage level
+   - Levels 1-3 should generate dramatically FEWER cards than levels 5-7
+   - Be highly selective at lower levels — only include truly essential information
 
 3. **Conciseness:** Answers must be ULTRA-CONCISE:
-   - Single fact: use 2-5 words or brief phrase (NOT a sentence)
+   - Single fact: use 2-5 words or brief phrases (without distorting the meaning)
    - Multiple facts: use bullet points (• item) with no periods
    - NO paragraphs or complete sentences
    - Only essential keywords and values
@@ -95,11 +99,14 @@ ${cardTypeList}
 
 6. **No Redundancy:** If the same topic appears multiple times, merge or reword to avoid duplication. Do not create near-identical cards.
 
-7. **Precision:** Include specific numbers, mechanisms, terms, or exceptions when present in the source material.
+7. **Precision:** Include specific numbers, mechanisms, terms, or exceptions ONLY when they match the coverage level requirement.
 
-8. **Completeness:** Do not skip figures, tables, lists, or any factual content (turn them into cards if they contain facts to remember).
+8. **Selectivity Based on Level:**
+   - Levels 1-2: Skip most details, examples, numbers, mechanisms — extract absolute minimum
+   - Levels 3-4: Include main concepts with moderate detail
+   - Levels 5-7: Capture progressively more comprehensive detail
 
-**Output:** Generate as many flashcards as needed to cover the content according to the specified coverage level. There is NO limit on the number of flashcards.`;
+**Output:** Generate flashcards strictly matching the coverage level. Lower levels = fewer cards, higher levels = more cards.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -127,7 +134,17 @@ ${cardTypeList}
           required: ["flashcards"],
         },
       },
-      contents: `Read the ENTIRE content below carefully and create flashcards according to the coverage level. Do not skip any part:\n\n${content}`,
+      contents: `Read the ENTIRE content below carefully and create flashcards according to the coverage level.
+
+CRITICAL: The coverage level determines HOW MANY cards to generate:
+- Level 1: Generate MINIMAL cards (only absolute essentials)
+- Levels 2-3: Generate LIMITED cards (core concepts only)
+- Levels 4-5: Generate MODERATE to THOROUGH cards
+- Levels 6-7: Generate COMPREHENSIVE cards (all details)
+
+Content to process:
+
+${content}`,
     });
 
     const rawJson = response.text;
