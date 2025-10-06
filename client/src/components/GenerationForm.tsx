@@ -8,7 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Upload, Youtube, Type, Sparkles } from "lucide-react";
+import { Upload, Youtube, Type, Sparkles, Loader2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 export default function GenerationForm() {
   const [textContent, setTextContent] = useState("");
@@ -17,10 +22,147 @@ export default function GenerationForm() {
   const [granularity, setGranularity] = useState([50]);
   const [extraNotes, setExtraNotes] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [activeTab, setActiveTab] = useState("text");
+  const { userId } = useUser();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const textMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("/api/generate/text", "POST", data);
+      return res as any;
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Flashcards generated!",
+        description: `Successfully created ${data.flashcards.length} flashcards`,
+      });
+      setLocation(`/editor/${data.deck.id}`);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Generation failed",
+        description: error.message || "Failed to generate flashcards",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const documentMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch("/api/generate/document", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Flashcards generated!",
+        description: `Successfully created ${data.flashcards.length} flashcards`,
+      });
+      setLocation(`/editor/${data.deck.id}`);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Generation failed",
+        description: error.message || "Failed to generate flashcards",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const youtubeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("/api/generate/youtube", "POST", data);
+      return res as any;
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Flashcards generated!",
+        description: `Successfully created ${data.flashcards.length} flashcards`,
+      });
+      setLocation(`/editor/${data.deck.id}`);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Generation failed",
+        description: error.message || "Failed to generate flashcards",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleGenerate = () => {
-    console.log("Generate flashcards", { cardType, granularity, extraNotes });
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to generate flashcards",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!title.trim()) {
+      toast({
+        title: "Title required",
+        description: "Please enter a title for your deck",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const baseData = {
+      userId,
+      title,
+      cardType,
+      granularity: granularity[0],
+      extraNotes: extraNotes ? 1 : 0,
+    };
+
+    if (activeTab === "text") {
+      if (!textContent.trim()) {
+        toast({
+          title: "Content required",
+          description: "Please enter some content to generate flashcards from",
+          variant: "destructive",
+        });
+        return;
+      }
+      textMutation.mutate({ ...baseData, content: textContent });
+    } else if (activeTab === "document") {
+      if (!file) {
+        toast({
+          title: "File required",
+          description: "Please upload a file",
+          variant: "destructive",
+        });
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", userId);
+      formData.append("title", title);
+      formData.append("cardType", cardType);
+      formData.append("granularity", granularity[0].toString());
+      formData.append("extraNotes", extraNotes ? "true" : "false");
+      documentMutation.mutate(formData);
+    } else if (activeTab === "youtube") {
+      if (!youtubeUrl.trim()) {
+        toast({
+          title: "URL required",
+          description: "Please enter a YouTube URL",
+          variant: "destructive",
+        });
+        return;
+      }
+      youtubeMutation.mutate({ ...baseData, url: youtubeUrl });
+    }
   };
+
+  const isLoading = textMutation.isPending || documentMutation.isPending || youtubeMutation.isPending;
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -34,7 +176,18 @@ export default function GenerationForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Tabs defaultValue="text" className="w-full">
+        <div className="space-y-2">
+          <Label htmlFor="deck-title">Deck Title</Label>
+          <Input
+            id="deck-title"
+            placeholder="e.g., Biology Chapter 5, JavaScript Basics"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            data-testid="input-title"
+          />
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text" data-testid="tab-text">
               <Type className="w-4 h-4 mr-2" />
@@ -78,7 +231,7 @@ export default function GenerationForm() {
                 <Input
                   id="file-upload"
                   type="file"
-                  accept=".pdf,.docx,.txt,.ppt,.pptx"
+                  accept=".pdf,.docx,.txt,.ppt,.pptx,.doc"
                   className="hidden"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   data-testid="input-file"
@@ -177,9 +330,19 @@ export default function GenerationForm() {
           onClick={handleGenerate} 
           className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-[hsl(258,90%,66%)]"
           data-testid="button-generate"
+          disabled={isLoading}
         >
-          <Sparkles className="w-5 h-5 mr-2" />
-          Generate Flashcards
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5 mr-2" />
+              Generate Flashcards
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

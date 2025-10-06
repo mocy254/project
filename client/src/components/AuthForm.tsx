@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -14,10 +16,23 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [, setLocation] = useLocation();
+  const { setUserId, setUserName } = useUser();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(`${mode} submitted:`, { email, password, name });
+    
+    const mockUserId = `user_${Date.now()}`;
+    setUserId(mockUserId);
+    setUserName(name || email.split("@")[0]);
+    
+    toast({
+      title: mode === "login" ? "Welcome back!" : "Account created!",
+      description: mode === "login" ? "You've successfully signed in." : "Your account has been created successfully.",
+    });
+    
+    setLocation("/dashboard");
   };
 
   return (
