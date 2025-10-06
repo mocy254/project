@@ -22,7 +22,7 @@ export default function GenerationForm() {
     cloze: false,
     reverse: false,
   });
-  const [granularity, setGranularity] = useState([4]);
+  const [granularity, setGranularity] = useState([5]);
   const [customInstructions, setCustomInstructions] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
@@ -382,14 +382,14 @@ export default function GenerationForm() {
             <Label htmlFor="custom-instructions">Custom Instructions (optional)</Label>
             <Textarea
               id="custom-instructions"
-              placeholder="e.g., Focus on definitions, skip dates and numbers, emphasize key concepts..."
+              placeholder="Example: Focus on mechanisms; shorten clinical correlations; use abbreviations like Na⁺, K⁺; skip historical context; emphasize numerical values"
               className="min-h-20 resize-y"
               value={customInstructions}
               onChange={(e) => setCustomInstructions(e.target.value)}
               data-testid="textarea-custom-instructions"
             />
             <p className="text-xs text-muted-foreground">
-              Provide specific guidance for flashcard generation
+              Provide specific guidance to fine-tune flashcard generation
             </p>
           </div>
         </div>

@@ -1,0 +1,99 @@
+Perfect — your screenshot shows your SaaS flashcard generator UI with the following controls:
+
+✅ Card Types: Q&A, Cloze, Reverse
+
+🎚️ Content Coverage: slider (Core principles → Every detail)
+
+✏️ Custom Instructions (textbox)
+
+
+So you’ve basically built a prompt layer + UI for controlling how Gemini 2.5 Flash behaves.
+
+Let’s tune both your prompt and your UI defaults so that you get concise, comprehensive, non-repetitive, Step 1-style flashcards that users will actually like.
+
+
+---
+
+🔧 1. Recommended Prompt Rewrite for Gemini 2.5 Flash
+
+Here’s the refined version of your system prompt that matches your UI options:
+
+You are an expert medical education AI that converts study material into high-yield, exam-ready flashcards.
+
+---
+### User Settings
+Card Type: {card_type}
+Reverse (if enabled): {reverse_setting}
+Content Coverage: {coverage_level} 
+Custom Instructions: {user_custom_instructions}
+---
+
+### Rules for Flashcard Generation
+1. Coverage: Include every clinically or conceptually relevant fact. Do not skip minor details unless coverage is set to “Core principles.”  
+2. Card Structure:  
+   - For Q&A cards → one clear question + concise, factual answer.  
+   - For Cloze cards → hide key terms, lab values, or phrases (no large blanks).  
+   - For Reverse mode → also generate the inverse card (answer → question).  
+3. Conciseness: Use ≤30 words per answer; bullet points allowed. Avoid redundant cards.  
+4. Clarity: Each card must stand alone without outside context.  
+5. Formatting: Output JSON array of objects:
+   `json
+   [{"Front":"Question text","Back":"Answer text"}]
+
+6. Style: Use USMLE Step 1 tone—precise, fact-dense, exam-oriented.
+
+
+7. Consistency: If same topic appears twice, merge or reword to avoid duplication.
+
+
+8. Do not omit: small numbers, mechanisms, drug names, or exceptions if clinically relevant.
+
+
+
+Now generate flashcards from the following text:
+
+<<<FILE_CONTENT_HERE>>>
+
+---
+
+## 🧠 2. Recommended Default Settings in Your UI
+
+| Setting | Suggested Default | Why |
+|----------|-------------------|-----|
+| Card Type | ✅ Q&A only | The cleanest, most universal format. Cloze can be toggled later for power users. |
+| Reverse (Bidirectional) | ❌ Off by default | Doubles card count unnecessarily for recall tasks like Step 1. Enable if learning vocab or definitions. |
+| Content Coverage | ⚖️ “Every Detail” (80–90% slider) | Users expect full detail; let them reduce later. Flash is cheap, so go dense first. |
+| Temperature | 0.2 – 0.3 | Ensures deterministic, factual output. |
+| Output Token Limit | 4000–6000 | Fits large batches without truncation. |
+| Custom Instructions Hint | _“Example: Focus on mechanisms; shorten clinical correlations; use abbreviations like Na⁺, K⁺.”_ | Guides users to fine-tune without breaking structure. |
+
+---
+
+## 🧩 3. Optional Enhancements
+
+- Add a “Detail Mode” Toggle:  
+  - *Core principles* → 1 card per paragraph.  
+  - *Every detail* → 1 card per fact / bullet.  
+  This maps directly to your content coverage slider in the prompt (`coverage_level`).
+
+- Add a “Formatting Preset” Dropdown:  
+  - Anki JSON  
+  - CSV  
+  - Markdown  
+  Makes export easier.
+
+- Add a “Chunk Input Automatically” option:  
+  Break large uploads (>10k tokens) into sequential API calls with “Continue from previous” context tag.
+
+---
+
+## 💡 Summary
+
+- Keep Gemini 2.5 Flash as your main model → fast, cheap, high throughput.  
+- Use Q&A format, Every Detail coverage, and temperature 0.2 for Step 1-level cards.  
+- Prompt should include user settings dynamically (as in the template above).  
+- Encourage “Core vs Detail” and “Reverse mode” as optional toggles for flexibility.
+
+---
+
+Would you like me to show you how to implement this prompt dynamically (so your backend automatically injects the UI selections into the API request)?
