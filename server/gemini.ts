@@ -4,71 +4,79 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export interface FlashcardGenerationOptions {
   content: string;
-  cardType: "qa" | "cloze" | "reverse";
+  cardTypes: string[];
   granularity: number;
-  extraNotes: boolean;
+  customInstructions: string;
 }
 
 export interface GeneratedFlashcard {
   question: string;
   answer: string;
   cardType: "qa" | "cloze" | "reverse";
-  extraNotes?: string;
 }
 
 export async function generateFlashcards(
   options: FlashcardGenerationOptions
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardType, granularity, extraNotes } = options;
+  const { content, cardTypes, granularity, customInstructions } = options;
 
+  // Granularity: 1-7 scale representing content coverage
   const granularityLabel = 
-    granularity < 33 ? "brief and concise" :
-    granularity < 66 ? "moderate detail" :
-    "detailed and comprehensive";
+    granularity === 1 ? "only the most essential core principles and main ideas" :
+    granularity === 2 ? "key concepts and major topics" :
+    granularity === 3 ? "important concepts with some supporting details" :
+    granularity === 4 ? "balanced coverage of main topics and subtopics" :
+    granularity === 5 ? "comprehensive coverage including supporting details" :
+    granularity === 6 ? "thorough coverage with specific details and examples" :
+    "exhaustive coverage capturing every detail, example, and nuance";
 
-  let cardTypeInstructions = "";
-  switch (cardType) {
-    case "qa":
-      cardTypeInstructions = `Create traditional question and answer flashcards. 
-The question should be clear and specific, and the answer should be direct and informative.`;
-      break;
-    case "cloze":
-      cardTypeInstructions = `Create cloze deletion flashcards using the format {{c1::answer}}. 
-The question should have one or more key terms replaced with the cloze deletion marker {{c1::term}}.
-The answer should be the term that fills in the blank.`;
-      break;
-    case "reverse":
-      cardTypeInstructions = `Create bidirectional (reverse) flashcards. 
-The question is a term/concept and the answer is its definition/explanation. 
-These can be studied in both directions.`;
-      break;
+  // Build card type instructions for all selected types
+  const cardTypeInstructions: string[] = [];
+  
+  if (cardTypes.includes("qa")) {
+    cardTypeInstructions.push(`- Q&A cards: Traditional question and answer format. Questions should be clear and specific, answers should be concise and accurate.`);
+  }
+  
+  if (cardTypes.includes("cloze")) {
+    cardTypeInstructions.push(`- Cloze deletion cards: Use {{c1::answer}} format. Replace key terms with cloze markers. The answer contains the complete sentence with cloze markers showing what to memorize.`);
+  }
+  
+  if (cardTypes.includes("reverse")) {
+    cardTypeInstructions.push(`- Reverse cards: Bidirectional format. Question is a term/concept, answer is its definition. Can be studied in both directions.`);
   }
 
-  const extraNotesInstruction = extraNotes
-    ? `Also include additional context, mnemonics, or helpful explanations in the extraNotes field.`
-    : `Do not include extra notes.`;
+  const cardTypeInstruction = cardTypes.length > 1 
+    ? `Generate a mix of the following card types:\n${cardTypeInstructions.join('\n')}\n\nDistribute cards across all selected types.`
+    : cardTypeInstructions[0];
 
-  const systemPrompt = `You are an expert educational content creator specializing in creating effective flashcards for learning.
+  const customInstructionsText = customInstructions 
+    ? `\nAdditional Instructions: ${customInstructions}`
+    : '';
 
-Your task is to analyze the provided content and generate high-quality flashcards that help students learn and retain information.
+  const systemPrompt = `You are an expert educational flashcard creator. Your goal is to create high-quality, concise, and accurate flashcards that help students learn effectively.
 
-Card Type Instructions:
-${cardTypeInstructions}
+CRITICAL RULES:
+1. NEVER add extra context, explanations, or notes beyond what's in the source material
+2. Keep all cards concise and to the point
+3. Extract information ONLY from the provided content - do not add external knowledge
+4. Answers must be factual and directly from the source material
 
-Granularity: Create flashcards with ${granularityLabel} content.
-${extraNotesInstruction}
+Card Types to Generate:
+${cardTypeInstruction}
 
-Generate between 5-20 flashcards depending on the content length and complexity.
-Focus on the most important concepts, facts, and relationships in the material.
+Content Coverage Level: ${granularityLabel}
+${customInstructionsText}
 
-Return your response as a JSON array of flashcard objects with this structure:
+Generate 5-20 flashcards based on content length and the specified granularity level.
+Focus on creating trusted, hallucination-free flashcards.
+
+Return your response as a JSON array with this exact structure:
 {
   "flashcards": [
     {
       "question": "string",
       "answer": "string",
-      "cardType": "${cardType}",
-      "extraNotes": "string or null"
+      "cardType": "qa" | "cloze" | "reverse"
     }
   ]
 }`;
@@ -90,7 +98,6 @@ Return your response as a JSON array of flashcard objects with this structure:
                   question: { type: "string" },
                   answer: { type: "string" },
                   cardType: { type: "string" },
-                  extraNotes: { type: "string", nullable: true },
                 },
                 required: ["question", "answer", "cardType"],
               },

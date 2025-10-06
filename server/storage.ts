@@ -56,7 +56,7 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const deck: Deck = { 
       ...insertDeck,
-      extraNotes: insertDeck.extraNotes ?? 0,
+      customInstructions: insertDeck.customInstructions ?? null,
       id,
       createdAt: now,
       updatedAt: now
@@ -97,7 +97,6 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const flashcard: Flashcard = { 
       ...insertFlashcard,
-      extraNotes: insertFlashcard.extraNotes ?? null,
       id,
       createdAt: new Date()
     };

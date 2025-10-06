@@ -42,17 +42,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/generate/text", async (req, res) => {
     try {
-      const { content, cardType, granularity, extraNotes, userId, title } = req.body;
+      const { content, cardTypes, granularity, customInstructions, userId, title } = req.body;
 
-      if (!content || !cardType || granularity === undefined || !userId || !title) {
+      if (!content || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
       const flashcards = await generateFlashcards({
         content,
-        cardType,
+        cardTypes,
         granularity,
-        extraNotes: Boolean(extraNotes)
+        customInstructions: customInstructions || ""
       });
 
       const deck = await storage.createDeck({
@@ -60,9 +60,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title,
         source: content.substring(0, 100) + "...",
         sourceType: "text",
-        cardType,
+        cardTypes,
         granularity,
-        extraNotes: extraNotes ? 1 : 0
+        customInstructions: customInstructions || null
       });
 
       const createdCards = await Promise.all(
@@ -72,7 +72,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             question: card.question,
             answer: card.answer,
             cardType: card.cardType,
-            extraNotes: card.extraNotes || null,
             position: index
           })
         )
@@ -91,15 +90,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const { cardType, granularity, extraNotes, userId, title } = req.body;
+      const { cardTypes, granularity, customInstructions, userId, title } = req.body;
 
       const content = await extractContentFromFile(req.file.path, req.file.mimetype);
 
+      const parsedCardTypes = JSON.parse(cardTypes);
       const flashcards = await generateFlashcards({
         content,
-        cardType,
+        cardTypes: parsedCardTypes,
         granularity: parseInt(granularity),
-        extraNotes: extraNotes === "true"
+        customInstructions: customInstructions || ""
       });
 
       const deck = await storage.createDeck({
@@ -107,9 +107,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title,
         source: req.file.originalname,
         sourceType: "document",
-        cardType,
+        cardTypes: parsedCardTypes,
         granularity: parseInt(granularity),
-        extraNotes: extraNotes === "true" ? 1 : 0
+        customInstructions: customInstructions || null
       });
 
       const createdCards = await Promise.all(
@@ -119,7 +119,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             question: card.question,
             answer: card.answer,
             cardType: card.cardType,
-            extraNotes: card.extraNotes || null,
             position: index
           })
         )
@@ -134,9 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/generate/youtube", async (req, res) => {
     try {
-      const { url, cardType, granularity, extraNotes, userId, title } = req.body;
+      const { url, cardTypes, granularity, customInstructions, userId, title } = req.body;
 
-      if (!url || !cardType || granularity === undefined || !userId || !title) {
+      if (!url || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
@@ -144,9 +143,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const flashcards = await generateFlashcards({
         content,
-        cardType,
+        cardTypes,
         granularity,
-        extraNotes: Boolean(extraNotes)
+        customInstructions: customInstructions || ""
       });
 
       const deck = await storage.createDeck({
@@ -154,9 +153,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title,
         source: url,
         sourceType: "youtube",
-        cardType,
+        cardTypes,
         granularity,
-        extraNotes: extraNotes ? 1 : 0
+        customInstructions: customInstructions || null
       });
 
       const createdCards = await Promise.all(
@@ -166,7 +165,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             question: card.question,
             answer: card.answer,
             cardType: card.cardType,
-            extraNotes: card.extraNotes || null,
             position: index
           })
         )
@@ -215,12 +213,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/cards/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const { question, answer, extraNotes } = req.body;
+      const { question, answer } = req.body;
 
       const updated = await storage.updateFlashcard(id, {
         question,
-        answer,
-        extraNotes
+        answer
       });
 
       if (!updated) {
@@ -271,13 +268,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
 
         case "csv":
-          const csvRows = ["Question,Answer,Type,Extra Notes"];
+          const csvRows = ["Question,Answer,Type"];
           cards.forEach(card => {
             const row = [
               `"${card.question.replace(/"/g, '""')}"`,
               `"${card.answer.replace(/"/g, '""')}"`,
-              card.cardType,
-              card.extraNotes ? `"${card.extraNotes.replace(/"/g, '""')}"` : ""
+              card.cardType
             ];
             csvRows.push(row.join(","));
           });
@@ -288,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         case "anki":
           const ankiRows = cards.map(card =>
-            `${card.question}\t${card.answer}${card.extraNotes ? `\t${card.extraNotes}` : ""}`
+            `${card.question}\t${card.answer}`
           );
           res.setHeader("Content-Type", "text/plain");
           res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.txt"`);
