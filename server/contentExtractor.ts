@@ -48,8 +48,11 @@ export async function extractYouTubeTranscript(url: string): Promise<string> {
 
     const transcript = await YoutubeTranscript.fetchTranscript(videoId);
     return transcript.map(item => item.text).join(" ");
-  } catch (error) {
-    throw new Error(`Failed to extract YouTube transcript: ${error}`);
+  } catch (error: any) {
+    if (error.message?.includes("Transcript is disabled")) {
+      throw new Error("This video doesn't have subtitles/captions enabled. Please choose a video with available transcripts.");
+    }
+    throw new Error(`Failed to extract YouTube transcript: ${error.message || error}`);
   }
 }
 
@@ -87,6 +90,6 @@ export async function extractContentFromFile(
     case "pptx":
       return extractPPTText(filePath);
     default:
-      throw new Error(`Unsupported file type: ${extension}`);
+      throw new Error(`Unsupported file type. Please upload PDF, DOCX, DOC, TXT, PPT, or PPTX files only.`);
   }
 }
