@@ -67,6 +67,13 @@ export default function Editor() {
         description: "Your changes have been saved",
       });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to update card",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -80,6 +87,13 @@ export default function Editor() {
         description: "The flashcard has been removed",
       });
       setSelectedCardId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to delete card",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 

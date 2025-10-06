@@ -37,6 +37,13 @@ export default function Decks() {
         description: "Your deck has been successfully deleted",
       });
     },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to delete deck",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const getSourceIcon = (sourceType: string) => {

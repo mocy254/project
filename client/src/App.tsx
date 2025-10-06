@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { UserProvider } from "@/contexts/UserContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
@@ -48,49 +49,59 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/dashboard">
-        {isAppRoute ? (
-          <AppLayout>
+        <ProtectedRoute>
+          {isAppRoute ? (
+            <AppLayout>
+              <Dashboard />
+            </AppLayout>
+          ) : (
             <Dashboard />
-          </AppLayout>
-        ) : (
-          <Dashboard />
-        )}
+          )}
+        </ProtectedRoute>
       </Route>
       <Route path="/generate">
-        {isAppRoute ? (
-          <AppLayout>
+        <ProtectedRoute>
+          {isAppRoute ? (
+            <AppLayout>
+              <Generate />
+            </AppLayout>
+          ) : (
             <Generate />
-          </AppLayout>
-        ) : (
-          <Generate />
-        )}
+          )}
+        </ProtectedRoute>
       </Route>
       <Route path="/editor/:id?">
-        {isAppRoute ? (
-          <AppLayout>
+        <ProtectedRoute>
+          {isAppRoute ? (
+            <AppLayout>
+              <Editor />
+            </AppLayout>
+          ) : (
             <Editor />
-          </AppLayout>
-        ) : (
-          <Editor />
-        )}
+          )}
+        </ProtectedRoute>
       </Route>
       <Route path="/settings">
-        {isAppRoute ? (
-          <AppLayout>
+        <ProtectedRoute>
+          {isAppRoute ? (
+            <AppLayout>
+              <Settings />
+            </AppLayout>
+          ) : (
             <Settings />
-          </AppLayout>
-        ) : (
-          <Settings />
-        )}
+          )}
+        </ProtectedRoute>
       </Route>
       <Route path="/decks">
-        {isAppRoute ? (
-          <AppLayout>
+        <ProtectedRoute>
+          {isAppRoute ? (
+            <AppLayout>
+              <Decks />
+            </AppLayout>
+          ) : (
             <Decks />
-          </AppLayout>
-        ) : (
-          <Decks />
-        )}
+          )}
+        </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
     </Switch>
