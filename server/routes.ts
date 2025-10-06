@@ -1,15 +1,298 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
 import { storage } from "./storage";
+import { generateFlashcards } from "./gemini";
+import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
+import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
+import { z } from "zod";
+
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "text/plain",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type"));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  
+  app.post("/api/generate/text", async (req, res) => {
+    try {
+      const { content, cardType, granularity, extraNotes, userId, title } = req.body;
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+      if (!content || !cardType || granularity === undefined || !userId || !title) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const flashcards = await generateFlashcards({
+        content,
+        cardType,
+        granularity,
+        extraNotes: Boolean(extraNotes)
+      });
+
+      const deck = await storage.createDeck({
+        userId,
+        title,
+        source: content.substring(0, 100) + "...",
+        sourceType: "text",
+        cardType,
+        granularity,
+        extraNotes: extraNotes ? 1 : 0
+      });
+
+      const createdCards = await Promise.all(
+        flashcards.map((card, index) =>
+          storage.createFlashcard({
+            deckId: deck.id,
+            question: card.question,
+            answer: card.answer,
+            cardType: card.cardType,
+            extraNotes: card.extraNotes || null,
+            position: index
+          })
+        )
+      );
+
+      res.json({ deck, flashcards: createdCards });
+    } catch (error: any) {
+      console.error("Text generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/generate/document", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const { cardType, granularity, extraNotes, userId, title } = req.body;
+
+      const content = await extractContentFromFile(req.file.path, req.file.mimetype);
+
+      const flashcards = await generateFlashcards({
+        content,
+        cardType,
+        granularity: parseInt(granularity),
+        extraNotes: extraNotes === "true"
+      });
+
+      const deck = await storage.createDeck({
+        userId,
+        title,
+        source: req.file.originalname,
+        sourceType: "document",
+        cardType,
+        granularity: parseInt(granularity),
+        extraNotes: extraNotes === "true" ? 1 : 0
+      });
+
+      const createdCards = await Promise.all(
+        flashcards.map((card, index) =>
+          storage.createFlashcard({
+            deckId: deck.id,
+            question: card.question,
+            answer: card.answer,
+            cardType: card.cardType,
+            extraNotes: card.extraNotes || null,
+            position: index
+          })
+        )
+      );
+
+      res.json({ deck, flashcards: createdCards });
+    } catch (error: any) {
+      console.error("Document generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/generate/youtube", async (req, res) => {
+    try {
+      const { url, cardType, granularity, extraNotes, userId, title } = req.body;
+
+      if (!url || !cardType || granularity === undefined || !userId || !title) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const content = await extractYouTubeTranscript(url);
+
+      const flashcards = await generateFlashcards({
+        content,
+        cardType,
+        granularity,
+        extraNotes: Boolean(extraNotes)
+      });
+
+      const deck = await storage.createDeck({
+        userId,
+        title,
+        source: url,
+        sourceType: "youtube",
+        cardType,
+        granularity,
+        extraNotes: extraNotes ? 1 : 0
+      });
+
+      const createdCards = await Promise.all(
+        flashcards.map((card, index) =>
+          storage.createFlashcard({
+            deckId: deck.id,
+            question: card.question,
+            answer: card.answer,
+            cardType: card.cardType,
+            extraNotes: card.extraNotes || null,
+            position: index
+          })
+        )
+      );
+
+      res.json({ deck, flashcards: createdCards });
+    } catch (error: any) {
+      console.error("YouTube generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/decks/user/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const decks = await storage.getDecksByUserId(userId);
+      res.json(decks);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/decks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deck = await storage.getDeck(id);
+      if (!deck) {
+        return res.status(404).json({ error: "Deck not found" });
+      }
+      res.json(deck);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/decks/:id/cards", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const cards = await storage.getFlashcardsByDeckId(id);
+      res.json(cards);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/cards/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { question, answer, extraNotes } = req.body;
+
+      const updated = await storage.updateFlashcard(id, {
+        question,
+        answer,
+        extraNotes
+      });
+
+      if (!updated) {
+        return res.status(404).json({ error: "Card not found" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/cards/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFlashcard(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/decks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteDeck(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/decks/:id/export/:format", async (req, res) => {
+    try {
+      const { id, format } = req.params;
+      const deck = await storage.getDeck(id);
+      const cards = await storage.getFlashcardsByDeckId(id);
+
+      if (!deck) {
+        return res.status(404).json({ error: "Deck not found" });
+      }
+
+      switch (format) {
+        case "json":
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.json"`);
+          res.json({ deck, flashcards: cards });
+          break;
+
+        case "csv":
+          const csvRows = ["Question,Answer,Type,Extra Notes"];
+          cards.forEach(card => {
+            const row = [
+              `"${card.question.replace(/"/g, '""')}"`,
+              `"${card.answer.replace(/"/g, '""')}"`,
+              card.cardType,
+              card.extraNotes ? `"${card.extraNotes.replace(/"/g, '""')}"` : ""
+            ];
+            csvRows.push(row.join(","));
+          });
+          res.setHeader("Content-Type", "text/csv");
+          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.csv"`);
+          res.send(csvRows.join("\n"));
+          break;
+
+        case "anki":
+          const ankiRows = cards.map(card =>
+            `${card.question}\t${card.answer}${card.extraNotes ? `\t${card.extraNotes}` : ""}`
+          );
+          res.setHeader("Content-Type", "text/plain");
+          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.txt"`);
+          res.send(ankiRows.join("\n"));
+          break;
+
+        default:
+          res.status(400).json({ error: "Invalid export format" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
-
   return httpServer;
 }

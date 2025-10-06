@@ -42,7 +42,8 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const user: User = { 
-      ...insertUser, 
+      ...insertUser,
+      name: insertUser.name ?? null,
       id,
       createdAt: new Date()
     };
@@ -54,7 +55,8 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const deck: Deck = { 
-      ...insertDeck, 
+      ...insertDeck,
+      extraNotes: insertDeck.extraNotes ?? 0,
       id,
       createdAt: now,
       updatedAt: now
@@ -94,7 +96,8 @@ export class MemStorage implements IStorage {
   async createFlashcard(insertFlashcard: InsertFlashcard): Promise<Flashcard> {
     const id = randomUUID();
     const flashcard: Flashcard = { 
-      ...insertFlashcard, 
+      ...insertFlashcard,
+      extraNotes: insertFlashcard.extraNotes ?? null,
       id,
       createdAt: new Date()
     };
