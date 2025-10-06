@@ -5,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Upload, Youtube, Type, Sparkles, Loader2 } from "lucide-react";
@@ -18,9 +17,13 @@ import { useLocation } from "wouter";
 export default function GenerationForm() {
   const [textContent, setTextContent] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
-  const [cardType, setCardType] = useState("qa");
-  const [granularity, setGranularity] = useState([50]);
-  const [extraNotes, setExtraNotes] = useState(false);
+  const [cardTypes, setCardTypes] = useState({
+    qa: true,
+    cloze: false,
+    reverse: false,
+  });
+  const [granularity, setGranularity] = useState([4]);
+  const [customInstructions, setCustomInstructions] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [activeTab, setActiveTab] = useState("text");
@@ -55,7 +58,17 @@ export default function GenerationForm() {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = "Failed to generate flashcards";
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
       return res.json();
     },
     onSuccess: (data) => {
@@ -114,12 +127,25 @@ export default function GenerationForm() {
       return;
     }
 
+    const selectedCardTypes = Object.entries(cardTypes)
+      .filter(([_, enabled]) => enabled)
+      .map(([type, _]) => type);
+
+    if (selectedCardTypes.length === 0) {
+      toast({
+        title: "Card type required",
+        description: "Please select at least one card type",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const baseData = {
       userId,
       title,
-      cardType,
+      cardTypes: selectedCardTypes,
       granularity: granularity[0],
-      extraNotes: extraNotes ? 1 : 0,
+      customInstructions: customInstructions.trim(),
     };
 
     if (activeTab === "text") {
@@ -145,9 +171,9 @@ export default function GenerationForm() {
       formData.append("file", file);
       formData.append("userId", userId);
       formData.append("title", title);
-      formData.append("cardType", cardType);
+      formData.append("cardTypes", JSON.stringify(selectedCardTypes));
       formData.append("granularity", granularity[0].toString());
-      formData.append("extraNotes", extraNotes ? "true" : "false");
+      formData.append("customInstructions", customInstructions.trim());
       documentMutation.mutate(formData);
     } else if (activeTab === "youtube") {
       if (!youtubeUrl.trim()) {
@@ -163,6 +189,16 @@ export default function GenerationForm() {
   };
 
   const isLoading = textMutation.isPending || documentMutation.isPending || youtubeMutation.isPending;
+
+  const granularityLabels = [
+    "Essential core principles only",
+    "Key concepts and main topics",
+    "Important concepts with details",
+    "Balanced coverage",
+    "Comprehensive with details",
+    "Thorough with examples",
+    "Every detail and nuance",
+  ];
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -265,7 +301,7 @@ export default function GenerationForm() {
                 data-testid="input-youtube"
               />
               <p className="text-xs text-muted-foreground">
-                Paste the URL of the YouTube video you want to learn from
+                Make sure the video has subtitles/captions enabled
               </p>
             </div>
           </TabsContent>
@@ -274,55 +310,87 @@ export default function GenerationForm() {
         <div className="border-t pt-6 space-y-6">
           <h3 className="font-semibold text-lg">Customization Options</h3>
           
-          <div className="space-y-2">
-            <Label htmlFor="card-type">Card Type</Label>
-            <Select value={cardType} onValueChange={setCardType}>
-              <SelectTrigger id="card-type" data-testid="select-card-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="qa">Q&A (Question & Answer)</SelectItem>
-                <SelectItem value="cloze">Deletion Cloze</SelectItem>
-                <SelectItem value="reverse">Reverse (Bidirectional)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-3">
+            <Label>Card Types (select one or more)</Label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="card-type-qa" className="font-normal">Q&A (Question & Answer)</Label>
+                  <p className="text-xs text-muted-foreground">Traditional question and answer format</p>
+                </div>
+                <Switch
+                  id="card-type-qa"
+                  checked={cardTypes.qa}
+                  onCheckedChange={(checked) => setCardTypes({ ...cardTypes, qa: checked })}
+                  data-testid="switch-card-type-qa"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="card-type-cloze" className="font-normal">Deletion Cloze</Label>
+                  <p className="text-xs text-muted-foreground">Fill-in-the-blank style cards</p>
+                </div>
+                <Switch
+                  id="card-type-cloze"
+                  checked={cardTypes.cloze}
+                  onCheckedChange={(checked) => setCardTypes({ ...cardTypes, cloze: checked })}
+                  data-testid="switch-card-type-cloze"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="card-type-reverse" className="font-normal">Reverse (Bidirectional)</Label>
+                  <p className="text-xs text-muted-foreground">Study term → definition or definition → term</p>
+                </div>
+                <Switch
+                  id="card-type-reverse"
+                  checked={cardTypes.reverse}
+                  onCheckedChange={(checked) => setCardTypes({ ...cardTypes, reverse: checked })}
+                  data-testid="switch-card-type-reverse"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label htmlFor="granularity">Granularity</Label>
+              <Label htmlFor="granularity">Content Coverage</Label>
               <span className="text-sm text-muted-foreground">
-                {granularity[0] < 33 ? "Brief" : granularity[0] < 66 ? "Moderate" : "Detailed"}
+                {granularityLabels[granularity[0] - 1]}
               </span>
             </div>
             <Slider
               id="granularity"
               value={granularity}
               onValueChange={setGranularity}
-              max={100}
+              min={1}
+              max={7}
               step={1}
               className="w-full"
               data-testid="slider-granularity"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Brief</span>
-              <span>Detailed</span>
+              <span>Core principles</span>
+              <span>Every detail</span>
             </div>
+            <p className="text-xs text-muted-foreground">
+              How much of the content should be included in flashcards
+            </p>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="extra-notes">Include Extra Notes</Label>
-              <p className="text-sm text-muted-foreground">
-                Add additional context and explanations to cards
-              </p>
-            </div>
-            <Switch
-              id="extra-notes"
-              checked={extraNotes}
-              onCheckedChange={setExtraNotes}
-              data-testid="switch-extra-notes"
+          <div className="space-y-2">
+            <Label htmlFor="custom-instructions">Custom Instructions (optional)</Label>
+            <Textarea
+              id="custom-instructions"
+              placeholder="e.g., Focus on definitions, skip dates and numbers, emphasize key concepts..."
+              className="min-h-20 resize-y"
+              value={customInstructions}
+              onChange={(e) => setCustomInstructions(e.target.value)}
+              data-testid="textarea-custom-instructions"
             />
+            <p className="text-xs text-muted-foreground">
+              Provide specific guidance for flashcard generation
+            </p>
           </div>
         </div>
 
