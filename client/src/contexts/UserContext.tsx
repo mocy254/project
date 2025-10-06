@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useLocation } from "wouter";
 
 interface UserContextType {
   userId: string | null;
   setUserId: (id: string | null) => void;
   userName: string | null;
   setUserName: (name: string | null) => void;
+  isAuthenticated: boolean;
+  logout: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -16,6 +19,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [userName, setUserName] = useState<string | null>(() => {
     return localStorage.getItem("userName");
   });
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (userId) {
@@ -33,8 +37,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [userName]);
 
+  const logout = () => {
+    setUserId(null);
+    setUserName(null);
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    setLocation("/");
+  };
+
   return (
-    <UserContext.Provider value={{ userId, setUserId, userName, setUserName }}>
+    <UserContext.Provider value={{ userId, setUserId, userName, setUserName, isAuthenticated: !!userId, logout }}>
       {children}
     </UserContext.Provider>
   );

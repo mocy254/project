@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -20,19 +22,33 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const { setUserId, setUserName } = useUser();
   const { toast } = useToast();
 
+  const authMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string; name?: string }) => {
+      const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
+      const res = await apiRequest(endpoint, "POST", data);
+      return res as unknown as { userId: string; name: string };
+    },
+    onSuccess: (data) => {
+      setUserId(data.userId);
+      setUserName(data.name);
+      toast({
+        title: mode === "login" ? "Welcome back!" : "Account created!",
+        description: mode === "login" ? "You've successfully signed in." : "Your account has been created successfully.",
+      });
+      setLocation("/dashboard");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Authentication failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const mockUserId = `user_${Date.now()}`;
-    setUserId(mockUserId);
-    setUserName(name || email.split("@")[0]);
-    
-    toast({
-      title: mode === "login" ? "Welcome back!" : "Account created!",
-      description: mode === "login" ? "You've successfully signed in." : "Your account has been created successfully.",
-    });
-    
-    setLocation("/dashboard");
+    authMutation.mutate({ email, password, name });
   };
 
   return (
@@ -96,8 +112,16 @@ export default function AuthForm({ mode }: AuthFormProps) {
               type="submit" 
               className="w-full h-12 text-base font-semibold"
               data-testid="button-submit"
+              disabled={authMutation.isPending}
             >
-              {mode === "login" ? "Sign In" : "Create Account"}
+              {authMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {mode === "login" ? "Signing in..." : "Creating account..."}
+                </>
+              ) : (
+                mode === "login" ? "Sign In" : "Create Account"
+              )}
             </Button>
           </form>
 

@@ -11,6 +11,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "wouter";
+import { useUser } from "@/contexts/UserContext";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
@@ -21,6 +22,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
+  const { logout } = useUser();
 
   return (
     <Sidebar>
@@ -54,13 +56,9 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/login">
-                <a data-testid="link-logout">
-                  <LogOut />
-                  <span>Logout</span>
-                </a>
-              </Link>
+            <SidebarMenuButton onClick={logout} data-testid="button-logout">
+              <LogOut />
+              <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
