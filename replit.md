@@ -2,7 +2,7 @@
 
 ## Overview
 
-FlashGenius is an educational productivity application that transforms various content formats (text, documents, YouTube videos) into AI-generated flashcards for studying. The application leverages Google's Gemini 2.5 Flash AI model to intelligently create customizable study materials with support for multiple card types (Q&A, cloze deletion, reverse cards), adjustable granularity, and optional extra notes.
+FlashGenius is an educational productivity application that transforms various content formats (text, documents, YouTube videos) into AI-generated flashcards for studying. The application leverages Google's Gemini 2.5 Flash AI model to create trusted, hallucination-free flashcards with support for multiple card types (Q&A, cloze deletion, reverse cards) that can be combined in a single deck, adjustable content coverage granularity (1-7 scale), and custom instructions for precise control over flashcard generation.
 
 ## User Preferences
 
@@ -69,11 +69,11 @@ Preferred communication style: Simple, everyday language.
   - Fields: id (UUID), email (unique), password, name (nullable), createdAt
   
 - `decks`: Flashcard deck containers
-  - Fields: id (UUID), userId (foreign key), title, source, sourceType, cardType, granularity, extraNotes, createdAt, updatedAt
+  - Fields: id (UUID), userId (foreign key), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), createdAt, updatedAt
   - Cascade delete on user removal
   
 - `flashcards`: Individual flashcards
-  - Fields: id (UUID), deckId (foreign key), question, answer, cardType, extraNotes (nullable), position, createdAt
+  - Fields: id (UUID), deckId (foreign key), question, answer, cardType, position, createdAt
   - Cascade delete on deck removal
 
 **Relationships:**
@@ -85,8 +85,12 @@ Preferred communication style: Simple, everyday language.
 **AI Service:**
 - Google Gemini 2.5 Flash API via `@google/genai` SDK
 - API key required via `GEMINI_API_KEY` environment variable
-- Customizable generation parameters: card type, granularity level, extra notes toggle
-- Structured prompt engineering for consistent flashcard format
+- Customizable generation parameters:
+  - Multiple card types (Q&A, cloze deletion, reverse cards) can be selected simultaneously
+  - Granularity level (1-7 scale) controls content coverage from core principles to every detail
+  - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
+- Structured prompt engineering for hallucination-free, concise flashcards
+- No additional context or explanations added - only information from source material
 
 **Database (Configured but Not Active):**
 - Neon PostgreSQL serverless database via `@neondatabase/serverless`
