@@ -20,15 +20,28 @@ export async function generateFlashcards(
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions } = options;
 
-  // Granularity: 1-7 scale representing content coverage
+  // Importance thresholds for each coverage level
+  const importanceMapping = {
+    1: { threshold: "9-10", description: "Only CORE PRINCIPLES (definitions, main classifications)" },
+    2: { threshold: "8-10", description: "Core + KEY MECHANISMS (main pathways, primary causes)" },
+    3: { threshold: "7-10", description: "Key ideas + MODERATE DETAILS (main symptoms, classifications)" },
+    4: { threshold: "6-10", description: "Balanced coverage (essential facts + supporting detail)" },
+    5: { threshold: "5-10", description: "Detailed (secondary mechanisms, exceptions, associations)" },
+    6: { threshold: "4-10", description: "Near-comprehensive (most concepts, facts, numbers)" },
+    7: { threshold: "1-10", description: "Every detail (all sentences, facts, numbers, concepts)" }
+  };
+
+  const currentLevel = importanceMapping[granularity as keyof typeof importanceMapping];
+  
+  // Granularity: 1-7 scale with importance-based filtering
   const coverageGuidance = 
-    granularity === 1 ? "Level 1 – Absolute Essentials Only: Generate MINIMAL cards (3-5 per major topic). Only include the single most important definition or principle per concept. Skip ALL details, mechanisms, examples, numbers, and subtopics. Ask: 'What is the ONE thing a student must remember?' Create only that card. Be extremely selective." :
-    granularity === 2 ? "Level 2 – Core Concepts Only: Generate LIMITED cards (5-10 per major topic). Include only critical definitions and the most important relationship or mechanism. Skip examples, exceptions, numbers, and secondary details. Focus on foundational knowledge only." :
-    granularity === 3 ? "Level 3 – Key Ideas: Generate MODERATE cards (10-15 per major topic). Cover main concepts and primary mechanisms. Include 1-2 supporting details per concept only if essential. Skip most examples, rare cases, and extensive lists." :
-    granularity === 4 ? "Level 4 – Balanced Coverage: Generate a balanced set of cards. Include essential facts plus moderate supporting detail. Add relevant examples or key numbers that aid understanding but skip excessive minutiae. Ideal for comprehensive yet efficient study." :
-    granularity === 5 ? "Level 5 – Detailed Understanding: Generate thorough cards. Include essential facts plus secondary mechanisms, important exceptions, and related associations. Capture most details found in the text while maintaining clarity. Merge related facts to avoid redundancy." :
-    granularity === 6 ? "Level 6 – Near-Comprehensive: Include almost every concept, fact, and number in the text. Each fact should appear in at least one flashcard. Use multiple cards per concept if necessary to maintain clarity and conciseness." :
-    "Level 7 – Every Detail: Convert every relevant sentence, fact, number, and concept into flashcards. No detail should be skipped unless it is purely stylistic or non-educational. Use multiple cards per concept if needed. Ensure cards remain readable and logically grouped by theme.";
+    granularity === 1 ? "Level 1 – Absolute Essentials Only (Importance 9-10): Include ONLY facts of critical importance (core definitions, main classifications). Skip ALL mechanisms, examples, numbers, symptoms, treatments, and complications. Generate 3-5 cards per major topic maximum." :
+    granularity === 2 ? "Level 2 – Core Concepts (Importance 8-10): Include critical definitions AND the single most important mechanism/pathway per concept. Skip examples, clinical features, numbers, and treatment details. Generate 5-10 cards per major topic." :
+    granularity === 3 ? "Level 3 – Key Ideas (Importance 7-10): Include main concepts, primary mechanisms, AND major clinical features/symptoms. Skip rare cases, detailed treatments, and extensive lists. Generate 10-15 cards per major topic." :
+    granularity === 4 ? "Level 4 – Balanced (Importance 6-10): Include essential facts, mechanisms, main symptoms, AND key treatment principles. Add important numbers that aid diagnosis. Skip rare complications and excessive detail." :
+    granularity === 5 ? "Level 5 – Detailed (Importance 5-10): Include all main content PLUS secondary mechanisms, important exceptions, clinical variations, and treatment details. Capture most key information while avoiding trivial facts." :
+    granularity === 6 ? "Level 6 – Near-Comprehensive (Importance 4-10): Include almost every concept, fact, number, and detail. Only skip purely stylistic or redundant information. Create multiple cards per complex concept." :
+    "Level 7 – Every Detail (Importance 1-10): Convert every educational sentence, fact, number, figure reference, and concept into flashcards. Include all mechanisms, symptoms (with timing/sequence), treatments (with doses if present), and complications.";
 
   // Build card type descriptions
   const cardTypeDescriptions: string[] = [];
@@ -51,23 +64,35 @@ export async function generateFlashcards(
     ? `\n\n**Custom Instructions:** ${customInstructions}`
     : '';
 
-  const systemPrompt = `You are a medical education AI that generates concise, complete flashcards from study materials.
+  const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
 
-**TASK:**
-Read the entire input carefully. Do NOT skip any part.
-Extract ONLY the facts required by the coverage level (lower levels = fewer cards, higher levels = more cards).
-Convert each fact into a flashcard with:
-- Front: a focused, standalone question or prompt
-- Back: CONCISE answer using minimal words:
+**TWO-STAGE PROCESS:**
+
+STAGE 1 - Analyze & Categorize (Mental Process):
+- Read entire content and identify all facts
+- Assign importance score (1-10) to each fact based on:
+  * 9-10: Core definitions, main classifications (what IS it?)
+  * 8: Primary mechanisms, main causes/pathways  
+  * 7: Major clinical features, key symptoms, main treatments
+  * 6: Supporting details, important numbers/values
+  * 5: Secondary mechanisms, exceptions, clinical variations
+  * 4: Additional details, less common features
+  * 1-3: Rare cases, minor details, examples
+
+STAGE 2 - Filter & Generate:
+- Current coverage level: ${currentLevel.threshold} importance range
+- Generate flashcards ONLY from facts with importance ≥ ${currentLevel.threshold.split('-')[0]}
+- Lower importance facts must be completely IGNORED at this level
+
+**FLASHCARD FORMAT:**
+- Front: focused, standalone question
+- Back: ULTRA-CONCISE answer:
   • Single fact: 2-5 words or brief phrase
   • Multiple facts: bullet points (• item)
   • NO complete sentences or paragraphs
-  • Include essential numbers/terms only
 
 Keep cards atomic — one idea per card.
-Avoid redundancy or overlapping questions.
-Use concise professional wording.
-IMPORTANT: Lower coverage levels should produce significantly FEWER cards than higher levels.
+Lower coverage levels = dramatically fewer cards.
 
 ---
 **USER SETTINGS:**
@@ -79,34 +104,38 @@ Coverage Level: ${coverageGuidance}${customInstructionsText}
 **CARD STRUCTURE:**
 ${cardTypeList}
 
-**RULES:**
-1. **Read Entire Input:** Process the ENTIRE content. Do not stop early or skip sections.
+**IMPORTANCE-BASED FILTERING RULES:**
 
-2. **Coverage & Card Limits:** ${coverageGuidance}
-   - Strictly adhere to the coverage level
-   - Levels 1-3 should generate dramatically FEWER cards than levels 5-7
-   - Be highly selective at lower levels — only include truly essential information
+1. **Analyze ENTIRE Content:** Read all sections but mentally categorize each fact by importance (1-10 scale)
 
-3. **Conciseness:** Answers must be ULTRA-CONCISE:
-   - Single fact: use 2-5 words or brief phrases (without distorting the meaning)
-   - Multiple facts: use bullet points (• item) with no periods
-   - NO paragraphs or complete sentences
-   - Only essential keywords and values
+2. **Apply Importance Filter:** ${coverageGuidance}
+   - ONLY create cards from facts meeting the importance threshold
+   - Example for Level 1: A definition (importance 10) → include. A treatment complication (importance 4) → SKIP
+   - Example for Level 3: Main symptoms (importance 7) → include. Rare side effects (importance 3) → SKIP
 
-4. **Atomic Cards:** One fact per card. Each card must stand alone without requiring outside context.
+3. **Topic Priority Examples:**
+   Medical content hierarchy (from highest to lowest importance):
+   * Definitions & classifications (9-10)
+   * Main mechanisms & primary causes (8)
+   * Key clinical features (6 Ps, cardinal symptoms) (7)
+   * Diagnostic criteria & main treatments (6-7)
+   * Secondary mechanisms & exceptions (5)
+   * Complications & treatment details (4-5)
+   * Timing/sequence details & specific doses (3-4)
+   * Rare cases & examples (1-3)
 
-5. **No Hallucination:** Extract information ONLY from the provided content. Never add external knowledge, elaboration, or examples not present in the source.
+4. **Conciseness:** Answers ULTRA-CONCISE:
+   - Single fact: 2-5 words
+   - Multiple facts: bullet points (•)
+   - NO sentences or paragraphs
 
-6. **No Redundancy:** If the same topic appears multiple times, merge or reword to avoid duplication. Do not create near-identical cards.
+5. **Atomic Cards:** One fact per card. Standalone questions.
 
-7. **Precision:** Include specific numbers, mechanisms, terms, or exceptions ONLY when they match the coverage level requirement.
+6. **No Hallucination:** Extract ONLY from provided content.
 
-8. **Selectivity Based on Level:**
-   - Levels 1-2: Skip most details, examples, numbers, mechanisms — extract absolute minimum
-   - Levels 3-4: Include main concepts with moderate detail
-   - Levels 5-7: Capture progressively more comprehensive detail
+7. **No Redundancy:** Merge duplicate topics.
 
-**Output:** Generate flashcards strictly matching the coverage level. Lower levels = fewer cards, higher levels = more cards.`;
+**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -134,13 +163,26 @@ ${cardTypeList}
           required: ["flashcards"],
         },
       },
-      contents: `Read the ENTIRE content below carefully and create flashcards according to the coverage level.
+      contents: `IMPORTANCE-BASED FLASHCARD GENERATION
 
-CRITICAL: The coverage level determines HOW MANY cards to generate:
-- Level 1: Generate MINIMAL cards (only absolute essentials)
-- Levels 2-3: Generate LIMITED cards (core concepts only)
-- Levels 4-5: Generate MODERATE to THOROUGH cards
-- Levels 6-7: Generate COMPREHENSIVE cards (all details)
+STEP 1 - ANALYZE (mentally categorize all facts by importance 1-10):
+Read the entire content below and identify:
+- Core definitions/classifications (importance 9-10)
+- Main mechanisms/causes (importance 8)
+- Key clinical features/symptoms (importance 7)
+- Supporting details/treatments (importance 6)
+- Secondary info/exceptions (importance 5)
+- Additional details (importance 4)
+- Minor details/examples (importance 1-3)
+
+STEP 2 - FILTER by current level (${currentLevel.threshold}):
+- Include ONLY facts with importance ≥ ${currentLevel.threshold.split('-')[0]}
+- Lower importance facts are EXCLUDED entirely
+- This naturally produces fewer cards at lower levels
+
+STEP 3 - GENERATE flashcards:
+- Create ultra-concise cards (2-5 words or bullets)
+- One atomic fact per card
 
 Content to process:
 

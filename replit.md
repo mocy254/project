@@ -89,11 +89,16 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - API key required via `GEMINI_API_KEY` environment variable
 - Customizable generation parameters:
   - Multiple card types (Q&A, cloze deletion, reverse cards) can be selected simultaneously
-  - Granularity level (1-7 scale) controls both content coverage AND number of cards:
-    * Level 1: Absolute essentials only (3-5 cards per major topic)
-    * Levels 2-3: Core concepts with limited detail (5-15 cards per topic)
-    * Levels 4-5: Balanced to detailed coverage (moderate to thorough cards)
-    * Levels 6-7: Near-comprehensive to every detail (extensive cards)
+  - Granularity level (1-7 scale) uses importance-based filtering:
+    * **Two-stage process:** First analyzes content and assigns importance scores (1-10) to facts, then filters based on level
+    * **Importance hierarchy:** Definitions/classifications (9-10) → Main mechanisms (8) → Clinical features (7) → Supporting details (6) → Secondary info (5) → Additional details (4) → Rare cases (1-3)
+    * Level 1 (9-10): Only core definitions and classifications
+    * Level 2 (8-10): Core + primary mechanisms/causes
+    * Level 3 (7-10): Key concepts + main clinical features
+    * Level 4 (6-10): Balanced coverage with supporting details
+    * Level 5 (5-10): Detailed with secondary mechanisms/exceptions
+    * Level 6 (4-10): Near-comprehensive (most details)
+    * Level 7 (1-10): Every detail including rare cases and examples
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
 - Structured prompt engineering for hallucination-free, ultra-concise flashcards
 - Answer format: bullet points or 2-5 word phrases (no complete sentences or paragraphs)

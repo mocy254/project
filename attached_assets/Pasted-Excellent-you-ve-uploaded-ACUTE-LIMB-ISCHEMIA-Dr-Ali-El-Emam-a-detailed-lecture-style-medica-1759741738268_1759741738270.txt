@@ -1,0 +1,165 @@
+Excellent — you’ve uploaded “ACUTE LIMB ISCHEMIA – Dr. Ali El-Emam”, a detailed lecture-style medical PDF.
+
+Here’s exactly how your SaaS should approach any document like this (especially medical PDFs) to generate flashcards across coverage levels 1–7 with Gemini 2.5 Flash.
+
+
+---
+
+🧭 1. Stage 1 – Document Analysis Pipeline
+
+Goal: Extract structure, meaning, and priority.
+
+Step 1: Segment the PDF
+
+Detect top-level headers and sections using patterns like:
+
+UPPERCASE titles → main topic
+
+Bold / underline / “Definition”, “Etiology”, “Pathophysiology”, etc. → subtopics
+
+
+Example segmentation from this file:
+
+1. General Considerations  
+2. Definition of Acute Limb Ischemia  
+3. Etiology  
+4. Arterial Embolism  
+5. Acute Arterial Thrombosis  
+6. Pathological Consequences of Acute Ischemia  
+7. Clinical Features (6 Ps)  
+8. Investigations  
+9. Treatment (Immediate, Specific, Embolism, Thrombosis, Trauma)  
+10. Complications  
+11. Gangrene  
+12. Amputation
+
+Step 2: Build a hierarchy
+
+Represent as a JSON tree:
+
+{
+ "topic": "Acute Limb Ischemia",
+ "sections": [
+   {"name": "Definition", "importance": 5},
+   {"name": "Etiology", "subsections": ["Embolism", "Thrombosis"], "importance": 7},
+   {"name": "Treatment", "subsections": ["Embolectomy", "Thrombolysis"], "importance": 8},
+   ...
+ ]
+}
+
+Step 3: Extract atomic facts
+
+Parse bullet points, numbered lists, and short sentences into discrete fact units:
+
+{"fact": "Acute limb ischemia is a surgical emergency.", "importance": 9}
+{"fact": "The 6 Ps of acute ischemia are pain, pallor, pulselessness, paresthesia, paralysis, and perishing cold.", "importance": 10}
+
+Attach metadata:
+
+Section → context (“Clinical features”)
+
+Type → definition / symptom / treatment / cause
+
+Importance → from keywords (“Definition” > core, “Complications” > supporting)
+
+
+
+---
+
+⚙️ 2. Stage 2 – Determine Content Coverage (1–7)
+
+Map your coverage slider (1–7) to a selection function that filters facts by importance and merges context level:
+
+Level Include facts with importance ≥ Notes
+
+1 9–10 Only core principles
+2 8–10 Key mechanisms
+3 7–10 Moderate details
+4 6–10 Balanced
+5 5–10 Detailed
+6 4–10 Near comprehensive
+7 1–10 Every detail
+
+
+Optionally, apply text summarization when trimming (Gemini Flash can do this inline).
+
+
+---
+
+🧩 3. Stage 3 – Generate Flashcards
+
+Input Prompt Template
+
+For each document section (≤8k tokens), send Gemini 2.5 Flash this system+user prompt:
+
+SYSTEM:
+You are an AI that creates concise, USMLE-style flashcards from medical documents.
+
+USER:
+Section: {section_name}
+Coverage Level: {1–7}
+Facts extracted (importance annotated):
+
+{fact_list}
+
+TASK:
+1. Generate flashcards (Front/Back) according to the coverage level:
+   - Level 1–2 → only top-importance facts.
+   - Level 3–4 → include moderate detail.
+   - Level 5–7 → include all.
+2. Keep cards atomic, ≤30 words per side.
+3. Output JSON: [{"Front": "...", "Back": "..."}]
+
+Example result for the “6 Ps” section:
+
+[
+ {"Front":"What are the 6 Ps of acute limb ischemia?","Back":"Pain, pallor, pulselessness, paresthesia, paralysis, perishing cold."},
+ {"Front":"Which is the first sensory loss in acute ischemia?","Back":"Light touch, progressing to anesthesia."}
+]
+
+
+---
+
+🚀 4. Stage 4 – Assembly & Optimization
+
+1. Merge duplicates: unify identical facts from multiple sections.
+
+
+2. Group by topic: keep cards under the same subheading for export.
+
+
+3. Trim by user level: apply filters dynamically when exporting deck.
+
+
+4. Export formats: JSON → CSV/Anki/Quizlet.
+
+
+
+
+---
+
+💡 5. Implementation Workflow Summary
+
+PDF → Text extraction → Section segmentation
+      ↓
+  Fact parsing + importance scoring
+      ↓
+ Coverage-level filtering (1–7)
+      ↓
+ Gemini 2.5 Flash prompt per section
+      ↓
+ Flashcard JSON output → merged & exported
+
+
+---
+
+✅ Practical Example (from your PDF)
+
+Input section: “Clinical Features of Acute Ischemia”
+
+Level 1 output (Core):
+
+“What are the 6 Ps of acute limb ischemia?” → “Pain, pallor, pulselessness, paresthesia, paralysis, perishing cold.”
+
+
+Level 4 output (Balanced):
