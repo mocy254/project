@@ -15,39 +15,197 @@ export interface GeneratedFlashcard {
   cardType: "qa" | "cloze" | "reverse";
 }
 
+interface TopicOutline {
+  topics: Array<{
+    title: string;
+    startLine: number;
+    endLine: number;
+    subtopics?: string[];
+  }>;
+}
+
+interface SemanticChunk {
+  content: string;
+  topics: string[];
+  context: string;
+}
+
 function estimateTokenCount(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-function chunkContent(content: string, maxTokens: number = 800000): string[] {
+async function extractTopicOutline(content: string): Promise<TopicOutline> {
+  const estimatedTokens = estimateTokenCount(content);
+  
+  if (estimatedTokens > 100000) {
+    const sampleSize = Math.floor(content.length * 0.3);
+    content = content.substring(0, sampleSize);
+  }
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.1,
+        responseSchema: {
+          type: "object",
+          properties: {
+            topics: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  subtopics: {
+                    type: "array",
+                    items: { type: "string" }
+                  }
+                },
+                required: ["title"]
+              }
+            }
+          },
+          required: ["topics"]
+        }
+      },
+      contents: `Analyze this document and extract a hierarchical outline of all major topics and subtopics.
+
+For medical/educational content, identify:
+- Main disease/condition names
+- Pathophysiology sections
+- Clinical features/symptoms sections
+- Diagnostic criteria sections
+- Treatment/management sections
+- Complications sections
+
+Return a JSON structure with topics and their subtopics.
+
+Content:
+${content}`
+    });
+
+    const rawText = response.text;
+    if (!rawText) {
+      throw new Error("Empty response from topic extraction");
+    }
+    const outline = JSON.parse(rawText);
+    return outline as TopicOutline;
+  } catch (error) {
+    console.error("Topic extraction failed, using fallback:", error);
+    return { topics: [] };
+  }
+}
+
+function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens: number = 100000): SemanticChunk[] {
   const estimatedTokens = estimateTokenCount(content);
   
   if (estimatedTokens <= maxTokens) {
-    return [content];
+    return [{
+      content,
+      topics: outline.topics.map(t => t.title),
+      context: "Complete document"
+    }];
   }
 
-  const chunks: string[] = [];
   const lines = content.split('\n');
+  const chunks: SemanticChunk[] = [];
+  
+  if (outline.topics.length === 0) {
+    let currentChunk = '';
+    let currentTokens = 0;
+    
+    for (const line of lines) {
+      const lineTokens = estimateTokenCount(line);
+      
+      if (currentTokens + lineTokens > maxTokens && currentChunk) {
+        chunks.push({
+          content: currentChunk.trim(),
+          topics: ["Section"],
+          context: "Part of larger document"
+        });
+        currentChunk = line + '\n';
+        currentTokens = lineTokens;
+      } else {
+        currentChunk += line + '\n';
+        currentTokens += lineTokens;
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        topics: ["Section"],
+        context: "Part of larger document"
+      });
+    }
+    
+    return chunks;
+  }
+
+  const topicPatterns = outline.topics.map(t => ({
+    title: t.title,
+    pattern: new RegExp(t.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+    subtopics: t.subtopics || []
+  }));
+
   let currentChunk = '';
   let currentTokens = 0;
-  
-  for (const line of lines) {
+  let currentTopics: string[] = [];
+  let lastMatchedTopic = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const lineTokens = estimateTokenCount(line);
     
+    let matchedTopic = '';
+    for (const { title, pattern } of topicPatterns) {
+      if (pattern.test(line)) {
+        matchedTopic = title;
+        break;
+      }
+    }
+
+    if (matchedTopic && matchedTopic !== lastMatchedTopic) {
+      if (currentChunk.trim() && currentTokens > 5000) {
+        chunks.push({
+          content: currentChunk.trim(),
+          topics: [...currentTopics],
+          context: `Topics: ${currentTopics.join(', ')}`
+        });
+        currentChunk = '';
+        currentTokens = 0;
+        currentTopics = [];
+      }
+      lastMatchedTopic = matchedTopic;
+      if (!currentTopics.includes(matchedTopic)) {
+        currentTopics.push(matchedTopic);
+      }
+    }
+
     if (currentTokens + lineTokens > maxTokens && currentChunk) {
-      chunks.push(currentChunk.trim());
+      chunks.push({
+        content: currentChunk.trim(),
+        topics: [...currentTopics],
+        context: `Topics: ${currentTopics.join(', ')}`
+      });
       currentChunk = line + '\n';
       currentTokens = lineTokens;
+      currentTopics = matchedTopic ? [matchedTopic] : [...currentTopics];
     } else {
       currentChunk += line + '\n';
       currentTokens += lineTokens;
     }
   }
-  
+
   if (currentChunk.trim()) {
-    chunks.push(currentChunk.trim());
+    chunks.push({
+      content: currentChunk.trim(),
+      topics: currentTopics,
+      context: currentTopics.length > 0 ? `Topics: ${currentTopics.join(', ')}` : "Final section"
+    });
   }
-  
+
   return chunks;
 }
 
@@ -56,31 +214,43 @@ export async function generateFlashcards(
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions } = options;
 
-  const chunks = chunkContent(content);
+  const estimatedTokens = estimateTokenCount(content);
   
-  if (chunks.length > 1) {
-    console.log(`Processing large document in ${chunks.length} chunks...`);
+  if (estimatedTokens > 100000) {
+    console.log(`Large document detected (${Math.floor(estimatedTokens / 1000)}k tokens). Extracting topic structure...`);
+    
+    const outline = await extractTopicOutline(content);
+    console.log(`Found ${outline.topics.length} main topics`);
+    
+    const semanticChunks = chunkContentByTopics(content, outline, 100000);
+    console.log(`Split into ${semanticChunks.length} semantic chunks`);
+    
     const allFlashcards: GeneratedFlashcard[] = [];
     
-    for (let i = 0; i < chunks.length; i++) {
-      console.log(`Processing chunk ${i + 1}/${chunks.length}...`);
+    for (let i = 0; i < semanticChunks.length; i++) {
+      const chunk = semanticChunks[i];
+      console.log(`Processing chunk ${i + 1}/${semanticChunks.length} - ${chunk.context}`);
+      
       const chunkFlashcards = await generateFlashcardsForChunk({
-        content: chunks[i],
+        content: chunk.content,
         cardTypes,
         granularity,
         customInstructions
-      });
+      }, chunk.context);
+      
       allFlashcards.push(...chunkFlashcards);
     }
     
+    console.log(`Generated ${allFlashcards.length} total flashcards from ${semanticChunks.length} chunks`);
     return allFlashcards;
   }
   
-  return generateFlashcardsForChunk(options);
+  return generateFlashcardsForChunk(options, "Complete document");
 }
 
 async function generateFlashcardsForChunk(
-  options: FlashcardGenerationOptions
+  options: FlashcardGenerationOptions,
+  chunkContext: string = "Document content"
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions } = options;
 
@@ -229,8 +399,10 @@ ${cardTypeList}
       },
       contents: `IMPORTANCE-BASED FLASHCARD GENERATION
 
+Context: ${chunkContext}
+
 STEP 1 - ANALYZE (mentally categorize all facts by importance 1-10):
-Read the entire content below and identify:
+Read the ENTIRE content section below and identify ALL facts:
 - Core definitions/classifications (importance 9-10)
 - Main mechanisms/causes (importance 8)
 - Key clinical features/symptoms (importance 7)
@@ -238,6 +410,8 @@ Read the entire content below and identify:
 - Secondary info/exceptions (importance 5)
 - Additional details (importance 4)
 - Minor details/examples (importance 1-3)
+
+**CRITICAL:** Process the COMPLETE content below. Do NOT skip or miss any sections. Read from start to finish.
 
 STEP 2 - FILTER by current level (${currentLevel.threshold}):
 - Include ONLY facts with importance ≥ ${currentLevel.threshold.split('-')[0]}
@@ -247,6 +421,7 @@ STEP 2 - FILTER by current level (${currentLevel.threshold}):
 STEP 3 - GENERATE flashcards:
 - Create ultra-concise cards (2-5 words or bullets)
 - One atomic fact per card
+- Ensure COMPLETE coverage of all qualifying facts in this section
 
 Content to process:
 
