@@ -50,39 +50,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const flashcards = await generateFlashcards({
-        content,
-        cardTypes,
-        granularity,
-        customInstructions: customInstructions || ""
-      });
+      const sessionId = randomUUID();
+      
+      // Return session ID immediately
+      res.json({ sessionId });
 
-      const deck = await storage.createDeck({
-        userId,
-        title,
-        source: content.substring(0, 100) + "...",
-        sourceType: "text",
-        cardTypes,
-        granularity,
-        customInstructions: customInstructions || null
-      });
+      // Process asynchronously in background
+      (async () => {
+        try {
+          progressManager.setProgress({
+            sessionId,
+            stage: "analyzing",
+            message: "Analyzing text content...",
+            progress: 10
+          });
 
-      const createdCards = await Promise.all(
-        flashcards.map((card, index) =>
-          storage.createFlashcard({
+          const flashcards = await generateFlashcards({
+            content,
+            cardTypes,
+            granularity,
+            customInstructions: customInstructions || "",
+            onProgress: (update) => {
+              progressManager.setProgress({
+                sessionId,
+                stage: update.stage as any,
+                message: update.message,
+                progress: update.progress,
+                currentStep: update.currentStep,
+                totalSteps: update.totalSteps,
+                cardsGenerated: update.cardsGenerated
+              });
+            }
+          });
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "saving",
+            message: "Saving flashcards...",
+            progress: 90
+          });
+
+          const deck = await storage.createDeck({
+            userId,
+            title,
+            source: content.substring(0, 100) + "...",
+            sourceType: "text",
+            cardTypes,
+            granularity,
+            customInstructions: customInstructions || null
+          });
+
+          const createdCards = await Promise.all(
+            flashcards.map((card, index) =>
+              storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index
+              })
+            )
+          );
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "complete",
+            message: "Generation complete!",
+            progress: 100
+          });
+
+          progressManager.setResult(sessionId, {
             deckId: deck.id,
-            question: card.question,
-            answer: card.answer,
-            cardType: card.cardType,
-            position: index
-          })
-        )
-      );
-
-      res.json({
-        deckId: deck.id,
-        flashcardCount: createdCards.length
-      });
+            flashcardCount: createdCards.length
+          });
+        } catch (error: any) {
+          console.error("Text generation error:", error);
+          progressManager.setProgress({
+            sessionId,
+            stage: "error",
+            message: error.message || "Generation failed",
+            progress: 0,
+            error: error.message
+          });
+          progressManager.setResult(sessionId, null);
+        }
+      })();
     } catch (error: any) {
       console.error("Text generation error:", error);
       res.status(500).json({ error: error.message || "Generation failed" });
@@ -96,43 +148,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { cardTypes, granularity, customInstructions, userId, title } = req.body;
+      const sessionId = randomUUID();
+      
+      // Return session ID immediately
+      res.json({ sessionId });
 
-      const content = await extractContentFromFile(req.file.path, req.file.mimetype);
+      // Process asynchronously in background
+      (async () => {
+        try {
+          progressManager.setProgress({
+            sessionId,
+            stage: "extracting",
+            message: "Extracting content from document...",
+            progress: 5
+          });
 
-      const parsedCardTypes = JSON.parse(cardTypes);
-      const flashcards = await generateFlashcards({
-        content,
-        cardTypes: parsedCardTypes,
-        granularity: parseInt(granularity),
-        customInstructions: customInstructions || ""
-      });
+          const content = await extractContentFromFile(req.file!.path, req.file!.mimetype);
 
-      const deck = await storage.createDeck({
-        userId,
-        title,
-        source: req.file.originalname,
-        sourceType: "document",
-        cardTypes: parsedCardTypes,
-        granularity: parseInt(granularity),
-        customInstructions: customInstructions || null
-      });
+          progressManager.setProgress({
+            sessionId,
+            stage: "analyzing",
+            message: "Analyzing document content...",
+            progress: 15
+          });
 
-      const createdCards = await Promise.all(
-        flashcards.map((card, index) =>
-          storage.createFlashcard({
+          const parsedCardTypes = JSON.parse(cardTypes);
+          const flashcards = await generateFlashcards({
+            content,
+            cardTypes: parsedCardTypes,
+            granularity: parseInt(granularity),
+            customInstructions: customInstructions || "",
+            onProgress: (update) => {
+              progressManager.setProgress({
+                sessionId,
+                stage: update.stage as any,
+                message: update.message,
+                progress: update.progress,
+                currentStep: update.currentStep,
+                totalSteps: update.totalSteps,
+                cardsGenerated: update.cardsGenerated
+              });
+            }
+          });
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "saving",
+            message: "Saving flashcards...",
+            progress: 90
+          });
+
+          const deck = await storage.createDeck({
+            userId,
+            title,
+            source: req.file!.originalname,
+            sourceType: "document",
+            cardTypes: parsedCardTypes,
+            granularity: parseInt(granularity),
+            customInstructions: customInstructions || null
+          });
+
+          const createdCards = await Promise.all(
+            flashcards.map((card, index) =>
+              storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index
+              })
+            )
+          );
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "complete",
+            message: "Generation complete!",
+            progress: 100
+          });
+
+          progressManager.setResult(sessionId, {
             deckId: deck.id,
-            question: card.question,
-            answer: card.answer,
-            cardType: card.cardType,
-            position: index
-          })
-        )
-      );
-
-      res.json({
-        deckId: deck.id,
-        flashcardCount: createdCards.length
-      });
+            flashcardCount: createdCards.length
+          });
+        } catch (error: any) {
+          console.error("Document generation error:", error);
+          progressManager.setProgress({
+            sessionId,
+            stage: "error",
+            message: error.message || "Generation failed",
+            progress: 0,
+            error: error.message
+          });
+          progressManager.setResult(sessionId, null);
+        }
+      })();
     } catch (error: any) {
       console.error("Document generation error:", error);
       res.status(500).json({ error: error.message || "Generation failed" });
@@ -147,41 +257,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      const content = await extractYouTubeTranscript(url);
+      const sessionId = randomUUID();
+      
+      // Return session ID immediately
+      res.json({ sessionId });
 
-      const flashcards = await generateFlashcards({
-        content,
-        cardTypes,
-        granularity,
-        customInstructions: customInstructions || ""
-      });
+      // Process asynchronously in background
+      (async () => {
+        try {
+          progressManager.setProgress({
+            sessionId,
+            stage: "extracting",
+            message: "Extracting transcript from YouTube video...",
+            progress: 5
+          });
 
-      const deck = await storage.createDeck({
-        userId,
-        title,
-        source: url,
-        sourceType: "youtube",
-        cardTypes,
-        granularity,
-        customInstructions: customInstructions || null
-      });
+          const content = await extractYouTubeTranscript(url);
 
-      const createdCards = await Promise.all(
-        flashcards.map((card, index) =>
-          storage.createFlashcard({
+          progressManager.setProgress({
+            sessionId,
+            stage: "analyzing",
+            message: "Analyzing video transcript...",
+            progress: 15
+          });
+
+          const flashcards = await generateFlashcards({
+            content,
+            cardTypes,
+            granularity,
+            customInstructions: customInstructions || "",
+            onProgress: (update) => {
+              progressManager.setProgress({
+                sessionId,
+                stage: update.stage as any,
+                message: update.message,
+                progress: update.progress,
+                currentStep: update.currentStep,
+                totalSteps: update.totalSteps,
+                cardsGenerated: update.cardsGenerated
+              });
+            }
+          });
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "saving",
+            message: "Saving flashcards...",
+            progress: 90
+          });
+
+          const deck = await storage.createDeck({
+            userId,
+            title,
+            source: url,
+            sourceType: "youtube",
+            cardTypes,
+            granularity,
+            customInstructions: customInstructions || null
+          });
+
+          const createdCards = await Promise.all(
+            flashcards.map((card, index) =>
+              storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index
+              })
+            )
+          );
+
+          progressManager.setProgress({
+            sessionId,
+            stage: "complete",
+            message: "Generation complete!",
+            progress: 100
+          });
+
+          progressManager.setResult(sessionId, {
             deckId: deck.id,
-            question: card.question,
-            answer: card.answer,
-            cardType: card.cardType,
-            position: index
-          })
-        )
-      );
-
-      res.json({
-        deckId: deck.id,
-        flashcardCount: createdCards.length
-      });
+            flashcardCount: createdCards.length
+          });
+        } catch (error: any) {
+          console.error("YouTube generation error:", error);
+          progressManager.setProgress({
+            sessionId,
+            stage: "error",
+            message: error.message || "Generation failed",
+            progress: 0,
+            error: error.message
+          });
+          progressManager.setResult(sessionId, null);
+        }
+      })();
     } catch (error: any) {
       console.error("YouTube generation error:", error);
       res.status(500).json({ error: error.message || "Generation failed" });
