@@ -57,11 +57,13 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 1. Text extraction from uploaded files (PDF, DOCX, TXT, PPT) using pdf-parse and mammoth libraries
    - File upload limit: 100MB to support large medical textbooks and comprehensive documents
 2. YouTube transcript extraction using youtube-transcript library
-3. Intelligent chunking for very large documents:
-   - Automatically splits documents >800k tokens into manageable chunks
-   - Processes each chunk separately and merges results
-   - Maintains context boundaries (splits at line breaks)
-4. Content passed to Gemini AI for flashcard generation
+3. **Intelligent topic-aware chunking** for large documents (>100k tokens):
+   - **Phase 1: Topic Extraction** - AI analyzes full document in 80k token passes to identify ALL topics/subtopics
+   - **Phase 2: Semantic Chunking** - Content split at topic boundaries (not arbitrary size limits)
+   - Each chunk maintains topic context for accurate flashcard generation
+   - Prevents information loss by ensuring related content stays together
+   - Automatically merges results from all topic-based chunks
+4. Content passed to Gemini AI for flashcard generation with importance-based filtering
 5. Generated flashcards stored with associated deck metadata
 
 **Data Storage:**

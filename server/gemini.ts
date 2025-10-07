@@ -36,12 +36,66 @@ function estimateTokenCount(text: string): number {
 
 async function extractTopicOutline(content: string): Promise<TopicOutline> {
   const estimatedTokens = estimateTokenCount(content);
+  const maxTokensPerPass = 80000;
   
-  if (estimatedTokens > 100000) {
-    const sampleSize = Math.floor(content.length * 0.3);
-    content = content.substring(0, sampleSize);
+  if (estimatedTokens <= maxTokensPerPass) {
+    return extractTopicsFromChunk(content);
   }
 
+  console.log(`Document too large for single analysis. Processing in ${Math.ceil(estimatedTokens / maxTokensPerPass)} passes...`);
+  
+  const lines = content.split('\n');
+  const chunks: string[] = [];
+  let currentChunk = '';
+  let currentTokens = 0;
+  
+  for (const line of lines) {
+    const lineTokens = estimateTokenCount(line);
+    
+    if (currentTokens + lineTokens > maxTokensPerPass && currentChunk) {
+      chunks.push(currentChunk.trim());
+      currentChunk = line + '\n';
+      currentTokens = lineTokens;
+    } else {
+      currentChunk += line + '\n';
+      currentTokens += lineTokens;
+    }
+  }
+  
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim());
+  }
+
+  const allTopics: Array<{ title: string; subtopics?: string[] }> = [];
+  
+  for (let i = 0; i < chunks.length; i++) {
+    console.log(`Analyzing section ${i + 1}/${chunks.length} for topics...`);
+    const chunkOutline = await extractTopicsFromChunk(chunks[i]);
+    allTopics.push(...chunkOutline.topics);
+  }
+
+  const uniqueTopics = new Map<string, { title: string; subtopics?: string[] }>();
+  for (const topic of allTopics) {
+    if (!uniqueTopics.has(topic.title)) {
+      uniqueTopics.set(topic.title, topic);
+    } else if (topic.subtopics && topic.subtopics.length > 0) {
+      const existing = uniqueTopics.get(topic.title)!;
+      if (!existing.subtopics) existing.subtopics = [];
+      existing.subtopics.push(...topic.subtopics);
+    }
+  }
+
+  return {
+    topics: Array.from(uniqueTopics.values()).map((topic, index) => ({
+      title: topic.title,
+      startLine: 0,
+      endLine: 0,
+      subtopics: topic.subtopics
+    }))
+  };
+}
+
+async function extractTopicsFromChunk(content: string): Promise<TopicOutline> {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -69,17 +123,18 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
           required: ["topics"]
         }
       },
-      contents: `Analyze this document and extract a hierarchical outline of all major topics and subtopics.
+      contents: `Analyze this document section and extract ALL major topics and subtopics.
 
 For medical/educational content, identify:
-- Main disease/condition names
+- Disease/condition names (e.g., "Diabetes Mellitus", "Heart Failure")
+- Chapter/section headings
 - Pathophysiology sections
 - Clinical features/symptoms sections
 - Diagnostic criteria sections
 - Treatment/management sections
 - Complications sections
 
-Return a JSON structure with topics and their subtopics.
+Be comprehensive - extract EVERY distinct topic mentioned.
 
 Content:
 ${content}`
@@ -104,7 +159,9 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
     return [{
       content,
       topics: outline.topics.map(t => t.title),
-      context: "Complete document"
+      context: outline.topics.length > 0 
+        ? `Topics covered: ${outline.topics.map(t => t.title).slice(0, 3).join(', ')}${outline.topics.length > 3 ? '...' : ''}`
+        : "Complete document"
     }];
   }
 
@@ -112,6 +169,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
   const chunks: SemanticChunk[] = [];
   
   if (outline.topics.length === 0) {
+    console.log("No topics detected, using simple chunking...");
     let currentChunk = '';
     let currentTokens = 0;
     
@@ -121,7 +179,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
       if (currentTokens + lineTokens > maxTokens && currentChunk) {
         chunks.push({
           content: currentChunk.trim(),
-          topics: ["Section"],
+          topics: ["Document section"],
           context: "Part of larger document"
         });
         currentChunk = line + '\n';
@@ -135,7 +193,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
     if (currentChunk.trim()) {
       chunks.push({
         content: currentChunk.trim(),
-        topics: ["Section"],
+        topics: ["Document section"],
         context: "Part of larger document"
       });
     }
@@ -152,46 +210,65 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
   let currentChunk = '';
   let currentTokens = 0;
   let currentTopics: string[] = [];
-  let lastMatchedTopic = '';
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lineTokens = estimateTokenCount(line);
     
     let matchedTopic = '';
-    for (const { title, pattern } of topicPatterns) {
+    let matchedSubtopic = '';
+    let isNewTopicBoundary = false;
+    
+    for (const { title, pattern, subtopics } of topicPatterns) {
       if (pattern.test(line)) {
         matchedTopic = title;
+        isNewTopicBoundary = currentTopics.length === 0 || currentTopics[0] !== title;
         break;
       }
+      
+      for (const subtopic of subtopics) {
+        const subtopicPattern = new RegExp(subtopic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        if (subtopicPattern.test(line)) {
+          matchedTopic = title;
+          matchedSubtopic = subtopic;
+          const currentContext = currentTopics.join(' - ');
+          const newContext = `${title} - ${subtopic}`;
+          isNewTopicBoundary = currentContext !== newContext;
+          break;
+        }
+      }
+      if (matchedTopic) break;
     }
 
-    if (matchedTopic && matchedTopic !== lastMatchedTopic) {
-      if (currentChunk.trim() && currentTokens > 5000) {
-        chunks.push({
-          content: currentChunk.trim(),
-          topics: [...currentTopics],
-          context: `Topics: ${currentTopics.join(', ')}`
-        });
-        currentChunk = '';
-        currentTokens = 0;
-        currentTopics = [];
-      }
-      lastMatchedTopic = matchedTopic;
-      if (!currentTopics.includes(matchedTopic)) {
-        currentTopics.push(matchedTopic);
-      }
+    if (isNewTopicBoundary && currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        topics: [...currentTopics],
+        context: currentTopics.length > 0 
+          ? `Topics: ${currentTopics.join(' - ')}`
+          : "Document section"
+      });
+      currentChunk = '';
+      currentTokens = 0;
+      currentTopics = [];
+    }
+
+    if (matchedTopic && isNewTopicBoundary) {
+      currentTopics = matchedSubtopic 
+        ? [matchedTopic, matchedSubtopic]
+        : [matchedTopic];
     }
 
     if (currentTokens + lineTokens > maxTokens && currentChunk) {
       chunks.push({
         content: currentChunk.trim(),
         topics: [...currentTopics],
-        context: `Topics: ${currentTopics.join(', ')}`
+        context: currentTopics.length > 0 
+          ? `Topics: ${currentTopics.join(' - ')}`
+          : "Document section"
       });
       currentChunk = line + '\n';
       currentTokens = lineTokens;
-      currentTopics = matchedTopic ? [matchedTopic] : [...currentTopics];
     } else {
       currentChunk += line + '\n';
       currentTokens += lineTokens;
@@ -201,8 +278,10 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
   if (currentChunk.trim()) {
     chunks.push({
       content: currentChunk.trim(),
-      topics: currentTopics,
-      context: currentTopics.length > 0 ? `Topics: ${currentTopics.join(', ')}` : "Final section"
+      topics: [...currentTopics],
+      context: currentTopics.length > 0 
+        ? `Topics: ${currentTopics.join(', ')}`
+        : "Final section"
     });
   }
 
