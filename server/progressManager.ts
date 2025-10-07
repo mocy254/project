@@ -1,5 +1,3 @@
-import type { WebSocket } from "ws";
-
 export interface ProgressUpdate {
   sessionId: string;
   stage: "extracting" | "analyzing" | "chunking" | "generating" | "saving" | "complete" | "error";
@@ -17,39 +15,20 @@ export interface GenerationResult {
 }
 
 class ProgressManager {
-  private connections = new Map<string, WebSocket>();
+  private progressStates = new Map<string, ProgressUpdate>();
   private results = new Map<string, GenerationResult | null>();
 
-  registerConnection(sessionId: string, ws: WebSocket) {
-    this.connections.set(sessionId, ws);
+  setProgress(update: ProgressUpdate) {
+    this.progressStates.set(update.sessionId, update);
     
-    ws.on("close", () => {
-      this.connections.delete(sessionId);
-    });
+    // Auto-cleanup after 5 minutes
+    setTimeout(() => {
+      this.progressStates.delete(update.sessionId);
+    }, 5 * 60 * 1000);
   }
 
-  sendProgress(update: ProgressUpdate) {
-    const ws = this.connections.get(update.sessionId);
-    if (ws && ws.readyState === 1) { // 1 = OPEN
-      try {
-        ws.send(JSON.stringify(update));
-      } catch (error) {
-        console.error(`Error sending progress for session ${update.sessionId}:`, error);
-      }
-    }
-  }
-
-  hasConnection(sessionId: string): boolean {
-    const ws = this.connections.get(sessionId);
-    return ws !== undefined && ws.readyState === 1;
-  }
-
-  closeConnection(sessionId: string) {
-    const ws = this.connections.get(sessionId);
-    if (ws) {
-      ws.close();
-      this.connections.delete(sessionId);
-    }
+  getProgress(sessionId: string): ProgressUpdate | null {
+    return this.progressStates.get(sessionId) || null;
   }
 
   setResult(sessionId: string, result: GenerationResult | null) {
@@ -62,6 +41,11 @@ class ProgressManager {
 
   getResult(sessionId: string): GenerationResult | null | undefined {
     return this.results.get(sessionId);
+  }
+
+  clearSession(sessionId: string) {
+    this.progressStates.delete(sessionId);
+    this.results.delete(sessionId);
   }
 }
 
