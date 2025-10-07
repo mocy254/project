@@ -52,6 +52,12 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - Multipart form data handling with Multer for file uploads (100MB limit)
 - Content type validation for document uploads (PDF, DOCX, DOC, TXT, PPT, PPTX)
 - Request/response logging middleware for API debugging
+- **HTTP Polling Progress Tracking:**
+  - Generation endpoints return `sessionId` immediately for async processing
+  - Progress tracked via GET `/api/generation/progress/:sessionId` (polled every 1 second)
+  - Progress states stored in memory with 5-minute auto-cleanup
+  - Stages: extracting → analyzing → chunking → generating → saving → complete/error
+  - Final result retrieved from GET `/api/generation/result/:sessionId`
 
 **Content Processing Pipeline:**
 1. Text extraction from uploaded files (PDF, DOCX, TXT, PPT) using pdf-parse and mammoth libraries
