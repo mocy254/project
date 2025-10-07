@@ -2,11 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
+import { randomUUID } from "crypto";
 import { storage } from "./storage";
 import { generateFlashcards } from "./gemini";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
+import { progressManager } from "./progressManager";
 
 const storage_config = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -41,6 +43,8 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/generate/text", async (req, res) => {
+    const sessionId = randomUUID();
+    
     try {
       const { content, cardTypes, granularity, customInstructions, userId, title } = req.body;
 
@@ -48,11 +52,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      res.json({ sessionId });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "extracting",
+        message: "Starting generation...",
+        progress: 5
+      });
+
       const flashcards = await generateFlashcards({
         content,
         cardTypes,
         granularity,
-        customInstructions: customInstructions || ""
+        customInstructions: customInstructions || "",
+        onProgress: (update) => {
+          progressManager.sendProgress({
+            sessionId,
+            ...update
+          } as any);
+        }
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "saving",
+        message: "Saving flashcards...",
+        progress: 90
       });
 
       const deck = await storage.createDeck({
@@ -77,20 +103,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )
       );
 
-      res.json({ deck, flashcards: createdCards });
+      progressManager.setResult(sessionId, {
+        deckId: deck.id,
+        flashcardCount: createdCards.length
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "complete",
+        message: `Generated ${createdCards.length} flashcards`,
+        progress: 100,
+        cardsGenerated: createdCards.length
+      });
+
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
     } catch (error: any) {
       console.error("Text generation error:", error);
-      res.status(500).json({ error: error.message });
+      progressManager.setResult(sessionId, null);
+      progressManager.sendProgress({
+        sessionId,
+        stage: "error",
+        message: error.message || "Generation failed",
+        progress: 0,
+        error: error.message
+      });
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
     }
   });
 
   app.post("/api/generate/document", upload.single("file"), async (req, res) => {
+    const sessionId = randomUUID();
+    
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
       const { cardTypes, granularity, customInstructions, userId, title } = req.body;
+
+      res.json({ sessionId });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "extracting",
+        message: "Extracting text from document...",
+        progress: 5
+      });
 
       const content = await extractContentFromFile(req.file.path, req.file.mimetype);
 
@@ -99,7 +157,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content,
         cardTypes: parsedCardTypes,
         granularity: parseInt(granularity),
-        customInstructions: customInstructions || ""
+        customInstructions: customInstructions || "",
+        onProgress: (update) => {
+          progressManager.sendProgress({
+            sessionId,
+            ...update
+          } as any);
+        }
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "saving",
+        message: "Saving flashcards...",
+        progress: 90
       });
 
       const deck = await storage.createDeck({
@@ -124,14 +195,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )
       );
 
-      res.json({ deck, flashcards: createdCards });
+      progressManager.setResult(sessionId, {
+        deckId: deck.id,
+        flashcardCount: createdCards.length
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "complete",
+        message: `Generated ${createdCards.length} flashcards`,
+        progress: 100,
+        cardsGenerated: createdCards.length
+      });
+
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
     } catch (error: any) {
       console.error("Document generation error:", error);
-      res.status(500).json({ error: error.message });
+      progressManager.setResult(sessionId, null);
+      progressManager.sendProgress({
+        sessionId,
+        stage: "error",
+        message: error.message || "Generation failed",
+        progress: 0,
+        error: error.message
+      });
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
     }
   });
 
   app.post("/api/generate/youtube", async (req, res) => {
+    const sessionId = randomUUID();
+    
     try {
       const { url, cardTypes, granularity, customInstructions, userId, title } = req.body;
 
@@ -139,13 +233,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      res.json({ sessionId });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "extracting",
+        message: "Fetching YouTube transcript...",
+        progress: 5
+      });
+
       const content = await extractYouTubeTranscript(url);
 
       const flashcards = await generateFlashcards({
         content,
         cardTypes,
         granularity,
-        customInstructions: customInstructions || ""
+        customInstructions: customInstructions || "",
+        onProgress: (update) => {
+          progressManager.sendProgress({
+            sessionId,
+            ...update
+          } as any);
+        }
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "saving",
+        message: "Saving flashcards...",
+        progress: 90
       });
 
       const deck = await storage.createDeck({
@@ -170,9 +286,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )
       );
 
-      res.json({ deck, flashcards: createdCards });
+      progressManager.setResult(sessionId, {
+        deckId: deck.id,
+        flashcardCount: createdCards.length
+      });
+
+      progressManager.sendProgress({
+        sessionId,
+        stage: "complete",
+        message: `Generated ${createdCards.length} flashcards`,
+        progress: 100,
+        cardsGenerated: createdCards.length
+      });
+
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
     } catch (error: any) {
       console.error("YouTube generation error:", error);
+      progressManager.setResult(sessionId, null);
+      progressManager.sendProgress({
+        sessionId,
+        stage: "error",
+        message: error.message || "Generation failed",
+        progress: 0,
+        error: error.message
+      });
+      setTimeout(() => progressManager.closeConnection(sessionId), 1000);
+    }
+  });
+
+  app.get("/api/generation/result/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const result = progressManager.getResult(sessionId);
+      
+      if (result === undefined) {
+        return res.status(404).json({ error: "Session not found or expired" });
+      }
+      
+      if (result === null) {
+        return res.status(500).json({ error: "Generation failed" });
+      }
+      
+      res.json(result);
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });

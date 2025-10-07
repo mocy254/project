@@ -2,11 +2,58 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+// Timeout wrapper for async operations
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  errorMessage: string = "Operation timed out"
+): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+    ),
+  ]);
+}
+
+// Retry wrapper with exponential backoff
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 2,
+  initialDelayMs: number = 1000
+): Promise<T> {
+  let lastError: Error | undefined;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt < maxRetries) {
+        const delay = initialDelayMs * Math.pow(2, attempt);
+        console.log(`Retry attempt ${attempt + 1} after ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError || new Error("Max retries exceeded");
+}
+
 export interface FlashcardGenerationOptions {
   content: string;
   cardTypes: string[];
   granularity: number;
   customInstructions: string;
+  onProgress?: (update: {
+    stage: string;
+    message: string;
+    progress: number;
+    currentStep?: number;
+    totalSteps?: number;
+    cardsGenerated?: number;
+  }) => void;
 }
 
 export interface GeneratedFlashcard {
@@ -291,38 +338,95 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
 export async function generateFlashcards(
   options: FlashcardGenerationOptions
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions } = options;
+  const { content, cardTypes, granularity, customInstructions, onProgress } = options;
 
   const estimatedTokens = estimateTokenCount(content);
   
   if (estimatedTokens > 100000) {
     console.log(`Large document detected (${Math.floor(estimatedTokens / 1000)}k tokens). Extracting topic structure...`);
+    onProgress?.({
+      stage: "analyzing",
+      message: "Analyzing document structure...",
+      progress: 10
+    });
     
     const outline = await extractTopicOutline(content);
     console.log(`Found ${outline.topics.length} main topics`);
     
+    onProgress?.({
+      stage: "chunking",
+      message: `Found ${outline.topics.length} topics, splitting document...`,
+      progress: 20
+    });
+    
     const semanticChunks = chunkContentByTopics(content, outline, 100000);
     console.log(`Split into ${semanticChunks.length} semantic chunks`);
     
+    onProgress?.({
+      stage: "generating",
+      message: `Processing ${semanticChunks.length} sections in parallel...`,
+      progress: 25,
+      totalSteps: semanticChunks.length
+    });
+    
     const allFlashcards: GeneratedFlashcard[] = [];
     
-    for (let i = 0; i < semanticChunks.length; i++) {
-      const chunk = semanticChunks[i];
-      console.log(`Processing chunk ${i + 1}/${semanticChunks.length} - ${chunk.context}`);
+    // Process chunks in parallel with concurrency limit
+    const CONCURRENCY = 3;
+    const chunkGroups: SemanticChunk[][] = [];
+    
+    for (let i = 0; i < semanticChunks.length; i += CONCURRENCY) {
+      chunkGroups.push(semanticChunks.slice(i, i + CONCURRENCY));
+    }
+    
+    let processedChunks = 0;
+    
+    for (const group of chunkGroups) {
+      const promises = group.map(async (chunk, idx) => {
+        const chunkIndex = processedChunks + idx;
+        console.log(`Processing chunk ${chunkIndex + 1}/${semanticChunks.length} - ${chunk.context}`);
+        
+        try {
+          const chunkFlashcards = await generateFlashcardsForChunk({
+            content: chunk.content,
+            cardTypes,
+            granularity,
+            customInstructions
+          }, chunk.context);
+          
+          return chunkFlashcards;
+        } catch (error) {
+          console.error(`Error processing chunk ${chunkIndex + 1}:`, error);
+          // Return empty array on error, but don't fail entire generation
+          return [];
+        }
+      });
       
-      const chunkFlashcards = await generateFlashcardsForChunk({
-        content: chunk.content,
-        cardTypes,
-        granularity,
-        customInstructions
-      }, chunk.context);
+      const results = await Promise.all(promises);
+      results.forEach(cards => allFlashcards.push(...cards));
       
-      allFlashcards.push(...chunkFlashcards);
+      processedChunks += group.length;
+      const progress = 25 + ((processedChunks / semanticChunks.length) * 65);
+      
+      onProgress?.({
+        stage: "generating",
+        message: `Processed ${processedChunks}/${semanticChunks.length} sections`,
+        progress: Math.round(progress),
+        currentStep: processedChunks,
+        totalSteps: semanticChunks.length,
+        cardsGenerated: allFlashcards.length
+      });
     }
     
     console.log(`Generated ${allFlashcards.length} total flashcards from ${semanticChunks.length} chunks`);
     return allFlashcards;
   }
+  
+  onProgress?.({
+    stage: "generating",
+    message: "Generating flashcards...",
+    progress: 30
+  });
   
   return generateFlashcardsForChunk(options, "Complete document");
 }
@@ -451,32 +555,34 @@ ${cardTypeList}
 **Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json",
-        temperature: 0.25,
-        responseSchema: {
-          type: "object",
-          properties: {
-            flashcards: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  question: { type: "string" },
-                  answer: { type: "string" },
-                  cardType: { type: "string" },
+    const response = await withRetry(
+      () => withTimeout(
+        ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          config: {
+            systemInstruction: systemPrompt,
+            responseMimeType: "application/json",
+            temperature: 0.25,
+            responseSchema: {
+              type: "object",
+              properties: {
+                flashcards: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      question: { type: "string" },
+                      answer: { type: "string" },
+                      cardType: { type: "string" },
+                    },
+                    required: ["question", "answer", "cardType"],
+                  },
                 },
-                required: ["question", "answer", "cardType"],
               },
+              required: ["flashcards"],
             },
           },
-          required: ["flashcards"],
-        },
-      },
-      contents: `IMPORTANCE-BASED FLASHCARD GENERATION
+          contents: `IMPORTANCE-BASED FLASHCARD GENERATION
 
 Context: ${chunkContext}
 
@@ -505,7 +611,13 @@ STEP 3 - GENERATE flashcards:
 Content to process:
 
 ${content}`,
-    });
+        }),
+        120000, // 2 minute timeout per chunk
+        "Gemini API request timed out"
+      ),
+      2, // 2 retries
+      1000 // 1 second initial delay
+    );
 
     const rawJson = response.text;
     if (!rawJson) {

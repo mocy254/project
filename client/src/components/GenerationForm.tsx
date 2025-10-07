@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import GenerationProgressDialog from "./GenerationProgressDialog";
 
 export default function GenerationForm() {
   const [textContent, setTextContent] = useState("");
@@ -27,7 +28,8 @@ export default function GenerationForm() {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [activeTab, setActiveTab] = useState("text");
-  const { userId } = useUser();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const { userId} = useUser();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -37,11 +39,7 @@ export default function GenerationForm() {
       return await res.json();
     },
     onSuccess: (data: any) => {
-      toast({
-        title: "Flashcards generated!",
-        description: `Successfully created ${data.flashcards.length} flashcards`,
-      });
-      setLocation(`/editor/${data.deck.id}`);
+      setSessionId(data.sessionId);
     },
     onError: (error: any) => {
       toast({
@@ -72,11 +70,7 @@ export default function GenerationForm() {
       return res.json();
     },
     onSuccess: (data) => {
-      toast({
-        title: "Flashcards generated!",
-        description: `Successfully created ${data.flashcards.length} flashcards`,
-      });
-      setLocation(`/editor/${data.deck.id}`);
+      setSessionId(data.sessionId);
     },
     onError: (error: any) => {
       toast({
@@ -93,11 +87,7 @@ export default function GenerationForm() {
       return await res.json();
     },
     onSuccess: (data: any) => {
-      toast({
-        title: "Flashcards generated!",
-        description: `Successfully created ${data.flashcards.length} flashcards`,
-      });
-      setLocation(`/editor/${data.deck.id}`);
+      setSessionId(data.sessionId);
     },
     onError: (error: any) => {
       toast({
@@ -107,6 +97,27 @@ export default function GenerationForm() {
       });
     },
   });
+
+  const handleGenerationComplete = () => {
+    toast({
+      title: "Flashcards generated!",
+      description: "Your flashcards are ready",
+    });
+    setSessionId(null);
+  };
+
+  const handleGenerationError = (error: string) => {
+    toast({
+      title: "Generation failed",
+      description: error,
+      variant: "destructive",
+    });
+    // Don't clear sessionId - let dialog stay open until user dismisses
+  };
+
+  const handleDismiss = () => {
+    setSessionId(null);
+  };
 
   const handleGenerate = () => {
     if (!userId) {
@@ -201,16 +212,24 @@ export default function GenerationForm() {
   ];
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-display flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-primary" />
-          Generate Flashcards
-        </CardTitle>
-        <CardDescription>
-          Choose your content source and customize how AI generates your flashcards
-        </CardDescription>
-      </CardHeader>
+    <>
+      <GenerationProgressDialog 
+        sessionId={sessionId}
+        onComplete={handleGenerationComplete}
+        onError={handleGenerationError}
+        onDismiss={handleDismiss}
+      />
+      
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-display flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-primary" />
+            Generate Flashcards
+          </CardTitle>
+          <CardDescription>
+            Choose your content source and customize how AI generates your flashcards
+          </CardDescription>
+        </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="deck-title">Deck Title</Label>
@@ -414,5 +433,6 @@ export default function GenerationForm() {
         </Button>
       </CardContent>
     </Card>
+    </>
   );
 }
