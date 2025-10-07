@@ -1,8 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { WebSocketServer } from "ws";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { progressManager } from "./progressManager";
 
 const app = express();
 app.use(express.json());
@@ -69,21 +67,5 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-  });
-
-  // Setup WebSocket server for progress updates
-  const wss = new WebSocketServer({ server, path: "/ws/progress" });
-  
-  wss.on("connection", (ws, req) => {
-    const url = new URL(req.url || "", `http://${req.headers.host}`);
-    const sessionId = url.searchParams.get("sessionId");
-    
-    if (!sessionId) {
-      ws.close(1008, "Missing sessionId");
-      return;
-    }
-    
-    progressManager.registerConnection(sessionId, ws);
-    log(`WebSocket connected: ${sessionId}`);
   });
 })();
