@@ -8,6 +8,7 @@ import { generateFlashcards } from "./gemini";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
+import { progressManager } from "./progressManager";
 
 const storage_config = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -184,6 +185,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("YouTube generation error:", error);
       res.status(500).json({ error: error.message || "Generation failed" });
+    }
+  });
+
+  app.get("/api/generation/progress/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const progress = progressManager.getProgress(sessionId);
+      
+      if (!progress) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+      
+      res.json(progress);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 
