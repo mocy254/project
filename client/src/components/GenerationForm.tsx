@@ -13,7 +13,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import GenerationProgressDialog from "./GenerationProgressDialog";
 
 export default function GenerationForm() {
   const [textContent, setTextContent] = useState("");
@@ -28,7 +27,6 @@ export default function GenerationForm() {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [activeTab, setActiveTab] = useState("text");
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const { userId} = useUser();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -39,7 +37,19 @@ export default function GenerationForm() {
       return await res.json();
     },
     onSuccess: (data: any) => {
-      setSessionId(data.sessionId);
+      toast({
+        title: "Generating flashcards...",
+        description: "This may take a moment",
+      });
+      if (data.deckId) {
+        setTimeout(() => {
+          toast({
+            title: "Flashcards generated!",
+            description: "Your flashcards are ready",
+          });
+          setLocation(`/editor/${data.deckId}`);
+        }, 2000);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -70,7 +80,19 @@ export default function GenerationForm() {
       return res.json();
     },
     onSuccess: (data) => {
-      setSessionId(data.sessionId);
+      toast({
+        title: "Generating flashcards...",
+        description: "This may take a moment",
+      });
+      if (data.deckId) {
+        setTimeout(() => {
+          toast({
+            title: "Flashcards generated!",
+            description: "Your flashcards are ready",
+          });
+          setLocation(`/editor/${data.deckId}`);
+        }, 2000);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -87,7 +109,19 @@ export default function GenerationForm() {
       return await res.json();
     },
     onSuccess: (data: any) => {
-      setSessionId(data.sessionId);
+      toast({
+        title: "Generating flashcards...",
+        description: "This may take a moment",
+      });
+      if (data.deckId) {
+        setTimeout(() => {
+          toast({
+            title: "Flashcards generated!",
+            description: "Your flashcards are ready",
+          });
+          setLocation(`/editor/${data.deckId}`);
+        }, 2000);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -97,27 +131,6 @@ export default function GenerationForm() {
       });
     },
   });
-
-  const handleGenerationComplete = () => {
-    toast({
-      title: "Flashcards generated!",
-      description: "Your flashcards are ready",
-    });
-    setSessionId(null);
-  };
-
-  const handleGenerationError = (error: string) => {
-    toast({
-      title: "Generation failed",
-      description: error,
-      variant: "destructive",
-    });
-    // Don't clear sessionId - let dialog stay open until user dismisses
-  };
-
-  const handleDismiss = () => {
-    setSessionId(null);
-  };
 
   const handleGenerate = () => {
     if (!userId) {
@@ -212,14 +225,6 @@ export default function GenerationForm() {
   ];
 
   return (
-    <>
-      <GenerationProgressDialog 
-        sessionId={sessionId}
-        onComplete={handleGenerationComplete}
-        onError={handleGenerationError}
-        onDismiss={handleDismiss}
-      />
-      
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-display flex items-center gap-2">
@@ -433,6 +438,5 @@ export default function GenerationForm() {
         </Button>
       </CardContent>
     </Card>
-    </>
   );
 }

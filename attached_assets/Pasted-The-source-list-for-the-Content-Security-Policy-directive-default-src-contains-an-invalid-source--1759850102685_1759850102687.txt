@@ -1,0 +1,546 @@
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+ stallwart: failed ping 1
+FlashGeniusAI:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+FlashGeniusAI:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+FlashGeniusAI:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+ 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+FlashGeniusAI:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onError%22%2C%22If%20your%20%60onError%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%2C%20%60error%60%20or%20%60errors%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20if%20you%20need%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60%2C%20%60error%60%20or%20%60errors%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onError%22%2C%22If%20your%20%60onError%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%2C%20%60error%60%20or%20%60errors%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20if%20you%20need%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60%2C%20%60error%60%20or%20%60errors%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ [LaunchDarkly] LaunchDarkly client initialized
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ Download the Apollo DevTools for a better development experience: https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22initialFetchPolicy%22%2C%22Use%20the%20%60fetchPolicy%60%20option%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+ Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'battery'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'layout-animations'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'navigation-override'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'oversized-images'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'publickey-credentials'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'speaker-selection'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'unoptimized-images'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'unsized-media'.
+_ @ framework-942dbb562b500978.js:1
+ Unrecognized feature: 'pointer-lock'.
+_ @ framework-942dbb562b500978.js:1
+ Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-942dbb562b500978.js:1
+ Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-942dbb562b500978.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A104%2C%22args%22%3A%5B%22useLazyQuery.execute%22%2C%22fetchPolicy%22%2C%22Please%20pass%20the%20option%20to%20the%20%60useLazyQuery%60%20hook%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A104%2C%22args%22%3A%5B%22useLazyQuery.execute%22%2C%22nextFetchPolicy%22%2C%22Please%20pass%20the%20option%20to%20the%20%60useLazyQuery%60%20hook%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ Failed when connecting: Connection closed (code: 1006)
+overrideMethod @ installHook.js:1
+o1151714.ingest.sentry.io/api/6318792/envelope/?sentry_key=8aa91189a4274b5a8c9b7b01d46ea360&sentry_version=7&sentry_client=sentry.javascript.browser%2F7.112.0:1  Failed to load resource: the server responded with a status of 429 ()
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22variables%22%2C%22Pass%20all%20%60variables%60%20to%20the%20returned%20%60execute%60%20function%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A104%2C%22args%22%3A%5B%22useLazyQuery.execute%22%2C%22fetchPolicy%22%2C%22Please%20pass%20the%20option%20to%20the%20%60useLazyQuery%60%20hook%20instead.%22%5D%7D
+overrideMethod @ installHook.js:1
+ [Coframe] Mutation callback infinite loop protection triggered, disconnecting mutation observer Object
+overrideMethod @ installHook.js:1
+68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Abeacon%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=fb6bf78d-fe17-482f-bf71-702b9022286a:1  Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED
+ WebSocket connection to 'wss://eval.riker.platform.replit.com/wsv2/v2.public.Q2dZSW5yQ1V4d1lTQmdpOXpKVEhCaUlGY21sclpYSXdBRHJUQVFva01tVXpZVEk0WWpZdE9XTm1NQzAwTnpSakxUa3paRFl0WlRrd1pqWmtPV1V5TWpnMkVnTnVhWGdhRjNKbGNHeHBkQzF5WlhCc0xXWnBiR1Z6TFhKcGEyVnlJZzFHYkdGemFFZGxibWwxYzBGSktnNU5iMmhoYldGa1FYTm9jbUZtTVVKUkNoaHlaWEJzYVhRdGNtVndiQzFpYkc5amEzTXRjbWxyWlhJU0ZuSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNtbHJaWElhSFhKbGNHeHBkQzF0WVhKbllYSnBibVV0WW14dlkydHpMWEpwYTJWeVNnY0loY3lhREJBQlVBQmFEbWx1ZEdWdWRGOXpkSFZrWlc1MGVBQlNJd2dCRUlDQWdJQWdHUUFBQUFBQUFCQkF...T2FraFlhbWxwUTJWbmFtUmFNREJUWkRKMVVITlFjbTlpZWxwUVZXNDRjelEzTkcwM04zcFpTVE14V0RaRVEySm1hWE5rUVcxMlZVOVBaVFVsTWtZbE1rWkhNVkIyVEZjbE1rWkJibk00Vlc1TE5EbElNbkJuYWtOSWVUVTRWbVJhUzNodFpEbFhNR3hYYUNVeVFsUm5jWE5VU1ZGYVFVZGhVazEwYTJ4YWFVZERla013U3pOYWRVVkpTVXRoTmlVeVFsQmlValJsYTA5SWNWaENSR2Q1YzIxelVtNVVVRzE2UldKTEpUSkdRM2xDZFZGWll6SkVNWFZuUldsaWRteE9kVVpoV0RoaFoxWmhOVFY1WkhRNE1FRWxNMFFsTTBRPSa1nft-adVWD5Bs1OUQIPqHmxbt28aS6V1MlcR70n9_ARRmSF00PLNDc9NrHj4jN81EC9tcxTAQ0ndxw4bZJwI.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 6504-7f5063fa94c1a36a.js:1
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=a4e85dfc-2553-4f0a-9c17-6ac980e67cc5:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+/data/repls/2e3a28b6-9cf0-474c-93d6-e90f6d9e2286/get_connection_metadata:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+ WebSocket connection to 'wss://replit.com/graphql_subscriptions' failed: 
+(anonymous) @ _app-93935d2926f235fa.js:36
+ WebSocket connection to 'wss://eval.riker.platform.replit.com/wsv2/v2.public.Q2dZSW5yQ1V4d1lTQmdpOXpKVEhCaUlGY21sclpYSXdBRHJUQVFva01tVXpZVEk0WWpZdE9XTm1NQzAwTnpSakxUa3paRFl0WlRrd1pqWmtPV1V5TWpnMkVnTnVhWGdhRjNKbGNHeHBkQzF5WlhCc0xXWnBiR1Z6TFhKcGEyVnlJZzFHYkdGemFFZGxibWwxYzBGSktnNU5iMmhoYldGa1FYTm9jbUZtTVVKUkNoaHlaWEJzYVhRdGNtVndiQzFpYkc5amEzTXRjbWxyWlhJU0ZuSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNtbHJaWElhSFhKbGNHeHBkQzF0WVhKbllYSnBibVV0WW14dlkydHpMWEpwYTJWeVNnY0loY3lhREJBQlVBQmFEbWx1ZEdWdWRGOXpkSFZrWlc1MGVBQlNJd2dCRUlDQWdJQWdHUUFBQUFBQUFCQkF...T2FraFlhbWxwUTJWbmFtUmFNREJUWkRKMVVITlFjbTlpZWxwUVZXNDRjelEzTkcwM04zcFpTVE14V0RaRVEySm1hWE5rUVcxMlZVOVBaVFVsTWtZbE1rWkhNVkIyVEZjbE1rWkJibk00Vlc1TE5EbElNbkJuYWtOSWVUVTRWbVJhUzNodFpEbFhNR3hYYUNVeVFsUm5jWE5VU1ZGYVFVZGhVazEwYTJ4YWFVZERla013U3pOYWRVVkpTVXRoTmlVeVFsQmlValJsYTA5SWNWaENSR2Q1YzIxelVtNVVVRzE2UldKTEpUSkdRM2xDZFZGWll6SkVNWFZuUldsaWRteE9kVVpoV0RoaFoxWmhOVFY1WkhRNE1FRWxNMFFsTTBRPSa1nft-adVWD5Bs1OUQIPqHmxbt28aS6V1MlcR70n9_ARRmSF00PLNDc9NrHj4jN81EC9tcxTAQ0ndxw4bZJwI.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+connect @ 6504-7f5063fa94c1a36a.js:1
+62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+ WebSocket connection to 'wss://eval.riker.platform.replit.com/wsv2/v2.public.Q2dZSW5yQ1V4d1lTQmdpOXpKVEhCaUlGY21sclpYSXdBRHJUQVFva01tVXpZVEk0WWpZdE9XTm1NQzAwTnpSakxUa3paRFl0WlRrd1pqWmtPV1V5TWpnMkVnTnVhWGdhRjNKbGNHeHBkQzF5WlhCc0xXWnBiR1Z6TFhKcGEyVnlJZzFHYkdGemFFZGxibWwxYzBGSktnNU5iMmhoYldGa1FYTm9jbUZtTVVKUkNoaHlaWEJzYVhRdGNtVndiQzFpYkc5amEzTXRjbWxyWlhJU0ZuSmxjR3hwZEMxeVpYQnNMVzFsZEdFdGNtbHJaWElhSFhKbGNHeHBkQzF0WVhKbllYSnBibVV0WW14dlkydHpMWEpwYTJWeVNnY0loY3lhREJBQlVBQmFEbWx1ZEdWdWRGOXpkSFZrWlc1MGVBQlNJd2dCRUlDQWdJQWdHUUFBQUFBQUFCQkF...T2FraFlhbWxwUTJWbmFtUmFNREJUWkRKMVVITlFjbTlpZWxwUVZXNDRjelEzTkcwM04zcFpTVE14V0RaRVEySm1hWE5rUVcxMlZVOVBaVFVsTWtZbE1rWkhNVkIyVEZjbE1rWkJibk00Vlc1TE5EbElNbkJuYWtOSWVUVTRWbVJhUzNodFpEbFhNR3hYYUNVeVFsUm5jWE5VU1ZGYVFVZGhVazEwYTJ4YWFVZERla013U3pOYWRVVkpTVXRoTmlVeVFsQmlValJsYTA5SWNWaENSR2Q1YzIxelVtNVVVRzE2UldKTEpUSkdRM2xDZFZGWll6SkVNWFZuUldsaWRteE9kVVpoV0RoaFoxWmhOVFY1WkhRNE1FRWxNMFFsTTBRPSa1nft-adVWD5Bs1OUQIPqHmxbt28aS6V1MlcR70n9_ARRmSF00PLNDc9NrHj4jN81EC9tcxTAQ0ndxw4bZJwI.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: WebSocket is closed before the connection is established.
+cleanupSocket @ 6504-7f5063fa94c1a36a.js:1
+api.sorryapp.com/v1/pages/27c7b5fc:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+api.sorryapp.com/v1/pages/27c7b5fc:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+api.sorryapp.com/v1/pages/27c7b5fc:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+cf.js?config=%257B%2…22startTime%252…:10 Uncaught (in promise) Error: Timeout waiting for command after 3600000ms for:
+e=>!("treatmentApplied"!==e.subscribe||!e.callback)
+securetoken.googleapis.com/v1/token?key=AIzaSyARAzVTWc_KOBojIholLo2wzwNOQ6VKcB8:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Axhr%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=30bbbb02-f9c9-44ec-a868-994c79a6f696:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+o1151714.ingest.sentry.io/api/6318792/envelope/?sentry_key=8aa91189a4274b5a8c9b7b01d46ea360&sentry_version=7&sentry_client=sentry.javascript.browser%2F7.112.0:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083%2Cretry_count%3A1%2Cretry_after%3A0&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=d2d69061-7cea-4d17-b4d6-1a8073d02359:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Axhr%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083%2Cretry_count%3A1%2Cretry_after%3A0&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=24ee0f1c-bc02-4f52-a56a-15285add76f6:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+ WebSocket connection to 'wss://replit.com/graphql_subscriptions' failed: 
+(anonymous) @ _app-93935d2926f235fa.js:36
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083%2Cretry_count%3A2%2Cretry_after%3A0&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=92f190ed-2651-4bc2-ac0e-789b83a6b4b4:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Axhr%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083%2Cretry_count%3A2%2Cretry_after%3A0&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=91754ad7-6e5f-43ee-8547-c85805489e26:1  Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+/data/repls/2e3a28b6-9cf0-474c-93d6-e90f6d9e2286/get_connection_metadata:1  Failed to load resource: net::ERR_NETWORK_CHANGED
+ WebSocket connection to 'wss://replit.com/graphql_subscriptions' failed: 
+(anonymous) @ _app-93935d2926f235fa.js:36
+logs.browser-intake-us5-datadoghq.com/api/v2/logs?ddsource=browser&ddtags=sdk_version%3A4.46.0%2Capi%3Afetch%2Cenv%3Aproduction%2Cservice%3Awebsite%2Cversion%3A72fe0083%2Cretry_count%3A3%2Cretry_after%3A0&dd-api-key=pub31a5047a3a4692afb84a423db984dc57&dd-evp-origin-version=4.46.0&dd-evp-origin=browser&dd-request-id=b621fa74-deb5-4bbe-a5ab-c607563f38f6:1  Failed to load resource: net::ERR_NETWORK_CHANGED
+t:1  Failed to load resource: net::ERR_SSL_BAD_RECORD_MAC_ALERT
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useLazyQuery%22%2C%22onError%22%2C%22If%20your%20%60onError%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%2C%20%60error%60%20or%20%60errors%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20if%20you%20need%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60%2C%20%60error%60%20or%20%60errors%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onError%22%2C%22If%20your%20%60onError%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%2C%20%60error%60%20or%20%60errors%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20if%20you%20need%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60%2C%20%60error%60%20or%20%60errors%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onError%22%2C%22If%20your%20%60onError%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%2C%20%60error%60%20or%20%60errors%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20if%20you%20need%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60%2C%20%60error%60%20or%20%60errors%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A78%2C%22args%22%3A%5B%22useQuery%22%2C%22onCompleted%22%2C%22If%20your%20%60onCompleted%60%20callback%20sets%20local%20state%2C%20switch%20to%20use%20derived%20state%20using%20%60data%60%20returned%20from%20the%20hook%20instead.%20Use%20%60useEffect%60%20to%20perform%20side-effects%20as%20a%20result%20of%20updates%20to%20%60data%60.%22%5D%7D
+overrideMethod @ installHook.js:1
+ An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.0%22%2C%22message%22%3A43%2C%22args%22%3A%5B%22UsageOverviewCurrentUser%22%5D%7D
+overrideMethod @ installHook.js:1
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'battery'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1hv%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+ [vite] server connection lost. Polling for restart...
+ WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ 2e3a28b6-9cf0-474c-9…da/3.2.3/eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM8 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM8 eruda.js:2
+VM8 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1339 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1339 eruda.js:2
+setupWebSocket @ VM1361 client:536
+(anonymous) @ VM1361 client:531
+VM1339 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1452 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1452 eruda.js:2
+setupWebSocket @ VM1475 client:536
+(anonymous) @ VM1475 client:531
+VM1452 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1569 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1569 eruda.js:2
+setupWebSocket @ VM1592 client:536
+(anonymous) @ VM1592 client:531
+VM1569 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1671 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1671 eruda.js:2
+setupWebSocket @ VM1694 client:536
+(anonymous) @ VM1694 client:531
+VM1671 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1778 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1778 eruda.js:2
+setupWebSocket @ VM1801 client:536
+(anonymous) @ VM1801 client:531
+VM1778 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM1890 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM1890 eruda.js:2
+setupWebSocket @ VM1911 client:536
+(anonymous) @ VM1911 client:531
+VM1890 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2008 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2008 eruda.js:2
+setupWebSocket @ VM2029 client:536
+(anonymous) @ VM2029 client:531
+VM2008 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2128 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2128 eruda.js:2
+setupWebSocket @ VM2151 client:536
+(anonymous) @ VM2151 client:531
+VM2128 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2230 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2230 eruda.js:2
+setupWebSocket @ VM2252 client:536
+(anonymous) @ VM2252 client:531
+VM2230 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2336 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2336 eruda.js:2
+setupWebSocket @ VM2359 client:536
+(anonymous) @ VM2359 client:531
+VM2336 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2440 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2440 eruda.js:2
+setupWebSocket @ VM2463 client:536
+(anonymous) @ VM2463 client:531
+VM2440 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2553 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2553 eruda.js:2
+setupWebSocket @ VM2576 client:536
+(anonymous) @ VM2576 client:531
+VM2553 eruda.js:2 [vite] server connection lost. Polling for restart...
+faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://2e3a28b6-9cf0-474c-93d6…:1  GET https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/&size=32 404 (Not Found)
+Image
+oY @ framework-942dbb562b500978.js:1
+e @ framework-942dbb562b500978.js:1
+(anonymous) @ framework-942dbb562b500978.js:1
+uO @ framework-942dbb562b500978.js:1
+u_ @ framework-942dbb562b500978.js:1
+r6 @ framework-942dbb562b500978.js:1
+(anonymous) @ framework-942dbb562b500978.js:1
+faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://2e3a28b6-9cf0-474c-93d6…:1  GET https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev&size=32 404 (Not Found)
+VM2666 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2666 eruda.js:2
+setupWebSocket @ VM2689 client:536
+(anonymous) @ VM2689 client:531
+VM2666 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2786 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2786 eruda.js:2
+setupWebSocket @ VM2808 client:536
+(anonymous) @ VM2808 client:531
+VM2786 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM2883 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM2883 eruda.js:2
+setupWebSocket @ VM2906 client:536
+(anonymous) @ VM2906 client:531
+VM2883 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3003 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3003 eruda.js:2
+setupWebSocket @ VM3024 client:536
+(anonymous) @ VM3024 client:531
+VM3003 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3113 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3113 eruda.js:2
+setupWebSocket @ VM3134 client:536
+(anonymous) @ VM3134 client:531
+VM3113 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3225 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3225 eruda.js:2
+setupWebSocket @ VM3248 client:536
+(anonymous) @ VM3248 client:531
+VM3225 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3336 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3336 eruda.js:2
+setupWebSocket @ VM3359 client:536
+(anonymous) @ VM3359 client:531
+VM3336 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3446 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3446 eruda.js:2
+setupWebSocket @ VM3469 client:536
+(anonymous) @ VM3469 client:531
+VM3446 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3555 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3555 eruda.js:2
+setupWebSocket @ VM3576 client:536
+(anonymous) @ VM3576 client:531
+VM3555 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3663 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3663 eruda.js:2
+setupWebSocket @ VM3686 client:536
+(anonymous) @ VM3686 client:531
+VM3663 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3781 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3781 eruda.js:2
+setupWebSocket @ VM3803 client:536
+(anonymous) @ VM3803 client:531
+VM3781 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM3890 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM3890 eruda.js:2
+setupWebSocket @ VM3912 client:536
+(anonymous) @ VM3912 client:531
+VM3890 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM4009 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM4009 eruda.js:2
+setupWebSocket @ VM4032 client:536
+(anonymous) @ VM4032 client:531
+VM4009 eruda.js:2 [vite] server connection lost. Polling for restart...
+VM4104 eruda.js:2 WebSocket connection to 'wss://2e3a28b6-9cf0-474c-93d6-e90f6d9e2286-00-1o743yb9gr4gs.riker.replit.dev/?token=dbKAol8RIg45' failed: Invalid frame header
+t @ VM4104 eruda.js:2
+setupWebSocket @ VM4127 client:536
+(anonymous) @ VM4127 client:531
+VM4104 eruda.js:2 [vite] server connection lost. Polling for restart...
