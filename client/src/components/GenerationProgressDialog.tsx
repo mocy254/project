@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,10 +31,8 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
   const [progress, setProgress] = useState<ProgressUpdate | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
   const [, setLocation] = useLocation();
 
-  // Reset state when sessionId changes
   useEffect(() => {
     setProgress(null);
     setIsComplete(false);
@@ -44,73 +42,67 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
   useEffect(() => {
     if (!sessionId) return;
 
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws/progress?sessionId=${sessionId}`;
-    
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    let intervalId: NodeJS.Timeout;
+    let isActive = true;
 
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-    };
-
-    ws.onmessage = (event) => {
+    const pollProgress = async () => {
       try {
-        const update: ProgressUpdate = JSON.parse(event.data);
+        const res = await fetch(`/api/generation/progress/${sessionId}`);
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            return;
+          }
+          throw new Error("Failed to fetch progress");
+        }
+
+        const update: ProgressUpdate = await res.json();
+        
+        if (!isActive) return;
+        
         setProgress(update);
 
         if (update.stage === "complete") {
+          clearInterval(intervalId);
           setIsComplete(true);
-          // Fetch the generation result
-          fetch(`/api/generation/result/${sessionId}`)
-            .then(async res => {
-              if (!res.ok) {
-                const errorData = await res.json().catch(() => ({ error: "Failed to retrieve result" }));
-                throw new Error(errorData.error || "Failed to retrieve result");
-              }
-              return res.json();
-            })
-            .then(result => {
-              setTimeout(() => {
-                onComplete?.(); // Call onComplete to show toast and clear sessionId
-                if (result.deckId) {
-                  setLocation(`/editor/${result.deckId}`);
-                }
-                ws.close();
-              }, 1500);
-            })
-            .catch(error => {
-              console.error("Error fetching result:", error);
-              setError(error.message || "Failed to retrieve generation result");
-              onError?.(error.message || "Failed to retrieve generation result");
-              setTimeout(() => ws.close(), 2000);
-            });
+          
+          const resultRes = await fetch(`/api/generation/result/${sessionId}`);
+          if (!resultRes.ok) {
+            const errorData = await resultRes.json().catch(() => ({ error: "Failed to retrieve result" }));
+            throw new Error(errorData.error || "Failed to retrieve result");
+          }
+          
+          const result = await resultRes.json();
+          
+          setTimeout(() => {
+            onComplete?.();
+            if (result.deckId) {
+              setLocation(`/editor/${result.deckId}`);
+            }
+          }, 1500);
         } else if (update.stage === "error") {
+          clearInterval(intervalId);
           setError(update.error || "Generation failed");
           onError?.(update.error || "Generation failed");
-          setTimeout(() => ws.close(), 2000);
         }
-      } catch (error) {
-        console.error("Error parsing progress update:", error);
+      } catch (err: any) {
+        console.error("Error polling progress:", err);
+        if (isActive && err.message !== "Failed to fetch progress") {
+          clearInterval(intervalId);
+          setError(err.message || "Connection error");
+          onError?.(err.message || "Connection error");
+        }
       }
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setError("Connection error");
-      onError?.("Connection error");
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket closed");
-    };
+    pollProgress();
+    intervalId = setInterval(pollProgress, 1000);
 
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
+      isActive = false;
+      clearInterval(intervalId);
     };
-  }, [sessionId, onComplete, onError]);
+  }, [sessionId, onComplete, onError, setLocation]);
 
   const getStageIcon = () => {
     if (error) return <XCircle className="w-6 h-6 text-destructive" />;
@@ -135,7 +127,6 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
     <Dialog 
       open={!!sessionId} 
       onOpenChange={(open) => {
-        // Only allow closing when there's an error
         if (!open && error && onDismiss) {
           onDismiss();
         }
@@ -144,11 +135,9 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
       <DialogContent 
         className="sm:max-w-md" 
         onPointerDownOutside={(e) => {
-          // Only allow closing when there's an error
           if (!error) e.preventDefault();
         }}
         onEscapeKeyDown={(e) => {
-          // Only allow closing when there's an error
           if (!error) e.preventDefault();
         }}
         data-testid="dialog-generation-progress"
