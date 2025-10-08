@@ -83,6 +83,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
 
+          // Validate that flashcards were generated
+          if (!flashcards || flashcards.length === 0) {
+            throw new Error("No flashcards were generated. The content may be too short or the AI service is experiencing issues. Please try again.");
+          }
+
           progressManager.setProgress({
             sessionId,
             stage: "saving",
@@ -191,6 +196,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
 
+          // Validate that flashcards were generated
+          if (!flashcards || flashcards.length === 0) {
+            throw new Error("No flashcards were generated. The content may be too short or the AI service is experiencing issues. Please try again.");
+          }
+
           progressManager.setProgress({
             sessionId,
             stage: "saving",
@@ -298,6 +308,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
             }
           });
+
+          // Validate that flashcards were generated
+          if (!flashcards || flashcards.length === 0) {
+            throw new Error("No flashcards were generated. The content may be too short or the AI service is experiencing issues. Please try again.");
+          }
 
           progressManager.setProgress({
             sessionId,

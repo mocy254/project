@@ -612,10 +612,10 @@ Content to process:
 
 ${content}`,
         }),
-        120000, // 2 minute timeout per chunk
+        300000, // 5 minute timeout per chunk
         "Gemini API request timed out"
       ),
-      2, // 2 retries
+      3, // 3 retries
       1000 // 1 second initial delay
     );
 
