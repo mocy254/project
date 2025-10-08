@@ -54,9 +54,18 @@ export async function extractYouTubeTranscript(url: string): Promise<string> {
     const transcript = await YoutubeTranscript.fetchTranscript(videoId);
     console.log(`Transcript items fetched: ${transcript.length}`);
     
+    // Check if transcript is empty
+    if (!transcript || transcript.length === 0) {
+      throw new Error("This video doesn't have subtitles/captions available. Please choose a different video with captions enabled.");
+    }
+    
     const content = transcript.map(item => item.text).join(" ");
     console.log(`Total transcript length: ${content.length} characters`);
     console.log(`First 200 chars: ${content.substring(0, 200)}`);
+    
+    if (content.trim().length === 0) {
+      throw new Error("The video transcript is empty. Please choose a different video.");
+    }
     
     return content;
   } catch (error: any) {
