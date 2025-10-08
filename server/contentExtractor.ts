@@ -1,6 +1,6 @@
 import { pdf } from "pdf-parse";
 import mammoth from "mammoth";
-import { YoutubeTranscript } from "youtube-transcript";
+import { Innertube } from "youtubei.js";
 import * as fs from "fs";
 
 export async function extractPDFText(filePath: string): Promise<string> {
@@ -50,16 +50,25 @@ export async function extractYouTubeTranscript(url: string): Promise<string> {
       throw new Error("Invalid YouTube URL");
     }
 
-    console.log(`Fetching transcript for video ID: ${videoId}`);
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-    console.log(`Transcript items fetched: ${transcript.length}`);
+    console.log(`Initializing YouTube client...`);
+    const youtube = await Innertube.create();
     
-    // Check if transcript is empty
-    if (!transcript || transcript.length === 0) {
+    console.log(`Fetching video info for video ID: ${videoId}`);
+    const info = await youtube.getInfo(videoId);
+    
+    console.log(`Fetching transcript...`);
+    const transcriptData = await info.getTranscript();
+    
+    if (!transcriptData || !transcriptData.transcript || !transcriptData.transcript.content || 
+        !transcriptData.transcript.content.body || !transcriptData.transcript.content.body.initial_segments) {
       throw new Error("This video doesn't have subtitles/captions available. Please choose a different video with captions enabled.");
     }
     
-    const content = transcript.map(item => item.text).join(" ");
+    // Extract text from transcript segments
+    const content = transcriptData.transcript.content.body.initial_segments
+      .map((segment: any) => segment.snippet.text)
+      .join(" ");
+    
     console.log(`Total transcript length: ${content.length} characters`);
     console.log(`First 200 chars: ${content.substring(0, 200)}`);
     
@@ -70,7 +79,7 @@ export async function extractYouTubeTranscript(url: string): Promise<string> {
     return content;
   } catch (error: any) {
     console.error(`YouTube transcript extraction error:`, error);
-    if (error.message?.includes("Transcript is disabled")) {
+    if (error.message?.includes("Transcript is disabled") || error.message?.includes("Transcript not available")) {
       throw new Error("This video doesn't have subtitles/captions enabled. Please choose a video with available transcripts.");
     }
     throw new Error(`Failed to extract YouTube transcript: ${error.message || error}`);
