@@ -10,7 +10,8 @@ import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
 // @ts-ignore - No type definitions available
-import { default as AnkiExport } from 'anki-apkg-export';
+import AnkiExportModule from 'anki-apkg-export';
+const AnkiExport = (AnkiExportModule as any).default || AnkiExportModule;
 
 const storage_config = multer.diskStorage({
   destination: (req, file, cb) => {
