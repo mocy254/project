@@ -1,0 +1,125 @@
+Perfect — if your SaaS is Node.js-based, anki-apkg-export is the easiest and cleanest way to generate .apkg (Anki deck) files dynamically.
+
+Here’s your complete setup guide 👇
+
+
+---
+
+⚙️ STEP 1 — Install the Library
+
+Run this in your project root:
+
+npm install anki-apkg-export
+
+or if using Yarn:
+
+yarn add anki-apkg-export
+
+
+---
+
+📦 STEP 2 — Basic Example
+
+Create a small test script (anki-test.js) to confirm everything works:
+
+import { default as AnkiExport } from 'anki-apkg-export';
+import fs from 'fs';
+
+const apkg = new AnkiExport('AI Flashcards Example');
+
+// Add cards (Front, Back)
+apkg.addCard('What is the powerhouse of the cell?', 'The mitochondria.');
+apkg.addCard('What is 2 + 2?', '4');
+
+// Generate and save
+apkg.save().then(zip => {
+  fs.writeFileSync('output.apkg', zip, 'binary');
+  console.log('✅ Deck saved as output.apkg');
+}).catch(err => console.error(err));
+
+Then run:
+
+node anki-test.js
+
+You should see output.apkg in your project folder — ready to open in Anki.
+
+
+---
+
+🧩 STEP 3 — Integrate into Your SaaS
+
+Here’s how you can use it in your API (for example, an Express route):
+
+import express from 'express';
+import { default as AnkiExport } from 'anki-apkg-export';
+
+const app = express();
+app.use(express.json());
+
+app.post('/export-anki', async (req, res) => {
+  try {
+    const { deckName, flashcards } = req.body; // [{front: '', back: ''}, ...]
+
+    const apkg = new AnkiExport(deckName || 'My Deck');
+
+    flashcards.forEach(card => {
+      apkg.addCard(card.front, card.back);
+    });
+
+    const zip = await apkg.save();
+    res.setHeader('Content-Disposition', 'attachment; filename=deck.apkg');
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.send(Buffer.from(zip, 'binary'));
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to export deck');
+  }
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+
+✅ This endpoint lets your frontend send flashcards as JSON
+✅ The backend responds with a ready-to-download .apkg file
+✅ No database needed — fully on-the-fly
+
+
+---
+
+📁 STEP 4 — (Optional) Add Media (Images, Audio)
+
+If your flashcards include media:
+
+apkg.addMedia('mitochondria.jpg', fs.readFileSync('./mitochondria.jpg'));
+apkg.addCard('<img src="mitochondria.jpg" />', 'The mitochondria.');
+
+The image will be embedded into the .apkg.
+
+
+---
+
+🧠 STEP 5 — Deployment Notes
+
+Works perfectly on Vercel, Render, Railway, or AWS Lambda.
+
+The generated .apkg file is small — usually a few MBs.
+
+You can store decks temporarily (e.g., /tmp folder) or stream directly to the client (best way).
+
+
+
+---
+
+✅ TL;DR Summary
+
+Task Command / Code Notes
+
+Install npm install anki-apkg-export One-liner setup
+Test Run small script to make output.apkg Ensures lib works
+Integrate Use Express route (above) Auto-download ready deck
+Media apkg.addMedia('file', buffer) Adds images/audio
+
+
+
+---
+
+Would you like me to show you the TypeScript version or Next.js API route version of this setup (since many SaaS apps use those)?
