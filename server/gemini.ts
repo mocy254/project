@@ -340,7 +340,13 @@ export async function generateFlashcards(
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions, onProgress } = options;
 
+  console.log(`=== Starting flashcard generation ===`);
+  console.log(`Content length: ${content.length} characters`);
+  console.log(`Card types: ${JSON.stringify(cardTypes)}`);
+  console.log(`Granularity: ${granularity}`);
+  
   const estimatedTokens = estimateTokenCount(content);
+  console.log(`Estimated tokens: ${estimatedTokens}`);
   
   if (estimatedTokens > 100000) {
     console.log(`Large document detected (${Math.floor(estimatedTokens / 1000)}k tokens). Extracting topic structure...`);
@@ -394,9 +400,12 @@ export async function generateFlashcards(
             customInstructions
           }, chunk.context);
           
+          console.log(`Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
           return chunkFlashcards;
         } catch (error) {
           console.error(`Error processing chunk ${chunkIndex + 1}:`, error);
+          console.error(`Error details:`, error instanceof Error ? error.message : error);
+          console.error(`Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
           // Return empty array on error, but don't fail entire generation
           return [];
         }
@@ -554,6 +563,8 @@ ${cardTypeList}
 
 **Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.`;
 
+  console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
+  
   try {
     const response = await withRetry(
       () => withTimeout(
@@ -621,13 +632,22 @@ ${content}`,
 
     const rawJson = response.text;
     if (!rawJson) {
+      console.error("Gemini returned empty response");
       throw new Error("Empty response from Gemini");
     }
 
     const data = JSON.parse(rawJson);
-    return data.flashcards || [];
+    const flashcards = data.flashcards || [];
+    console.log(`Gemini API returned ${flashcards.length} flashcards for chunk: ${chunkContext.substring(0, 50)}...`);
+    
+    if (flashcards.length === 0) {
+      console.warn(`Warning: Gemini returned 0 flashcards for chunk. This may indicate the content is too short or lacks extractable information.`);
+    }
+    
+    return flashcards;
   } catch (error) {
     console.error("Error generating flashcards:", error);
+    console.error("Error type:", error instanceof Error ? error.constructor.name : typeof error);
     throw new Error(`Failed to generate flashcards: ${error}`);
   }
 }
