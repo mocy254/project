@@ -9,6 +9,7 @@ import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtra
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
+// @ts-ignore - No type definitions available
 import AnkiExport from "anki-apkg-export";
 
 const storage_config = multer.diskStorage({
@@ -537,9 +538,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Generate the .apkg file
           const zipData = await apkg.save();
           
-          res.setHeader("Content-Type", "application/apkg");
+          // Set proper headers for Anki package download
+          res.setHeader("Content-Type", "application/zip");
           res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
-          res.send(Buffer.from(zipData, "binary"));
+          res.send(zipData);
           break;
 
         default:
