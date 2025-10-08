@@ -41,14 +41,26 @@ export async function extractPPTText(filePath: string): Promise<string> {
 
 export async function extractYouTubeTranscript(url: string): Promise<string> {
   try {
+    console.log(`Extracting transcript from YouTube URL: ${url}`);
+    
     const videoId = extractYouTubeVideoId(url);
+    console.log(`Extracted video ID: ${videoId}`);
+    
     if (!videoId) {
       throw new Error("Invalid YouTube URL");
     }
 
+    console.log(`Fetching transcript for video ID: ${videoId}`);
     const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-    return transcript.map(item => item.text).join(" ");
+    console.log(`Transcript items fetched: ${transcript.length}`);
+    
+    const content = transcript.map(item => item.text).join(" ");
+    console.log(`Total transcript length: ${content.length} characters`);
+    console.log(`First 200 chars: ${content.substring(0, 200)}`);
+    
+    return content;
   } catch (error: any) {
+    console.error(`YouTube transcript extraction error:`, error);
     if (error.message?.includes("Transcript is disabled")) {
       throw new Error("This video doesn't have subtitles/captions enabled. Please choose a video with available transcripts.");
     }
