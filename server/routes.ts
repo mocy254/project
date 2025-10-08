@@ -9,6 +9,7 @@ import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtra
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
+import AnkiExport from "anki-apkg-export";
 
 const storage_config = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -512,12 +513,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
 
         case "anki":
-          const ankiRows = cards.map(card =>
-            `${card.question}\t${card.answer}`
-          );
-          res.setHeader("Content-Type", "text/plain");
-          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.txt"`);
-          res.send(ankiRows.join("\n"));
+          const apkg = new AnkiExport(deck.title);
+          
+          // Add all flashcards to the package
+          cards.forEach(card => {
+            // Format the question and answer based on card type
+            let question = card.question;
+            let answer = card.answer;
+            
+            // For cloze deletion cards, format them properly for Anki
+            if (card.cardType === "cloze") {
+              // Replace [blank] with {{c1::answer}} format for Anki
+              const clozeParts = question.split("[blank]");
+              if (clozeParts.length > 1) {
+                question = clozeParts[0] + `{{c1::${answer}}}` + clozeParts.slice(1).join("[blank]");
+                answer = ""; // Cloze cards don't need separate answer
+              }
+            }
+            
+            apkg.addCard(question, answer);
+          });
+          
+          // Generate the .apkg file
+          const zipData = await apkg.save();
+          
+          res.setHeader("Content-Type", "application/apkg");
+          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
+          res.send(Buffer.from(zipData, "binary"));
           break;
 
         default:
