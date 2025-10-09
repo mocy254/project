@@ -33,7 +33,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
         <motion.div 
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -54,18 +54,47 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1 
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+            <motion.span 
+              className="block mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
+              animate={{ 
+                y: [0, -5, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
               Stop Forgetting.
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            </motion.span>
+            <motion.span 
+              className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
+              style={{ backgroundSize: "200% 200%" }}
+              animate={{ 
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                y: [0, -5, 0],
+              }}
+              transition={{
+                backgroundPosition: {
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "linear"
+                },
+                y: {
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.3
+                }
+              }}
+            >
               Start Remembering.
-            </span>
+            </motion.span>
           </motion.h1>
 
           <motion.p 
@@ -158,6 +187,47 @@ export default function Hero() {
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+          >
+            <motion.div
+              className="flex flex-col items-center gap-2 cursor-pointer group"
+              onClick={() => {
+                const howItWorks = document.getElementById("how-it-works");
+                howItWorks?.scrollIntoView({ behavior: "smooth" });
+              }}
+              whileHover={{ scale: 1.1 }}
+              animate={{ y: [0, 10, 0] }}
+              transition={{
+                y: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
+              data-testid="scroll-indicator"
+            >
+              <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
+                Scroll to explore
+              </span>
+              <div className="w-6 h-10 rounded-full border-2 border-primary/30 flex items-start justify-center p-2 group-hover:border-primary/60 transition-colors">
+                <motion.div
+                  className="w-1.5 h-1.5 bg-primary rounded-full"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>

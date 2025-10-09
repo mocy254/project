@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { Upload, Sparkles, Edit, Download, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { Upload, Sparkles, Edit, Download, ArrowRight, Zap } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const steps = [
   {
@@ -38,19 +39,28 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+
   return (
-    <div id="how-it-works" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-background to-card/30">
-      {/* Background effects */}
+    <div ref={ref} id="how-it-works" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-background to-card/30">
+      {/* Background effects with parallax */}
       <motion.div 
         className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl"
+        style={{ scale, opacity }}
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.2, 0.3, 0.2],
+          rotate: [0, 360],
         }}
         transition={{
-          duration: 12,
+          duration: 20,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "linear"
         }}
       />
 

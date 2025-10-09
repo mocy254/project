@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Brain, Sliders, Edit3, Download, ShieldCheck, Clock, FileStack, Microscope } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const features = [
   {
@@ -74,14 +75,23 @@ const itemVariants = {
 };
 
 export default function FeatureSection() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+
   return (
-    <div id="features" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Simplified background effects */}
+    <div ref={ref} id="features" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Parallax background effects */}
       <motion.div 
         className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-primary/15 to-transparent rounded-full blur-3xl"
+        style={{ y, opacity }}
         animate={{
           scale: [1, 1.15, 1],
-          opacity: [0.2, 0.3, 0.2],
         }}
         transition={{
           duration: 12,
@@ -137,21 +147,30 @@ export default function FeatureSection() {
             <motion.div 
               key={i} 
               variants={itemVariants}
-              whileHover={{ y: -8, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
+              whileHover={{ y: -12, scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              <Card className={`relative group p-6 h-full bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border-primary/20 overflow-visible`}>
+              <Card className={`relative group p-6 h-full bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border-primary/20 overflow-visible cursor-pointer`}>
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 rounded-lg"
+                  transition={{ duration: 0.4 }}
+                />
+                <motion.div
+                  className="relative"
+                  whileHover={{ scale: 1.15, rotate: [0, -5, 5, 0] }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-primary/20">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-shadow">
                     <feature.icon className="w-7 h-7 text-primary-foreground" />
                   </div>
                 </motion.div>
-                <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                <motion.h3 
+                  className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   {feature.title}
-                </h3>
+                </motion.h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
