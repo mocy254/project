@@ -1,0 +1,99 @@
+Billing: Stripe Checkout + webhooks. Ask Agent: “Add Stripe webhook /webhook/stripe that upgrades user to Pro on successful payment and sets plan=pro in users table.”
+
+
+Replit Agent supports connectors and can help wire these up. 
+
+
+---
+
+7) Frontend (UX areas to prompt the Agent about)
+
+Upload flow with drag & drop + progress
+
+Job status screen with live websocket updates
+
+Deck preview (first 20 cards) + export button
+
+Settings: coverage level slider (1–7), export formats (Anki .apkg, CSV)
+
+Onboarding modal for first-run with sample deck generation
+
+
+Prompt example: “Make mobile-first React components for Upload, Progress, and DeckPreview. Use Tailwind.” Agent will scaffold UI code if asked.
+
+
+---
+
+8) Testing, monitoring & analytics
+
+Ask Agent to create pytest unit tests for chunker + generator.
+
+Add Sentry for error logging and PostHog / Mixpanel for product analytics.
+
+Create an Admin route /admin/jobs to view jobs and re-run or cancel.
+
+
+Agent can generate tests and set up CI. Use the Agent’s testing loop (Agent 3) to auto-test generated code. 
+
+
+---
+
+9) Deployment & production considerations
+
+Replit is perfect for prototyping and early users, but for scale you may move storage or workers to dedicated providers (S3, GCP, AWS, Render, Fly, etc.). Use Replit for an MVP and iterate quickly. Guides show building and deploying apps on Replit with Agent. 
+
+
+
+---
+
+10) Example “refine” prompts to give the Agent after initial scaffold
+
+“Change the chunking to 1200–1600 token chunks using token counting (add tiktoken) and add overlap 200 tokens.”
+
+“Implement a retry policy on generation failures and exponential backoff for LLM calls.”
+
+“Add a daily quota system (free users = 1,000 cards/month) and email reminders when quota is near limit.”
+
+“Add a one-click demo that generates 50 sample cards from the First Aid PDF we provide.”
+
+
+
+---
+
+Common pitfalls & tips
+
+Token limits & cost: chunk smart. Use embeddings + retrieval to limit prompt size.
+
+Large PDF uploads: stream to S3; don’t load huge files into memory.
+
+Vector DB costs: start with Supabase or a small Pinecone namespace — cheaper for prototyping.
+
+Security: always store API keys in env vars and use HTTPS.
+
+Replit limits: free Repls sleep; Agent features and longer runtimes may require paid plan — plan accordingly. 
+
+
+
+---
+
+Quick checklist you can paste to Replit Agent (one prompt)
+
+> “Build an MVP for FlashcardsAI with: FastAPI backend, React frontend, PDF upload, chunking + embeddings (OpenAI), vector DB (Pinecone or Supabase), background worker, Anki .apkg export (genanki), Supabase auth, Stripe billing, admin dashboard, tests. Use env vars for keys. Show me the project plan and scaffold code. After scaffolding, add unit tests for chunking and a demo PDF to try the flow.”
+
+
+
+Paste that into the Agent, review the plan it proposes, then hit Start.
+
+
+---
+
+Want me to do one thing right now for you?
+
+I can:
+
+produce a ready-to-paste Replit Agent prompt tuned for the exact stack you prefer (OpenAI vs Gemini, Pinecone vs Supabase), or
+
+generate the full backend worker script for chunking + embeddings + genanki that you can paste into your Repl.
+
+
+Which would you like me to create now? (I’ll produce the full prompt/script immediately so you can paste it into Replit Agent.)
