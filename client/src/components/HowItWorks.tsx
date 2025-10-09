@@ -80,11 +80,7 @@ export default function HowItWorks() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Your Journey to
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Long-Term Retention
+              How It Works
             </span>
           </motion.h2>
           <motion.p 
@@ -94,8 +90,8 @@ export default function HowItWorks() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            From information overload to{" "}
-            <span className="text-primary font-semibold">confident recall</span> in 4 simple steps
+            From lecture chaos to{" "}
+            <span className="text-primary font-semibold">organized mastery</span> in 4 simple steps
           </motion.p>
         </motion.div>
 
