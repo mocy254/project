@@ -29,6 +29,8 @@ export default function GenerationForm() {
   const [title, setTitle] = useState("");
   const [activeTab, setActiveTab] = useState("text");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [includeSource, setIncludeSource] = useState(false);
+  const [createSubdecks, setCreateSubdecks] = useState(false);
   const { userId} = useUser();
   const { toast } = useToast();
 
@@ -141,6 +143,8 @@ export default function GenerationForm() {
       cardTypes: selectedCardTypes,
       granularity: granularity[0],
       customInstructions: customInstructions.trim(),
+      includeSource: includeSource.toString(),
+      createSubdecks: createSubdecks.toString(),
     };
 
     if (activeTab === "text") {
@@ -169,6 +173,8 @@ export default function GenerationForm() {
       formData.append("cardTypes", JSON.stringify(selectedCardTypes));
       formData.append("granularity", granularity[0].toString());
       formData.append("customInstructions", customInstructions.trim());
+      formData.append("includeSource", includeSource.toString());
+      formData.append("createSubdecks", createSubdecks.toString());
       documentMutation.mutate(formData);
     } else if (activeTab === "youtube") {
       if (!youtubeUrl.trim()) {
@@ -398,6 +404,37 @@ export default function GenerationForm() {
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Core principles</span>
                     <span>Every detail</span>
+                  </div>
+                </div>
+
+                {/* Additional Options */}
+                <div className="space-y-4 pt-2 border-t border-border/30">
+                  <Label className="text-sm font-medium">Additional Options</Label>
+                  <div className="grid gap-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="include-source" className="font-medium cursor-pointer">Include Source in Answer</Label>
+                        <p className="text-xs text-muted-foreground">Add timestamps for videos or page references for documents</p>
+                      </div>
+                      <Switch
+                        id="include-source"
+                        checked={includeSource}
+                        onCheckedChange={setIncludeSource}
+                        data-testid="switch-include-source"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="create-subdecks" className="font-medium cursor-pointer">Create Subdecks by Subtopics</Label>
+                        <p className="text-xs text-muted-foreground">Organize flashcards into separate decks based on subtopics</p>
+                      </div>
+                      <Switch
+                        id="create-subdecks"
+                        checked={createSubdecks}
+                        onCheckedChange={setCreateSubdecks}
+                        data-testid="switch-create-subdecks"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
