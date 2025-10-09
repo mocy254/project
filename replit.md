@@ -23,11 +23,17 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - Tailwind CSS for utility-first styling with custom design system
 
 **Design System:**
-- Inspired by Notion's clean card-based layouts and Linear's refined typography
-- Custom color palette with HSL values for easy theme switching
-- Typography using Inter (body) and Poppins (headings) font families
+- Medical student-focused aesthetic with calming, professional colors
+- **Color Palette (Updated Oct 2025):**
+  - Primary: Medical blue (200 95% 45%) - calming, trustworthy, healthcare-associated
+  - Accent: Soft teal (175 45% 92%) - modern, clean complement
+  - Backgrounds: Warm neutrals (210 20% 98%) - comfortable for long study sessions
+  - Text: Professional grays with high contrast for readability
+  - Error: Softer red (0 70% 55%) - less harsh than standard alerts
+- Typography using Inter (body) and Poppins (headings) font families for professional medical aesthetic
 - Support for light and dark modes with CSS custom properties
 - Component variants using class-variance-authority (CVA)
+- **Animations:** Smooth framer-motion transitions (fade-ins, slides, viewport triggers) without performance overhead
 
 **State Management:**
 - UserContext for authentication state (userId, userName) with localStorage persistence
@@ -38,6 +44,13 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - Public routes: Landing (`/`), Login (`/login`), Signup (`/signup`)
 - Protected routes: Dashboard (`/dashboard`), Generate (`/generate`), Editor (`/editor/:id`), Decks (`/decks`), Settings (`/settings`)
 - ProtectedRoute wrapper component enforces authentication
+
+**Landing Page (Updated Oct 2025):**
+- **Value Propositions:** Emphasizes time-saving (10+ hours/week), hallucination-free AI, and trustworthy content for medical students
+- **Hero Section:** "Study Smarter, Not Harder" messaging with three key benefits (Save Time, No Hallucinations, Customizable)
+- **Feature Section:** 8 cards highlighting medical student-specific features (smart topic analysis, granularity control, Anki export)
+- **CTA Section:** Trust signals (no credit card, free forever, cancel anytime) to reduce friction
+- **Responsive Design:** Mobile-first with adaptive grids (1/2/4 columns) across breakpoints
 
 ### Backend Architecture
 
