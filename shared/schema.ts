@@ -20,6 +20,8 @@ export const decks = pgTable("decks", {
   cardTypes: text("card_types").array().notNull(),
   granularity: integer("granularity").notNull(),
   customInstructions: text("custom_instructions"),
+  includeSource: text("include_source").notNull().default('false'),
+  createSubdecks: text("create_subdecks").notNull().default('false'),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

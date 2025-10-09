@@ -57,6 +57,8 @@ export class MemStorage implements IStorage {
     const deck: Deck = { 
       ...insertDeck,
       customInstructions: insertDeck.customInstructions ?? null,
+      includeSource: insertDeck.includeSource ?? 'false',
+      createSubdecks: insertDeck.createSubdecks ?? 'false',
       id,
       createdAt: now,
       updatedAt: now
