@@ -1,63 +1,107 @@
 import { Card } from "@/components/ui/card";
-import { Brain, Sliders, Edit3, Download, Layers, Zap } from "lucide-react";
+import { Brain, Sliders, Edit3, Download, FileStack, Zap, ShieldCheck, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
 const features = [
   {
+    icon: ShieldCheck,
+    title: "Hallucination-Free AI",
+    description: "Our AI only uses information from your source material - no made-up facts, no errors. Study with confidence."
+  },
+  {
+    icon: Clock,
+    title: "Save 10+ Hours Weekly",
+    description: "Stop manually creating flashcards. Generate comprehensive decks from 100+ page textbooks in minutes."
+  },
+  {
     icon: Brain,
-    title: "AI-Powered Generation",
-    description: "Gemini 2.5 Flash creates intelligent flashcards from your content automatically"
+    title: "Smart Topic Analysis",
+    description: "Gemini 2.5 Flash intelligently identifies key concepts, definitions, and clinical facts from your content."
   },
   {
     icon: Sliders,
-    title: "Advanced Customization",
-    description: "Choose card types (Q&A, cloze deletion, reverse), granularity, and extra notes"
+    title: "Granularity Control",
+    description: "Choose coverage level (1-7) to focus on core concepts or get comprehensive detail - perfect for different study stages."
+  },
+  {
+    icon: FileStack,
+    title: "Multi-Format Support",
+    description: "Upload PDFs, DOCX, PPT files, paste text, or use YouTube lecture links. We handle it all."
   },
   {
     icon: Edit3,
-    title: "Interactive Editor",
-    description: "Edit, delete, and manually create cards with our intuitive editing interface"
+    title: "Full Editing Control",
+    description: "Review and refine every flashcard. Add, delete, or modify cards to match your learning style."
   },
   {
     icon: Download,
-    title: "Export Anywhere",
-    description: "Export to JSON, CSV, or Anki-compatible formats for use in any study app"
-  },
-  {
-    icon: Layers,
-    title: "Multi-Format Support",
-    description: "Upload PDFs, Word docs, PowerPoint, or paste YouTube links and text"
+    title: "Export to Anki",
+    description: "Seamlessly export to Anki .apkg format or JSON/CSV for use in your preferred study app."
   },
   {
     icon: Zap,
-    title: "Instant Results",
-    description: "Generate comprehensive flashcard decks in seconds, not hours"
+    title: "Multiple Card Types",
+    description: "Generate Q&A, cloze deletion, and reverse cards - all in the same deck for varied practice."
   }
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
+
 export default function FeatureSection() {
   return (
-    <div className="py-24 px-4">
+    <div className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Everything You Need to Study Smarter
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            Built for Medical Students
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Powerful features designed to transform your learning experience
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+            Every feature designed to help you learn faster, retain more, and ace your exams with AI you can trust
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
           {features.map((feature, i) => (
-            <Card key={i} className="p-6 hover-elevate transition-all duration-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-[hsl(258,90%,66%)] rounded-lg flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-display text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-            </Card>
+            <motion.div key={i} variants={itemVariants}>
+              <Card className="p-6 h-full hover-elevate transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="font-display text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
