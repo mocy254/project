@@ -109,16 +109,11 @@ export default function HowItWorks() {
               transition={{ duration: 0.6, delay: i * 0.1 }}
             >
               <Card className={`relative h-full p-6 bg-gradient-to-br ${step.color} backdrop-blur-xl border-primary/20 overflow-visible hover-elevate group`}>
-                <motion.div
-                  whileHover={{ scale: 1.05, rotate: 5 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-xl shadow-primary/30">
-                    <span className="font-display text-lg font-bold text-primary-foreground">
-                      {step.number}
-                    </span>
-                  </div>
-                </motion.div>
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-xl shadow-primary/30">
+                  <span className="font-display text-lg font-bold text-primary-foreground">
+                    {step.number}
+                  </span>
+                </div>
 
                 <div className="mt-6 mb-4">
                   <motion.div
@@ -140,7 +135,7 @@ export default function HowItWorks() {
 
                 {i < steps.length - 1 && (
                   <motion.div 
-                    className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 text-primary/40"
+                    className="hidden lg:block absolute -right-8 top-1/2 -translate-y-1/2 text-primary/50 z-10"
                     animate={{
                       x: [0, 5, 0],
                     }}
@@ -150,7 +145,7 @@ export default function HowItWorks() {
                       ease: "easeInOut"
                     }}
                   >
-                    <ArrowRight className="w-6 h-6" />
+                    <ArrowRight className="w-8 h-8" />
                   </motion.div>
                 )}
               </Card>
