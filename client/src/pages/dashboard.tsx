@@ -199,7 +199,7 @@ export default function Dashboard() {
                       </DropdownMenu>
                     </CardHeader>
                     <CardContent className="flex items-center gap-4 pt-0">
-                      <Link href={`/editor/${deck.id}`}>
+                      <Link href={`/study/${deck.id}`}>
                         <Button variant="default" size="sm" data-testid={`button-study-${deck.id}`} className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
                           Study Now
                         </Button>

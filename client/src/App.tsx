@@ -16,6 +16,7 @@ import Generate from "@/pages/generate";
 import Editor from "@/pages/editor";
 import Settings from "@/pages/settings";
 import Decks from "@/pages/decks";
+import Study from "@/pages/study";
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,7 +40,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
 function Router() {
   const [location] = useLocation();
-  const isAppRoute = ["/dashboard", "/generate", "/editor", "/settings", "/decks"].some(
+  const isAppRoute = ["/dashboard", "/generate", "/editor", "/settings", "/decks", "/study"].some(
     route => location.startsWith(route)
   );
 
@@ -79,6 +80,11 @@ function Router() {
           ) : (
             <Editor />
           )}
+        </ProtectedRoute>
+      </Route>
+      <Route path="/study/:id">
+        <ProtectedRoute>
+          <Study />
         </ProtectedRoute>
       </Route>
       <Route path="/settings">

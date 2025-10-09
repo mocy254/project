@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Edit, Trash2, Plus, Save, Download, Loader2, Eye } from "lucide-react";
-import { useParams } from "wouter";
+import { Edit, Trash2, Plus, Save, Download, Loader2, Eye, BookOpen } from "lucide-react";
+import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +26,7 @@ export default function Editor() {
   const params = useParams();
   const deckId = params.id as string;
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editedQuestion, setEditedQuestion] = useState("");
@@ -176,6 +177,15 @@ export default function Editor() {
           <p className="text-muted-foreground mt-1">Edit and preview your flashcards</p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            onClick={() => setLocation(`/study/${deckId}`)} 
+            variant="default" 
+            size="sm"
+            data-testid="button-study"
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            Study
+          </Button>
           <Button onClick={() => handleExport("json")} variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             JSON
