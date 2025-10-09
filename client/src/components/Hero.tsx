@@ -109,7 +109,7 @@ export default function Hero() {
                   data-testid="button-get-started"
                 >
                   <GraduationCap className="mr-2 w-6 h-6" />
-                  Start Learning Smarter
+                  Turn Notes Into Flashcards Now
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </motion.div>
@@ -140,20 +140,20 @@ export default function Hero() {
             {[
               { 
                 icon: Clock, 
-                label: "Under 3 Minutes", 
-                description: "Upload a 200-page textbook, get a complete deck faster than making coffee",
+                label: "Get Your Time Back", 
+                description: "Every hour you spend making flashcards is an hour you could've spent mastering them",
                 gradient: "from-primary/20 to-accent/20"
               },
               { 
                 icon: Brain, 
-                label: "Zero Setup Required", 
-                description: "No complicated workflows. Just upload, customize, and export to Anki—done",
+                label: "Study Smarter, Not Harder", 
+                description: "From First Aid to lecture slides—instantly organized, perfectly formatted, Anki-ready",
                 gradient: "from-accent/20 to-primary/20"
               },
               { 
                 icon: Stethoscope, 
-                label: "Medical-Grade Accuracy", 
-                description: "Only facts from YOUR materials. No AI hallucinations, no made-up drugs",
+                label: "Built by Med Students", 
+                description: "We know the struggle. We built the solution. Now we're helping thousands reclaim their focus",
                 gradient: "from-primary/20 via-accent/20 to-primary/20"
               }
             ].map((feature, i) => (
