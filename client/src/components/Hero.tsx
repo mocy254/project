@@ -54,16 +54,16 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1 
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.15] pb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <span className="block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-              Your Journey to
+            <span className="block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent pb-1">
+              Stop Drowning in
             </span>
             <motion.span 
-              className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
+              className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent pb-1"
               style={{ backgroundSize: "200% 200%" }}
               animate={{ 
                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
@@ -76,7 +76,7 @@ export default function Hero() {
                 }
               }}
             >
-              Long-Term Retention
+              Medical Notes
             </motion.span>
           </motion.h1>
 
@@ -86,10 +86,10 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            Stop wasting hours re-reading textbooks. Turn any lecture, PDF, or video into{" "}
-            <span className="text-primary font-semibold">instant study decks</span>{" "}
-            in under 3 minutes—so you can focus on{" "}
-            <span className="text-accent font-semibold">actually learning</span>.
+            You're studying every day, yet facts still slip away. You spend more time{" "}
+            <span className="text-muted-foreground/80 italic">making</span> flashcards than{" "}
+            <span className="text-primary font-semibold">mastering</span> them.{" "}
+            <span className="block mt-4">Let AI turn your lectures, notes, and videos into Anki-ready decks—instantly.</span>
           </motion.p>
 
           <motion.div 
