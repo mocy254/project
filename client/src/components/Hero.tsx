@@ -86,10 +86,10 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            Transform your lectures and textbooks into{" "}
-            <span className="text-primary font-semibold">active recall</span>{" "}
-            flashcards that actually stick. Because reading isn't learning—
-            <span className="text-accent font-semibold">testing yourself is</span>.
+            Stop wasting hours re-reading textbooks. Turn any lecture, PDF, or video into{" "}
+            <span className="text-primary font-semibold">instant study decks</span>{" "}
+            in under 3 minutes—so you can focus on{" "}
+            <span className="text-accent font-semibold">actually learning</span>.
           </motion.p>
 
           <motion.div 
@@ -139,21 +139,21 @@ export default function Hero() {
           >
             {[
               { 
-                icon: Brain, 
-                label: "Active Recall Built-In", 
-                description: "Every card forces retrieval—the proven method to lock in knowledge",
+                icon: Clock, 
+                label: "Under 3 Minutes", 
+                description: "Upload a 200-page textbook, get a complete deck faster than making coffee",
                 gradient: "from-primary/20 to-accent/20"
               },
               { 
-                icon: Clock, 
-                label: "Spaced Repetition Ready", 
-                description: "Export to Anki for scientifically-timed reviews",
+                icon: Brain, 
+                label: "Zero Setup Required", 
+                description: "No complicated workflows. Just upload, customize, and export to Anki—done",
                 gradient: "from-accent/20 to-primary/20"
               },
               { 
                 icon: Stethoscope, 
-                label: "No Hallucinations", 
-                description: "Only facts from YOUR textbooks and lectures",
+                label: "Medical-Grade Accuracy", 
+                description: "Only facts from YOUR materials. No AI hallucinations, no made-up drugs",
                 gradient: "from-primary/20 via-accent/20 to-primary/20"
               }
             ].map((feature, i) => (
