@@ -14,6 +14,7 @@ export const users = pgTable("users", {
 export const decks = pgTable("decks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  parentDeckId: varchar("parent_deck_id"),
   title: text("title").notNull(),
   source: text("source").notNull(),
   sourceType: text("source_type").notNull(),

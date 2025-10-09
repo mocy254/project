@@ -9,6 +9,7 @@ export interface IStorage {
   createDeck(deck: InsertDeck): Promise<Deck>;
   getDeck(id: string): Promise<Deck | undefined>;
   getDecksByUserId(userId: string): Promise<Deck[]>;
+  getSubdecks(parentDeckId: string): Promise<Deck[]>;
   updateDeck(id: string, deck: Partial<InsertDeck>): Promise<Deck | undefined>;
   deleteDeck(id: string): Promise<void>;
   
@@ -56,6 +57,7 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const deck: Deck = { 
       ...insertDeck,
+      parentDeckId: insertDeck.parentDeckId ?? null,
       customInstructions: insertDeck.customInstructions ?? null,
       includeSource: insertDeck.includeSource ?? 'false',
       createSubdecks: insertDeck.createSubdecks ?? 'false',
@@ -75,6 +77,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.decks.values()).filter(deck => deck.userId === userId);
   }
 
+  async getSubdecks(parentDeckId: string): Promise<Deck[]> {
+    return Array.from(this.decks.values()).filter(deck => deck.parentDeckId === parentDeckId);
+  }
+
   async updateDeck(id: string, updateData: Partial<InsertDeck>): Promise<Deck | undefined> {
     const deck = this.decks.get(id);
     if (!deck) return undefined;
@@ -89,10 +95,19 @@ export class MemStorage implements IStorage {
   }
 
   async deleteDeck(id: string): Promise<void> {
-    this.decks.delete(id);
+    // Delete all subdecks first
+    const subdecks = await this.getSubdecks(id);
+    for (const subdeck of subdecks) {
+      await this.deleteDeck(subdeck.id);
+    }
+    
+    // Delete all flashcards associated with this deck
     Array.from(this.flashcards.values())
       .filter(card => card.deckId === id)
       .forEach(card => this.flashcards.delete(card.id));
+    
+    // Delete the deck itself
+    this.decks.delete(id);
   }
 
   async createFlashcard(insertFlashcard: InsertFlashcard): Promise<Flashcard> {
