@@ -53,6 +53,9 @@ export default function Dashboard() {
     }
   };
 
+  // Filter out subdecks, only show parent decks on dashboard
+  const parentDecks = decks?.filter((deck: any) => !deck.parentDeckId) || [];
+  
   const totalCards = decks?.reduce((sum: number, deck: any) => sum + (deck.cardCount || 0), 0) || 0;
   // Credits logic will be implemented later
   const creditsRemaining = 1000;
@@ -101,7 +104,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-display font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {decks?.length || 0}
+                {parentDecks.length}
               </div>
               <p className="text-xs text-muted-foreground mt-2">Active collections</p>
             </CardContent>
@@ -137,7 +140,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-        ) : !decks || decks.length === 0 ? (
+        ) : parentDecks.length === 0 ? (
           <Card className="p-12 text-center bg-gradient-to-br from-card to-card/80 border-primary/20">
             <p className="text-muted-foreground mb-4">No decks yet. Create your first flashcard deck!</p>
             <Link href="/generate">
@@ -149,7 +152,7 @@ export default function Dashboard() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {decks.map((deck: any, index: number) => {
+            {parentDecks.map((deck: any, index: number) => {
               const SourceIcon = getSourceIcon(deck.sourceType);
               return (
                 <motion.div
