@@ -10,13 +10,14 @@ import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
 import { ObjectStorageService } from "./objectStorage";
-import { createReadStream, unlink } from "fs";
+import { readFile, unlink } from "fs";
 import { promisify } from "util";
 // @ts-ignore - No type definitions available
 import AnkiExportModule from 'anki-apkg-export';
 const AnkiExport = (AnkiExportModule as any).default || AnkiExportModule;
 
 const unlinkAsync = promisify(unlink);
+const readFileAsync = promisify(readFile);
 
 // Helper function to upload file to Object Storage
 async function uploadFileToStorage(
@@ -29,11 +30,13 @@ async function uploadFileToStorage(
     // Get upload URL
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     
-    // Upload file
-    const fileStream = createReadStream(filePath);
+    // Read file into buffer before uploading (ensures file is fully read before cleanup)
+    const fileBuffer = await readFileAsync(filePath);
+    
+    // Upload file buffer
     const response = await fetch(uploadURL, {
       method: 'PUT',
-      body: fileStream as any,
+      body: fileBuffer,
     });
 
     if (!response.ok) {

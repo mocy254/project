@@ -91,9 +91,15 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 5. Generated flashcards stored with associated deck metadata
 
 **Data Storage:**
-- Currently using in-memory storage (MemStorage class) with Map-based data structures
-- Designed for eventual PostgreSQL integration via Drizzle ORM
-- Schema defined with proper relationships and constraints ready for database migration
+- **PostgreSQL Database (Oct 2025):** Production-ready Neon serverless database with Drizzle ORM
+  - All user data, decks, and flashcards persisted to PostgreSQL
+  - Database migrations managed via `npm run db:push` (Drizzle Kit)
+  - Connection pooling with `@neondatabase/serverless` and WebSocket support
+- **Replit App Storage (Oct 2025):** Cloud-based file storage for uploaded documents
+  - Files uploaded to Google Cloud Storage via Replit App Storage
+  - Private object storage with ACL policies (owner-based access control)
+  - Object paths stored in deck `fileUrl` field (format: `/objects/uploads/{uuid}`)
+  - Automatic cleanup of local temp files after cloud upload
 
 ### Database Schema
 
@@ -102,9 +108,10 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
   - Fields: id (UUID), email (unique), password, name (nullable), createdAt
   
 - `decks`: Flashcard deck containers with hierarchical structure support
-  - Fields: id (UUID), userId (foreign key), parentDeckId (nullable, self-referential for hierarchy), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), includeSource (boolean as 'true'/'false'), createSubdecks (boolean as 'true'/'false'), createdAt, updatedAt
+  - Fields: id (UUID), userId (foreign key), parentDeckId (nullable, self-referential for hierarchy), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), includeSource (boolean as 'true'/'false'), createSubdecks (boolean as 'true'/'false'), fileUrl (nullable, cloud storage path), createdAt, updatedAt
   - Supports parent-child relationships for subdeck organization
   - Cascade delete on user removal and recursive deletion of child subdecks
+  - **fileUrl:** Stores cloud storage path for uploaded documents (format: `/objects/uploads/{uuid}`)
   
 - `flashcards`: Individual flashcards
   - Fields: id (UUID), deckId (foreign key), question, answer, cardType, position, createdAt
