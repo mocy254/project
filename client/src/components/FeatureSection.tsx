@@ -1,55 +1,55 @@
 import { Card } from "@/components/ui/card";
-import { Brain, Sliders, Edit3, Download, FileStack, Zap, ShieldCheck, Clock } from "lucide-react";
+import { Brain, Sliders, Edit3, Download, ShieldCheck, Clock, FileStack, Microscope } from "lucide-react";
 import { motion } from "framer-motion";
 
 const features = [
   {
-    icon: ShieldCheck,
-    title: "Hallucination-Free",
-    description: "AI that only uses your source material - guaranteed accuracy for medical exams",
+    icon: Brain,
+    title: "Active Recall Engine",
+    description: "Every flashcard forces retrieval practice—the #1 scientifically-proven method to move info from short-term cramming to long-term memory",
     gradient: "from-primary/20 to-accent/20"
   },
   {
     icon: Clock,
-    title: "Save 10+ Hours Weekly",
-    description: "Generate comprehensive decks from 100+ page textbooks in minutes, not days",
+    title: "Built for Spaced Repetition",
+    description: "Seamless Anki export means you'll review cards exactly when your brain is about to forget them. Science-backed, retention-maximized.",
     gradient: "from-accent/20 to-primary/20"
   },
   {
-    icon: Brain,
-    title: "Smart Topic Analysis",
-    description: "Automatically identifies key concepts, clinical facts, and exam-relevant details",
-    gradient: "from-primary/20 via-accent/30 to-primary/20"
+    icon: ShieldCheck,
+    title: "Zero Hallucinations",
+    description: "We only pull from YOUR source material. No made-up facts, no fictional drugs, no mystery mechanisms. Your textbook = your flashcards.",
+    gradient: "from-primary/20 via-accent/20 to-primary/20"
   },
   {
-    icon: Sliders,
-    title: "Precision Control",
-    description: "Adjust detail level from core concepts to comprehensive coverage",
-    gradient: "from-accent/30 to-primary/20"
+    icon: Microscope,
+    title: "Med School Optimized",
+    description: "Designed for anatomy atlases, pharmacology tables, pathology slides, and those brutal biochem pathways. We get it—because we built it for us.",
+    gradient: "from-accent/20 to-primary/20"
   },
   {
     icon: FileStack,
-    title: "Universal Input",
-    description: "PDFs, DOCX, PPT, YouTube lectures - we handle every format seamlessly",
-    gradient: "from-primary/20 to-accent/30"
+    title: "Any Format, Any Source",
+    description: "PDFs from faculty, DOCX notes, YouTube lectures, PowerPoints. 200-page textbook chapters? Bring it. We handle the heavy lifting.",
+    gradient: "from-primary/20 to-accent/20"
+  },
+  {
+    icon: Sliders,
+    title: "Granularity Control",
+    description: "Need just high-yield facts? Or every single detail? Slide the dial. From \"Step 1 core concepts\" to \"shelf exam minutiae\"—you decide.",
+    gradient: "from-accent/20 via-primary/20 to-accent/20"
   },
   {
     icon: Edit3,
-    title: "Full Editing Power",
-    description: "Review, refine, and customize every flashcard to match your study style",
-    gradient: "from-accent/20 via-primary/30 to-accent/20"
+    title: "Full Editing Freedom",
+    description: "Hate a phrasing? Change it. Want to add a mnemonic? Do it. Organize by systems, diseases, or drugs. These are YOUR cards.",
+    gradient: "from-primary/20 to-accent/20"
   },
   {
     icon: Download,
     title: "Export Anywhere",
-    description: "Seamless export to Anki .apkg, JSON, CSV - use in any study app",
-    gradient: "from-primary/30 to-accent/20"
-  },
-  {
-    icon: Zap,
-    title: "Multi-Card Types",
-    description: "Q&A, cloze deletion, reverse cards - all in one deck for varied practice",
-    gradient: "from-accent/20 to-primary/30"
+    description: "One-click .apkg for Anki. CSV for spreadsheets. JSON for nerds. Study on your phone, tablet, laptop—wherever muscle memory kicks in.",
+    gradient: "from-accent/20 to-primary/20"
   }
 ];
 
@@ -58,54 +58,41 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08
+      staggerChildren: 0.06
     }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.6, ease: "easeOut" }
+    transition: { duration: 0.5, ease: "easeOut" }
   }
 };
 
 export default function FeatureSection() {
   return (
-    <div className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Background gradient effects */}
+    <div id="features" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Simplified background effects */}
       <motion.div 
-        className="absolute top-20 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl"
+        className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-primary/15 to-transparent rounded-full blur-3xl"
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div 
-        className="absolute bottom-20 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.5, 0.3],
+          scale: [1, 1.15, 1],
+          opacity: [0.2, 0.3, 0.2],
         }}
         transition={{
           duration: 12,
           repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2
+          ease: "easeInOut"
         }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <motion.div 
-          className="text-center mb-20"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -119,7 +106,11 @@ export default function FeatureSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Everything You Need
+              Built Different,
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Because Med School Is
             </span>
           </motion.h2>
           <motion.p 
@@ -129,8 +120,9 @@ export default function FeatureSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            Powerful features designed for{" "}
-            <span className="text-primary font-semibold">medical excellence</span>
+            Features designed by med students who were{" "}
+            <span className="text-primary font-semibold">tired of forgetting everything</span>{" "}
+            they just studied
           </motion.p>
         </motion.div>
 
@@ -148,13 +140,9 @@ export default function FeatureSection() {
               whileHover={{ y: -8, scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className={`relative group p-6 h-full bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border-primary/20 overflow-hidden`}>
+              <Card className={`relative group p-6 h-full bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border-primary/20 overflow-visible`}>
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                />
-                <motion.div
-                  className="relative"
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.3 }}
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-primary/20">

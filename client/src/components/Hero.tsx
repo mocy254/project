@@ -1,112 +1,88 @@
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Zap, Brain, Sparkles, ArrowRight } from "lucide-react";
+import { GraduationCap, Brain, Clock, ArrowRight, Stethoscope } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-card to-background">
-      {/* Animated gradient orbs */}
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-card to-background pt-16">
+      {/* Optimized animated gradient orbs - fewer, simpler animations */}
       <motion.div 
-        className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/30 to-accent/30 rounded-full blur-3xl"
+        className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.4, 0.3],
         }}
         transition={{
-          duration: 8,
+          duration: 10,
           repeat: Infinity,
           ease: "easeInOut"
         }}
       />
       <motion.div 
-        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-accent/40 to-primary/20 rounded-full blur-3xl"
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-accent/20 to-primary/15 rounded-full blur-3xl"
         animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.4, 0.6, 0.4],
+          scale: [1, 1.15, 1],
+          opacity: [0.3, 0.4, 0.3],
         }}
         transition={{
-          duration: 10,
+          duration: 12,
           repeat: Infinity,
           ease: "easeInOut",
           delay: 1
-        }}
-      />
-      <motion.div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-primary/20 via-accent/30 to-primary/20 rounded-full blur-3xl"
-        animate={{
-          rotate: [0, 360],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "linear"
         }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <motion.div 
           className="text-center"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           <motion.div 
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 backdrop-blur-xl border border-primary/30 text-foreground px-6 py-2.5 rounded-full mb-8 shadow-lg shadow-primary/10"
-            initial={{ opacity: 0, scale: 0.8 }}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/15 via-accent/15 to-primary/15 backdrop-blur-xl border border-primary/20 text-foreground px-5 py-2 rounded-full mb-8 shadow-lg shadow-primary/10"
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             whileHover={{ scale: 1.05 }}
           >
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Advanced AI Technology
+            <Stethoscope className="w-4 h-4 text-primary" />
+            <span className="text-sm font-semibold">
+              Built for Medical Students
             </span>
           </motion.div>
 
           <motion.h1 
-            className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
-            initial={{ opacity: 0, y: 30 }}
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Master Medicine
+            <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+              Stop Forgetting.
             </span>
             <br />
-            <motion.span 
-              className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                backgroundSize: "200% 200%"
-              }}
-            >
-              Effortlessly
-            </motion.span>
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Start Remembering.
+            </span>
           </motion.h1>
 
           <motion.p 
-            className="text-xl sm:text-2xl md:text-3xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            Transform dense textbooks and lectures into{" "}
-            <span className="text-primary font-semibold">instant flashcards</span>.
-            Study smarter with AI that never hallucinates.
+            Transform your lectures and textbooks into{" "}
+            <span className="text-primary font-semibold">active recall</span>{" "}
+            flashcards that actually stick. Because reading isn't learning—
+            <span className="text-accent font-semibold">testing yourself is</span>.
           </motion.p>
 
           <motion.div 
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
-            initial={{ opacity: 0, y: 30 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
@@ -121,7 +97,7 @@ export default function Hero() {
                   data-testid="button-get-started"
                 >
                   <GraduationCap className="mr-2 w-6 h-6" />
-                  Start Free Now
+                  Start Learning Smarter
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </motion.div>
@@ -145,44 +121,41 @@ export default function Hero() {
 
           <motion.div 
             className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto"
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
           >
             {[
               { 
-                icon: Zap, 
-                label: "Generate in Seconds", 
-                description: "100-page textbook to flashcards instantly",
+                icon: Brain, 
+                label: "Active Recall Built-In", 
+                description: "Every card forces retrieval—the proven method to lock in knowledge",
                 gradient: "from-primary/20 to-accent/20"
               },
               { 
-                icon: Brain, 
-                label: "Zero Hallucinations", 
-                description: "Only facts from your actual content",
+                icon: Clock, 
+                label: "Spaced Repetition Ready", 
+                description: "Export to Anki for scientifically-timed reviews",
                 gradient: "from-accent/20 to-primary/20"
               },
               { 
-                icon: Sparkles, 
-                label: "Full Customization", 
-                description: "Control card types, detail level, and more",
-                gradient: "from-primary/20 via-accent/30 to-primary/20"
+                icon: Stethoscope, 
+                label: "No Hallucinations", 
+                description: "Only facts from YOUR textbooks and lectures",
+                gradient: "from-primary/20 via-accent/20 to-primary/20"
               }
             ].map((feature, i) => (
               <motion.div 
                 key={i} 
-                className={`relative group bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border border-primary/20 rounded-2xl p-8 hover-elevate overflow-hidden`}
-                initial={{ opacity: 0, y: 30 }}
+                className={`relative group bg-gradient-to-br ${feature.gradient} backdrop-blur-xl border border-primary/20 rounded-2xl p-6 hover-elevate overflow-visible`}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                />
-                <feature.icon className="w-12 h-12 text-primary mx-auto mb-4" />
-                <p className="font-semibold text-lg text-foreground mb-2">{feature.label}</p>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <feature.icon className="w-10 h-10 text-primary mx-auto mb-4" />
+                <p className="font-semibold text-base text-foreground mb-2">{feature.label}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>
