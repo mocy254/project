@@ -2,7 +2,7 @@
 
 ## Overview
 
-FlashGenius is an educational productivity application that transforms various content formats (text, documents, YouTube videos) into AI-generated flashcards for studying. The application leverages Google's Gemini 2.5 Flash AI model to create trusted, hallucination-free flashcards with support for multiple card types (Q&A, cloze deletion, reverse cards) that can be combined in a single deck, adjustable content coverage granularity (1-7 scale), and custom instructions for precise control over flashcard generation.
+FlashGenius is an educational productivity application that transforms various content formats (text, documents, YouTube videos) into AI-generated flashcards for studying. The application leverages advanced AI technology to create trusted, hallucination-free flashcards with support for multiple card types (Q&A, cloze deletion, reverse cards) that can be combined in a single deck, adjustable content coverage granularity (1-7 scale), and custom instructions for precise control over flashcard generation.
 
 ## User Preferences
 
@@ -82,7 +82,7 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
    - Each chunk maintains topic context for accurate flashcard generation
    - Prevents information loss by ensuring related content stays together
    - Automatically merges results from all topic-based chunks
-4. Content passed to Gemini AI for flashcard generation with importance-based filtering
+4. Content passed to AI for flashcard generation with importance-based filtering
 5. Generated flashcards stored with associated deck metadata
 
 **Data Storage:**
@@ -111,7 +111,7 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 ### External Dependencies
 
 **AI Service:**
-- Google Gemini 2.5 Flash API via `@google/genai` SDK
+- Advanced AI API via `@google/genai` SDK
 - API key required via `GEMINI_API_KEY` environment variable
 - Customizable generation parameters:
   - Multiple card types (Q&A, cloze deletion, reverse cards) can be selected simultaneously

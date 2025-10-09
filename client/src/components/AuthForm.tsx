@@ -52,12 +52,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/10 via-background to-accent/10">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/20 via-background to-accent/20">
+      <Card className="w-full max-w-md shadow-2xl shadow-primary/20 bg-gradient-to-br from-card to-card/80 backdrop-blur-xl border-primary/20">
         <CardHeader className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 text-primary mb-2">
-            <Sparkles className="w-8 h-8" />
-            <span className="font-display text-2xl font-bold">FlashGenius</span>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Sparkles className="w-8 h-8 text-primary" />
+            <span className="font-display text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">FlashGenius</span>
           </div>
           <CardTitle className="text-2xl font-display">
             {mode === "login" ? "Welcome Back" : "Create Account"}
