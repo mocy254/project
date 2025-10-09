@@ -96,9 +96,10 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - `users`: User accounts with email authentication
   - Fields: id (UUID), email (unique), password, name (nullable), createdAt
   
-- `decks`: Flashcard deck containers
-  - Fields: id (UUID), userId (foreign key), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), includeSource (boolean as 'true'/'false'), createSubdecks (boolean as 'true'/'false'), createdAt, updatedAt
-  - Cascade delete on user removal
+- `decks`: Flashcard deck containers with hierarchical structure support
+  - Fields: id (UUID), userId (foreign key), parentDeckId (nullable, self-referential for hierarchy), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), includeSource (boolean as 'true'/'false'), createSubdecks (boolean as 'true'/'false'), createdAt, updatedAt
+  - Supports parent-child relationships for subdeck organization
+  - Cascade delete on user removal and recursive deletion of child subdecks
   
 - `flashcards`: Individual flashcards
   - Fields: id (UUID), deckId (foreign key), question, answer, cardType, position, createdAt
@@ -131,9 +132,14 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
     * Allows AI to reference specific timestamps in flashcard answers
     * Helps students locate exact moments in video for review
   - **Create Subdecks Option (Oct 2025):**
-    * Option stored in deck metadata for future subdeck creation feature
-    * Designed to automatically organize flashcards by subtopics into separate decks
-    * Currently saves preference; full implementation pending
+    * **Intelligent Subdeck Organization:** AI automatically detects subtopics in content and creates hierarchical deck structure
+    * When enabled, creates parent deck + child subdecks (one per subtopic)
+    * Each subdeck contains flashcards relevant to its specific subtopic
+    * **Example:** Content about cardiac anatomy creates parent "Cardiac Anatomy" with subdecks for "Heart Chambers", "Valves", "Coronary Circulation", "Electrical Conduction"
+    * **Storage:** Uses `parentDeckId` field for hierarchical relationships
+    * **UI:** File-tree style display with expand/collapse, folder icons for parents, indentation for children
+    * **Deletion:** Recursive cascade delete removes all child subdecks when parent is deleted
+    * Supports unlimited nesting depth (parent → child → grandchild → etc.)
 - Structured prompt engineering for hallucination-free, ultra-concise flashcards
 - Answer format: bullet points or 2-5 word phrases (no complete sentences or paragraphs)
 - No additional context or explanations added - only information from source material
