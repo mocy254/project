@@ -7,8 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProgressUpdate {
   stage: string;
@@ -106,7 +107,17 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
 
   const getStageIcon = () => {
     if (error) return <XCircle className="w-6 h-6 text-destructive" />;
-    if (isComplete) return <CheckCircle2 className="w-6 h-6 text-green-500" />;
+    if (isComplete) {
+      return (
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        >
+          <CheckCircle2 className="w-6 h-6 text-primary" />
+        </motion.div>
+      );
+    }
     return <Loader2 className="w-6 h-6 animate-spin text-primary" />;
   };
 
@@ -123,6 +134,14 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
     return labels[stage] || stage;
   };
 
+  // Sparkle confetti animation positions
+  const sparkles = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 400 - 200,
+    y: Math.random() * 300 - 150,
+    delay: Math.random() * 0.3,
+  }));
+
   return (
     <Dialog 
       open={!!sessionId} 
@@ -133,7 +152,7 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
       }}
     >
       <DialogContent 
-        className="sm:max-w-md" 
+        className="sm:max-w-md bg-gradient-to-br from-card to-card/80 border-primary/20 overflow-hidden" 
         onPointerDownOutside={(e) => {
           if (!error) e.preventDefault();
         }}
@@ -142,21 +161,76 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
         }}
         data-testid="dialog-generation-progress"
       >
-        <DialogHeader>
+        {/* Success Sparkles Animation */}
+        <AnimatePresence>
+          {isComplete && (
+            <>
+              {sparkles.map((sparkle) => (
+                <motion.div
+                  key={sparkle.id}
+                  className="absolute"
+                  initial={{ 
+                    opacity: 0,
+                    scale: 0,
+                    x: 0,
+                    y: 0,
+                  }}
+                  animate={{ 
+                    opacity: [0, 1, 1, 0],
+                    scale: [0, 1, 1.2, 0],
+                    x: sparkle.x,
+                    y: sparkle.y,
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    delay: sparkle.delay,
+                    ease: "easeOut"
+                  }}
+                  style={{
+                    left: '50%',
+                    top: '30%',
+                  }}
+                >
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </motion.div>
+              ))}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.5, 0] }}
+                transition={{ duration: 1.5 }}
+              />
+            </>
+          )}
+        </AnimatePresence>
+
+        <DialogHeader className="relative z-10">
           <DialogTitle className="flex items-center gap-2">
             {getStageIcon()}
-            {error ? "Generation Failed" : isComplete ? "Success!" : "Generating Flashcards"}
+            <motion.span
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              key={error ? "error" : isComplete ? "complete" : "generating"}
+            >
+              {error ? "Generation Failed" : isComplete ? "Success!" : "Generating Flashcards"}
+            </motion.span>
           </DialogTitle>
           <DialogDescription>
-            {error 
-              ? error 
-              : isComplete 
-              ? "Your flashcards are ready!" 
-              : "Please wait while we process your content..."}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {error 
+                ? error 
+                : isComplete 
+                ? "Your flashcards are ready!" 
+                : "Please wait while we process your content..."}
+            </motion.span>
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 relative z-10">
           {progress && !error && (
             <>
               <div className="space-y-2">
@@ -164,24 +238,44 @@ export default function GenerationProgressDialog({ sessionId, onComplete, onErro
                   <span className="text-muted-foreground">
                     {getStageLabel(progress.stage)}
                   </span>
-                  <span className="font-medium">{progress.progress}%</span>
+                  <motion.span 
+                    className="font-medium"
+                    key={progress.progress}
+                    initial={{ scale: 1.2 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    {progress.progress}%
+                  </motion.span>
                 </div>
                 <Progress value={progress.progress} className="h-2" data-testid="progress-bar" />
               </div>
               
               <div className="space-y-1">
-                <p className="text-sm text-foreground" data-testid="text-progress-message">
+                <motion.p 
+                  className="text-sm text-foreground" 
+                  data-testid="text-progress-message"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  key={progress.message}
+                >
                   {progress.message}
-                </p>
+                </motion.p>
                 {progress.totalSteps && progress.currentStep && (
                   <p className="text-xs text-muted-foreground">
                     Processing section {progress.currentStep} of {progress.totalSteps}
                   </p>
                 )}
                 {progress.cardsGenerated !== undefined && progress.cardsGenerated > 0 && (
-                  <p className="text-xs text-muted-foreground" data-testid="text-cards-generated">
-                    {progress.cardsGenerated} flashcards generated so far
-                  </p>
+                  <motion.p 
+                    className="text-xs text-primary font-medium" 
+                    data-testid="text-cards-generated"
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    key={progress.cardsGenerated}
+                  >
+                    🎉 {progress.cardsGenerated} flashcards generated!
+                  </motion.p>
                 )}
               </div>
             </>

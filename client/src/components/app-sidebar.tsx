@@ -26,25 +26,27 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarContent>
+      <SidebarContent className="p-4">
         <SidebarGroup>
-          <div className="px-4 py-6">
-            <div className="flex items-center gap-2 text-sidebar-primary">
-              <Sparkles className="w-6 h-6" />
-              <span className="font-display text-xl font-bold">FlashGenius</span>
+          <div className="px-2 py-6 mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <span className="font-display text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                FlashGenius
+              </span>
             </div>
           </div>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="mb-2 px-2">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location === item.url}>
+                  <SidebarMenuButton asChild isActive={location === item.url} className="py-3 px-3">
                     <Link href={item.url}>
-                      <a data-testid={`link-${item.title.toLowerCase().replace(' ', '-')}`}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
+                      <span data-testid={`link-${item.title.toLowerCase().replace(' ', '-')}`} className="flex items-center gap-3 w-full">
+                        <item.icon className="w-5 h-5" />
+                        <span className="text-sm font-medium">{item.title}</span>
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -53,12 +55,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={logout} data-testid="button-logout">
-              <LogOut />
-              <span>Logout</span>
+            <SidebarMenuButton onClick={logout} data-testid="button-logout" className="py-3 px-3">
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
