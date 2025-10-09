@@ -54,46 +54,29 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1 
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <motion.span 
-              className="block mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
-              animate={{ 
-                y: [0, -5, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              Stop Forgetting.
-            </motion.span>
+            <span className="block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+              Your Journey to
+            </span>
             <motion.span 
               className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
               style={{ backgroundSize: "200% 200%" }}
               animate={{ 
                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                y: [0, -5, 0],
               }}
               transition={{
                 backgroundPosition: {
                   duration: 5,
                   repeat: Infinity,
                   ease: "linear"
-                },
-                y: {
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.3
                 }
               }}
             >
-              Start Remembering.
+              Long-Term Retention
             </motion.span>
           </motion.h1>
 
