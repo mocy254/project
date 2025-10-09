@@ -39,7 +39,7 @@ export async function extractPPTText(filePath: string): Promise<string> {
   }
 }
 
-export async function extractYouTubeTranscript(url: string): Promise<string> {
+export async function extractYouTubeTranscript(url: string, includeTimestamps: boolean = false): Promise<string> {
   try {
     console.log(`Extracting transcript from YouTube URL: ${url}`);
     
@@ -65,9 +65,26 @@ export async function extractYouTubeTranscript(url: string): Promise<string> {
     }
     
     // Extract text from transcript segments
-    const content = transcriptData.transcript.content.body.initial_segments
-      .map((segment: any) => segment.snippet.text)
-      .join(" ");
+    const segments = transcriptData.transcript.content.body.initial_segments;
+    let content: string;
+    
+    if (includeTimestamps) {
+      // Include timestamps in the content
+      content = segments
+        .map((segment: any) => {
+          const startMs = segment.start_ms || 0;
+          const minutes = Math.floor(startMs / 60000);
+          const seconds = Math.floor((startMs % 60000) / 1000);
+          const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          return `[${timestamp}] ${segment.snippet.text}`;
+        })
+        .join(" ");
+    } else {
+      // Plain text without timestamps
+      content = segments
+        .map((segment: any) => segment.snippet.text)
+        .join(" ");
+    }
     
     console.log(`Total transcript length: ${content.length} characters`);
     console.log(`First 200 chars: ${content.substring(0, 200)}`);

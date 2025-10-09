@@ -47,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/generate/text", async (req, res) => {
     try {
-      const { content, cardTypes, granularity, customInstructions, userId, title } = req.body;
+      const { content, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
 
       if (!content || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -105,7 +105,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sourceType: "text",
             cardTypes,
             granularity,
-            customInstructions: customInstructions || null
+            customInstructions: customInstructions || null,
+            includeSource: includeSource || 'false',
+            createSubdecks: createSubdecks || 'false'
           });
 
           const createdCards = await Promise.all(
@@ -155,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const { cardTypes, granularity, customInstructions, userId, title } = req.body;
+      const { cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
       const sessionId = randomUUID();
       
       // Return session ID immediately
@@ -218,7 +220,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sourceType: "document",
             cardTypes: parsedCardTypes,
             granularity: parseInt(granularity),
-            customInstructions: customInstructions || null
+            customInstructions: customInstructions || null,
+            includeSource: includeSource || 'false',
+            createSubdecks: createSubdecks || 'false'
           });
 
           const createdCards = await Promise.all(
@@ -264,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/generate/youtube", async (req, res) => {
     try {
-      const { url, cardTypes, granularity, customInstructions, userId, title } = req.body;
+      const { url, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
 
       if (!url || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -285,7 +289,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 5
           });
 
-          const content = await extractYouTubeTranscript(url);
+          const shouldIncludeTimestamps = includeSource === 'true';
+          const content = await extractYouTubeTranscript(url, shouldIncludeTimestamps);
 
           progressManager.setProgress({
             sessionId,
@@ -331,7 +336,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sourceType: "youtube",
             cardTypes,
             granularity,
-            customInstructions: customInstructions || null
+            customInstructions: customInstructions || null,
+            includeSource: includeSource || 'false',
+            createSubdecks: createSubdecks || 'false'
           });
 
           const createdCards = await Promise.all(
