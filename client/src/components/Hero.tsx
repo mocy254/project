@@ -189,46 +189,6 @@ export default function Hero() {
             ))}
           </motion.div>
 
-          {/* Scroll indicator */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          >
-            <motion.div
-              className="flex flex-col items-center gap-2 cursor-pointer group"
-              onClick={() => {
-                const howItWorks = document.getElementById("how-it-works");
-                howItWorks?.scrollIntoView({ behavior: "smooth" });
-              }}
-              whileHover={{ scale: 1.1 }}
-              animate={{ y: [0, 10, 0] }}
-              transition={{
-                y: {
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              }}
-              data-testid="scroll-indicator"
-            >
-              <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
-                Scroll to explore
-              </span>
-              <div className="w-6 h-10 rounded-full border-2 border-primary/30 flex items-start justify-center p-2 group-hover:border-primary/60 transition-colors">
-                <motion.div
-                  className="w-1.5 h-1.5 bg-primary rounded-full"
-                  animate={{ y: [0, 12, 0] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
         </motion.div>
       </div>
     </div>
