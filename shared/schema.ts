@@ -23,6 +23,7 @@ export const decks = pgTable("decks", {
   customInstructions: text("custom_instructions"),
   includeSource: text("include_source").notNull().default('false'),
   createSubdecks: text("create_subdecks").notNull().default('false'),
+  fileUrl: text("file_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
