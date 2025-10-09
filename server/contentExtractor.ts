@@ -73,16 +73,24 @@ export async function extractYouTubeTranscript(url: string, includeTimestamps: b
       content = segments
         .map((segment: any) => {
           const startMs = segment.start_ms || 0;
-          const minutes = Math.floor(startMs / 60000);
+          const hours = Math.floor(startMs / 3600000);
+          const minutes = Math.floor((startMs % 3600000) / 60000);
           const seconds = Math.floor((startMs % 60000) / 1000);
-          const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-          return `[${timestamp}] ${segment.snippet.text}`;
+          
+          // Format as HH:MM:SS or MM:SS depending on video length
+          const timestamp = hours > 0 
+            ? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+            : `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          
+          // Clean the text by removing excessive whitespace and normalizing
+          const cleanText = segment.snippet.text.replace(/\s+/g, ' ').trim();
+          return `[${timestamp}] ${cleanText}`;
         })
         .join(" ");
     } else {
       // Plain text without timestamps
       content = segments
-        .map((segment: any) => segment.snippet.text)
+        .map((segment: any) => segment.snippet.text.replace(/\s+/g, ' ').trim())
         .join(" ");
     }
     

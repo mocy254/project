@@ -97,7 +97,7 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
   - Fields: id (UUID), email (unique), password, name (nullable), createdAt
   
 - `decks`: Flashcard deck containers
-  - Fields: id (UUID), userId (foreign key), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), createdAt, updatedAt
+  - Fields: id (UUID), userId (foreign key), title, source, sourceType, cardTypes (array), granularity, customInstructions (nullable), includeSource (boolean as 'true'/'false'), createSubdecks (boolean as 'true'/'false'), createdAt, updatedAt
   - Cascade delete on user removal
   
 - `flashcards`: Individual flashcards
@@ -126,6 +126,14 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
     * Level 6 (4-10): Near-comprehensive (most details)
     * Level 7 (1-10): Every detail including rare cases and examples
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
+  - **Include Source Option (Oct 2025):**
+    * For YouTube videos: Embeds timestamps in transcript (e.g., `[2:45] The mitochondria...`) when enabled
+    * Allows AI to reference specific timestamps in flashcard answers
+    * Helps students locate exact moments in video for review
+  - **Create Subdecks Option (Oct 2025):**
+    * Option stored in deck metadata for future subdeck creation feature
+    * Designed to automatically organize flashcards by subtopics into separate decks
+    * Currently saves preference; full implementation pending
 - Structured prompt engineering for hallucination-free, ultra-concise flashcards
 - Answer format: bullet points or 2-5 word phrases (no complete sentences or paragraphs)
 - No additional context or explanations added - only information from source material
