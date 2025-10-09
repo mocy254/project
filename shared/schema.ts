@@ -14,7 +14,7 @@ export const users = pgTable("users", {
 export const decks = pgTable("decks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  parentDeckId: varchar("parent_deck_id").references(() => decks.id, { onDelete: "cascade" }),
+  parentDeckId: varchar("parent_deck_id").references((): any => decks.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   source: text("source").notNull(),
   sourceType: text("source_type").notNull(),
@@ -47,6 +47,8 @@ export const insertDeckSchema = createInsertSchema(decks).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  cardTypes: z.array(z.string()).min(1),
 });
 
 export const insertFlashcardSchema = createInsertSchema(flashcards).omit({

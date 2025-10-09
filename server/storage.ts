@@ -63,6 +63,7 @@ export class MemStorage implements IStorage {
       customInstructions: insertDeck.customInstructions ?? null,
       includeSource: insertDeck.includeSource ?? 'false',
       createSubdecks: insertDeck.createSubdecks ?? 'false',
+      fileUrl: insertDeck.fileUrl ?? null,
       id,
       createdAt: now,
       updatedAt: now

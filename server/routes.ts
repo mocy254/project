@@ -9,9 +9,79 @@ import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtra
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
+import { ObjectStorageService } from "./objectStorage";
+import { createReadStream, unlink } from "fs";
+import { promisify } from "util";
 // @ts-ignore - No type definitions available
 import AnkiExportModule from 'anki-apkg-export';
 const AnkiExport = (AnkiExportModule as any).default || AnkiExportModule;
+
+const unlinkAsync = promisify(unlink);
+
+// Helper function to upload file to Object Storage
+async function uploadFileToStorage(
+  filePath: string,
+  userId: string
+): Promise<string> {
+  try {
+    const objectStorageService = new ObjectStorageService();
+    
+    // Get upload URL
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    
+    // Upload file
+    const fileStream = createReadStream(filePath);
+    const response = await fetch(uploadURL, {
+      method: 'PUT',
+      body: fileStream as any,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload file to storage: ${response.statusText}`);
+    }
+
+    // Set ACL policy and get path
+    const aclResponse = await objectStorageService.trySetObjectEntityAclPolicy(
+      uploadURL,
+      {
+        owner: userId,
+        visibility: "private"
+      }
+    );
+
+    // Validate ACL response before normalization
+    if (!aclResponse || typeof aclResponse !== 'string') {
+      throw new Error("ACL response missing canonical object path - normalization failed");
+    }
+
+    const trimmedResponse = aclResponse.trim();
+    if (!trimmedResponse) {
+      throw new Error("ACL response missing canonical object path - normalization failed");
+    }
+
+    // Normalize to canonical /objects/... format
+    let objectPath: string;
+    try {
+      objectPath = objectStorageService.normalizeObjectEntityPath(trimmedResponse);
+    } catch (normError) {
+      throw new Error(`ACL response normalization failed: ${normError instanceof Error ? normError.message : 'unknown error'}`);
+    }
+
+    // Validate the normalized path
+    if (!objectPath || typeof objectPath !== 'string' || !objectPath.startsWith("/objects/")) {
+      throw new Error("ACL response missing canonical object path - normalization failed");
+    }
+
+    return objectPath;
+  } finally {
+    // Always clean up local file, even if upload fails
+    try {
+      await unlinkAsync(filePath);
+    } catch (cleanupError) {
+      console.error("Failed to clean up local file:", filePath, cleanupError);
+    }
+  }
+}
 
 const storage_config = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -279,6 +349,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let resultDeckId: string;
           let totalCardCount: number;
 
+          // Upload file to Object Storage (cleanup handled in helper)
+          let fileUrl: string | null = null;
+          try {
+            fileUrl = await uploadFileToStorage(req.file!.path, userId);
+          } catch (uploadError) {
+            console.error("Failed to upload file to storage:", uploadError);
+            // Continue without fileUrl if upload fails
+          }
+
           if (shouldCreateSubdecks && flashcards.some(c => c.subtopic)) {
             // Create parent deck
             const parentDeck = await storage.createDeck({
@@ -290,7 +369,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               granularity: parseInt(granularity),
               customInstructions: customInstructions || null,
               includeSource: includeSource || 'false',
-              createSubdecks: 'true'
+              createSubdecks: 'true',
+              fileUrl
             });
 
             // Group flashcards by subtopic
@@ -340,7 +420,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               granularity: parseInt(granularity),
               customInstructions: customInstructions || null,
               includeSource: includeSource || 'false',
-              createSubdecks: 'false'
+              createSubdecks: 'false',
+              fileUrl
             });
 
             const createdCards = await Promise.all(
