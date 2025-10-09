@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import { randomUUID } from "crypto";
 import { storage } from "./storage";
-import { generateFlashcards } from "./gemini";
+import { generateFlashcards, groupFlashcardsBySubtopic } from "./gemini";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
@@ -68,11 +68,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 10
           });
 
+          const shouldCreateSubdecks = createSubdecks === 'true';
           const flashcards = await generateFlashcards({
             content,
             cardTypes,
             granularity,
             customInstructions: customInstructions || "",
+            createSubdecks: shouldCreateSubdecks,
             onProgress: (update) => {
               progressManager.setProgress({
                 sessionId,
@@ -98,29 +100,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 90
           });
 
-          const deck = await storage.createDeck({
-            userId,
-            title,
-            source: content.substring(0, 100) + "...",
-            sourceType: "text",
-            cardTypes,
-            granularity,
-            customInstructions: customInstructions || null,
-            includeSource: includeSource || 'false',
-            createSubdecks: createSubdecks || 'false'
-          });
+          let resultDeckId: string;
+          let totalCardCount: number;
 
-          const createdCards = await Promise.all(
-            flashcards.map((card, index) =>
-              storage.createFlashcard({
-                deckId: deck.id,
-                question: card.question,
-                answer: card.answer,
-                cardType: card.cardType,
-                position: index
-              })
-            )
-          );
+          if (shouldCreateSubdecks && flashcards.some(c => c.subtopic)) {
+            // Create parent deck
+            const parentDeck = await storage.createDeck({
+              userId,
+              title,
+              source: content.substring(0, 100) + "...",
+              sourceType: "text",
+              cardTypes,
+              granularity,
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'true'
+            });
+
+            // Group flashcards by subtopic
+            const subdeckGroups = groupFlashcardsBySubtopic(flashcards);
+            
+            // Create subdeck for each subtopic
+            let totalCards = 0;
+            for (const group of subdeckGroups) {
+              const subdeck = await storage.createDeck({
+                userId,
+                parentDeckId: parentDeck.id,
+                title: group.subtopic,
+                source: content.substring(0, 100) + "...",
+                sourceType: "text",
+                cardTypes,
+                granularity,
+                customInstructions: customInstructions || null,
+                includeSource: includeSource || 'false',
+                createSubdecks: 'false'
+              });
+
+              await Promise.all(
+                group.flashcards.map((card, index) =>
+                  storage.createFlashcard({
+                    deckId: subdeck.id,
+                    question: card.question,
+                    answer: card.answer,
+                    cardType: card.cardType,
+                    position: index
+                  })
+                )
+              );
+
+              totalCards += group.flashcards.length;
+            }
+
+            resultDeckId = parentDeck.id;
+            totalCardCount = totalCards;
+          } else {
+            // Create single deck
+            const deck = await storage.createDeck({
+              userId,
+              title,
+              source: content.substring(0, 100) + "...",
+              sourceType: "text",
+              cardTypes,
+              granularity,
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'false'
+            });
+
+            const createdCards = await Promise.all(
+              flashcards.map((card, index) =>
+                storage.createFlashcard({
+                  deckId: deck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index
+                })
+              )
+            );
+
+            resultDeckId = deck.id;
+            totalCardCount = createdCards.length;
+          }
 
           progressManager.setProgress({
             sessionId,
@@ -130,8 +191,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           progressManager.setResult(sessionId, {
-            deckId: deck.id,
-            flashcardCount: createdCards.length
+            deckId: resultDeckId,
+            flashcardCount: totalCardCount
           });
         } catch (error: any) {
           console.error("Text generation error:", error);
@@ -183,11 +244,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           const parsedCardTypes = JSON.parse(cardTypes);
+          const shouldCreateSubdecks = createSubdecks === 'true';
           const flashcards = await generateFlashcards({
             content,
             cardTypes: parsedCardTypes,
             granularity: parseInt(granularity),
             customInstructions: customInstructions || "",
+            createSubdecks: shouldCreateSubdecks,
             onProgress: (update) => {
               progressManager.setProgress({
                 sessionId,
@@ -213,29 +276,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 90
           });
 
-          const deck = await storage.createDeck({
-            userId,
-            title,
-            source: req.file!.originalname,
-            sourceType: "document",
-            cardTypes: parsedCardTypes,
-            granularity: parseInt(granularity),
-            customInstructions: customInstructions || null,
-            includeSource: includeSource || 'false',
-            createSubdecks: createSubdecks || 'false'
-          });
+          let resultDeckId: string;
+          let totalCardCount: number;
 
-          const createdCards = await Promise.all(
-            flashcards.map((card, index) =>
-              storage.createFlashcard({
-                deckId: deck.id,
-                question: card.question,
-                answer: card.answer,
-                cardType: card.cardType,
-                position: index
-              })
-            )
-          );
+          if (shouldCreateSubdecks && flashcards.some(c => c.subtopic)) {
+            // Create parent deck
+            const parentDeck = await storage.createDeck({
+              userId,
+              title,
+              source: req.file!.originalname,
+              sourceType: "document",
+              cardTypes: parsedCardTypes,
+              granularity: parseInt(granularity),
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'true'
+            });
+
+            // Group flashcards by subtopic
+            const subdeckGroups = groupFlashcardsBySubtopic(flashcards);
+            
+            // Create subdeck for each subtopic
+            let totalCards = 0;
+            for (const group of subdeckGroups) {
+              const subdeck = await storage.createDeck({
+                userId,
+                parentDeckId: parentDeck.id,
+                title: group.subtopic,
+                source: req.file!.originalname,
+                sourceType: "document",
+                cardTypes: parsedCardTypes,
+                granularity: parseInt(granularity),
+                customInstructions: customInstructions || null,
+                includeSource: includeSource || 'false',
+                createSubdecks: 'false'
+              });
+
+              await Promise.all(
+                group.flashcards.map((card, index) =>
+                  storage.createFlashcard({
+                    deckId: subdeck.id,
+                    question: card.question,
+                    answer: card.answer,
+                    cardType: card.cardType,
+                    position: index
+                  })
+                )
+              );
+
+              totalCards += group.flashcards.length;
+            }
+
+            resultDeckId = parentDeck.id;
+            totalCardCount = totalCards;
+          } else {
+            // Create single deck
+            const deck = await storage.createDeck({
+              userId,
+              title,
+              source: req.file!.originalname,
+              sourceType: "document",
+              cardTypes: parsedCardTypes,
+              granularity: parseInt(granularity),
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'false'
+            });
+
+            const createdCards = await Promise.all(
+              flashcards.map((card, index) =>
+                storage.createFlashcard({
+                  deckId: deck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index
+                })
+              )
+            );
+
+            resultDeckId = deck.id;
+            totalCardCount = createdCards.length;
+          }
 
           progressManager.setProgress({
             sessionId,
@@ -245,8 +367,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           progressManager.setResult(sessionId, {
-            deckId: deck.id,
-            flashcardCount: createdCards.length
+            deckId: resultDeckId,
+            flashcardCount: totalCardCount
           });
         } catch (error: any) {
           console.error("Document generation error:", error);
@@ -299,11 +421,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 15
           });
 
+          const shouldCreateSubdecks = createSubdecks === 'true';
           const flashcards = await generateFlashcards({
             content,
             cardTypes,
             granularity,
             customInstructions: customInstructions || "",
+            createSubdecks: shouldCreateSubdecks,
             onProgress: (update) => {
               progressManager.setProgress({
                 sessionId,
@@ -329,29 +453,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 90
           });
 
-          const deck = await storage.createDeck({
-            userId,
-            title,
-            source: url,
-            sourceType: "youtube",
-            cardTypes,
-            granularity,
-            customInstructions: customInstructions || null,
-            includeSource: includeSource || 'false',
-            createSubdecks: createSubdecks || 'false'
-          });
+          let resultDeckId: string;
+          let totalCardCount: number;
 
-          const createdCards = await Promise.all(
-            flashcards.map((card, index) =>
-              storage.createFlashcard({
-                deckId: deck.id,
-                question: card.question,
-                answer: card.answer,
-                cardType: card.cardType,
-                position: index
-              })
-            )
-          );
+          if (shouldCreateSubdecks && flashcards.some(c => c.subtopic)) {
+            // Create parent deck
+            const parentDeck = await storage.createDeck({
+              userId,
+              title,
+              source: url,
+              sourceType: "youtube",
+              cardTypes,
+              granularity,
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'true'
+            });
+
+            // Group flashcards by subtopic
+            const subdeckGroups = groupFlashcardsBySubtopic(flashcards);
+            
+            // Create subdeck for each subtopic
+            let totalCards = 0;
+            for (const group of subdeckGroups) {
+              const subdeck = await storage.createDeck({
+                userId,
+                parentDeckId: parentDeck.id,
+                title: group.subtopic,
+                source: url,
+                sourceType: "youtube",
+                cardTypes,
+                granularity,
+                customInstructions: customInstructions || null,
+                includeSource: includeSource || 'false',
+                createSubdecks: 'false'
+              });
+
+              await Promise.all(
+                group.flashcards.map((card, index) =>
+                  storage.createFlashcard({
+                    deckId: subdeck.id,
+                    question: card.question,
+                    answer: card.answer,
+                    cardType: card.cardType,
+                    position: index
+                  })
+                )
+              );
+
+              totalCards += group.flashcards.length;
+            }
+
+            resultDeckId = parentDeck.id;
+            totalCardCount = totalCards;
+          } else {
+            // Create single deck
+            const deck = await storage.createDeck({
+              userId,
+              title,
+              source: url,
+              sourceType: "youtube",
+              cardTypes,
+              granularity,
+              customInstructions: customInstructions || null,
+              includeSource: includeSource || 'false',
+              createSubdecks: 'false'
+            });
+
+            const createdCards = await Promise.all(
+              flashcards.map((card, index) =>
+                storage.createFlashcard({
+                  deckId: deck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index
+                })
+              )
+            );
+
+            resultDeckId = deck.id;
+            totalCardCount = createdCards.length;
+          }
 
           progressManager.setProgress({
             sessionId,
@@ -361,8 +544,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           progressManager.setResult(sessionId, {
-            deckId: deck.id,
-            flashcardCount: createdCards.length
+            deckId: resultDeckId,
+            flashcardCount: totalCardCount
           });
         } catch (error: any) {
           console.error("YouTube generation error:", error);
