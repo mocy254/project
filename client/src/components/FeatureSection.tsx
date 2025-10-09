@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Brain, Sliders, Edit3, Download, ShieldCheck, Clock, FileStack, Microscope } from "lucide-react";
+import { Brain, Sliders, Edit3, Download, ShieldCheck, Clock, FileStack, Microscope, Palette } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -39,6 +39,12 @@ const features = [
     title: "Granularity Control",
     description: "Need just high-yield facts? Or every single detail? Slide the dial. From \"Step 1 core concepts\" to \"shelf exam minutiae\"—you decide.",
     gradient: "from-accent/20 via-primary/20 to-accent/20"
+  },
+  {
+    icon: Palette,
+    title: "Custom Instructions",
+    description: "Tell the AI exactly what you want: \"focus on definitions\", \"skip dates\", \"include clinical correlations\". Your deck, your rules, your way.",
+    gradient: "from-primary/20 via-accent/20 to-primary/20"
   },
   {
     icon: Edit3,
