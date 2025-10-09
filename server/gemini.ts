@@ -1,6 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
+import { get_encoding } from "tiktoken";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+
+// Initialize tiktoken encoder for accurate token counting (cl100k_base encoding used by GPT-4/Gemini)
+const encoder = get_encoding("cl100k_base");
 
 // Timeout wrapper for async operations
 async function withTimeout<T>(
@@ -84,12 +88,43 @@ interface SemanticChunk {
   context: string;
 }
 
-function estimateTokenCount(text: string): number {
-  return Math.ceil(text.length / 4);
+function countTokens(text: string): number {
+  try {
+    const tokens = encoder.encode(text);
+    return tokens.length;
+  } catch (error) {
+    console.error("Error counting tokens, falling back to estimation:", error);
+    // Fallback to estimation if tiktoken fails
+    return Math.ceil(text.length / 4);
+  }
+}
+
+// Get overlap text (last ~targetTokens from the given text)
+function getOverlapText(text: string, targetTokens: number = 200): string {
+  if (!text.trim()) return '';
+  
+  const lines = text.split('\n');
+  const overlapLines: string[] = [];
+  let overlapTokens = 0;
+  
+  // Work backwards from the end to collect ~targetTokens
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    const lineTokens = countTokens(line);
+    
+    if (overlapTokens + lineTokens > targetTokens && overlapLines.length > 0) {
+      break;
+    }
+    
+    overlapLines.unshift(line);
+    overlapTokens += lineTokens;
+  }
+  
+  return overlapLines.join('\n');
 }
 
 async function extractTopicOutline(content: string): Promise<TopicOutline> {
-  const estimatedTokens = estimateTokenCount(content);
+  const estimatedTokens = countTokens(content);
   const maxTokensPerPass = 80000;
   
   if (estimatedTokens <= maxTokensPerPass) {
@@ -104,7 +139,7 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
   let currentTokens = 0;
   
   for (const line of lines) {
-    const lineTokens = estimateTokenCount(line);
+    const lineTokens = countTokens(line);
     
     if (currentTokens + lineTokens > maxTokensPerPass && currentChunk) {
       chunks.push(currentChunk.trim());
@@ -207,7 +242,7 @@ ${content}`
 }
 
 function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens: number = 100000): SemanticChunk[] {
-  const estimatedTokens = estimateTokenCount(content);
+  const estimatedTokens = countTokens(content);
   
   if (estimatedTokens <= maxTokens) {
     return [{
@@ -223,12 +258,12 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
   const chunks: SemanticChunk[] = [];
   
   if (outline.topics.length === 0) {
-    console.log("No topics detected, using simple chunking...");
+    console.log("No topics detected, using simple chunking with overlap...");
     let currentChunk = '';
     let currentTokens = 0;
     
     for (const line of lines) {
-      const lineTokens = estimateTokenCount(line);
+      const lineTokens = countTokens(line);
       
       if (currentTokens + lineTokens > maxTokens && currentChunk) {
         chunks.push({
@@ -236,8 +271,12 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
           topics: ["Document section"],
           context: "Part of larger document"
         });
-        currentChunk = line + '\n';
-        currentTokens = lineTokens;
+        
+        // Get 200-token overlap from previous chunk for context continuity
+        const overlap = getOverlapText(currentChunk, 200);
+        
+        currentChunk = overlap + (overlap ? '\n' : '') + line + '\n';
+        currentTokens = countTokens(currentChunk);
       } else {
         currentChunk += line + '\n';
         currentTokens += lineTokens;
@@ -267,7 +306,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const lineTokens = estimateTokenCount(line);
+    const lineTokens = countTokens(line);
     
     let matchedTopic = '';
     let matchedSubtopic = '';
@@ -302,8 +341,11 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
           ? `Topics: ${currentTopics.join(' - ')}`
           : "Document section"
       });
-      currentChunk = '';
-      currentTokens = 0;
+      
+      // Add 200-token overlap for context continuity at topic boundaries
+      const overlap = getOverlapText(currentChunk, 200);
+      currentChunk = overlap + (overlap ? '\n' : '');
+      currentTokens = countTokens(currentChunk);
       currentTopics = [];
     }
 
@@ -321,8 +363,11 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
           ? `Topics: ${currentTopics.join(' - ')}`
           : "Document section"
       });
-      currentChunk = line + '\n';
-      currentTokens = lineTokens;
+      
+      // Add 200-token overlap for context continuity at size boundaries
+      const overlap = getOverlapText(currentChunk, 200);
+      currentChunk = overlap + (overlap ? '\n' : '') + line + '\n';
+      currentTokens = countTokens(currentChunk);
     } else {
       currentChunk += line + '\n';
       currentTokens += lineTokens;
@@ -352,7 +397,7 @@ export async function generateFlashcards(
   console.log(`Card types: ${JSON.stringify(cardTypes)}`);
   console.log(`Granularity: ${granularity}`);
   
-  const estimatedTokens = estimateTokenCount(content);
+  const estimatedTokens = countTokens(content);
   console.log(`Estimated tokens: ${estimatedTokens}`);
   
   if (estimatedTokens > 100000) {
@@ -636,6 +681,7 @@ STEP 3 - GENERATE flashcards:
 - Create ultra-concise cards (2-5 words or bullets)
 - One atomic fact per card${createSubdecks ? '\n- Assign each flashcard to a specific subtopic (e.g., "Pathophysiology", "Treatment", "Diagnosis")' : ''}
 - Ensure COMPLETE coverage of all qualifying facts in this section
+- **IMPORTANT:** For medical content at level ${granularity}, expect to generate MANY flashcards (typically 20-50+ cards per topic at level 5-7). Do NOT artificially limit the number of flashcards - create cards for EVERY qualifying fact.
 
 Content to process:
 
