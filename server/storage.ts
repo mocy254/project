@@ -1,5 +1,7 @@
-import { type User, type InsertUser, type Deck, type InsertDeck, type Flashcard, type InsertFlashcard } from "@shared/schema";
+import { type User, type InsertUser, type Deck, type InsertDeck, type Flashcard, type InsertFlashcard, users, decks, flashcards } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, and, asc, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -141,4 +143,80 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DbStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
+  }
+
+  async createDeck(insertDeck: InsertDeck): Promise<Deck> {
+    const result = await db.insert(decks).values(insertDeck).returning();
+    return result[0];
+  }
+
+  async getDeck(id: string): Promise<Deck | undefined> {
+    const result = await db.select().from(decks).where(eq(decks.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getDecksByUserId(userId: string): Promise<Deck[]> {
+    return db.select().from(decks).where(eq(decks.userId, userId)).orderBy(asc(decks.createdAt));
+  }
+
+  async getSubdecks(parentDeckId: string): Promise<Deck[]> {
+    return db.select().from(decks).where(eq(decks.parentDeckId, parentDeckId)).orderBy(asc(decks.createdAt));
+  }
+
+  async updateDeck(id: string, updateData: Partial<InsertDeck>): Promise<Deck | undefined> {
+    const result = await db
+      .update(decks)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(decks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteDeck(id: string): Promise<void> {
+    // Database cascade delete will handle subdecks and flashcards automatically
+    // due to onDelete: "cascade" in schema
+    await db.delete(decks).where(eq(decks.id, id));
+  }
+
+  async createFlashcard(insertFlashcard: InsertFlashcard): Promise<Flashcard> {
+    const result = await db.insert(flashcards).values(insertFlashcard).returning();
+    return result[0];
+  }
+
+  async getFlashcardsByDeckId(deckId: string): Promise<Flashcard[]> {
+    return db
+      .select()
+      .from(flashcards)
+      .where(eq(flashcards.deckId, deckId))
+      .orderBy(asc(flashcards.position));
+  }
+
+  async updateFlashcard(id: string, updateData: Partial<InsertFlashcard>): Promise<Flashcard | undefined> {
+    const result = await db
+      .update(flashcards)
+      .set(updateData)
+      .where(eq(flashcards.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteFlashcard(id: string): Promise<void> {
+    await db.delete(flashcards).where(eq(flashcards.id, id));
+  }
+}
+
+export const storage = new DbStorage();
