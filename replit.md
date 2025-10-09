@@ -81,14 +81,20 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 1. Text extraction from uploaded files (PDF, DOCX, TXT, PPT) using pdf-parse and mammoth libraries
    - File upload limit: 100MB to support large medical textbooks and comprehensive documents
 2. YouTube transcript extraction using youtube-transcript library
-3. **Intelligent topic-aware chunking** for large documents (>100k tokens):
+3. **Accurate Token Counting (Oct 2025):**
+   - Tiktoken library with cl100k_base encoding for precise token measurement
+   - Replaces character-based estimation (char/4) with actual tokenization
+   - Critical for accurate chunk sizing and AI context window management
+4. **Intelligent topic-aware chunking** for large documents (>100k tokens):
    - **Phase 1: Topic Extraction** - AI analyzes full document in 80k token passes to identify ALL topics/subtopics
    - **Phase 2: Semantic Chunking** - Content split at topic boundaries (not arbitrary size limits)
+   - **200-Token Overlap (Oct 2025):** Each chunk includes last ~200 tokens from previous chunk for context continuity
+   - Overlap applied at both topic boundaries and size limits
    - Each chunk maintains topic context for accurate flashcard generation
    - Prevents information loss by ensuring related content stays together
    - Automatically merges results from all topic-based chunks
-4. Content passed to AI for flashcard generation with importance-based filtering
-5. Generated flashcards stored with associated deck metadata
+5. Content passed to AI for flashcard generation with importance-based filtering
+6. Generated flashcards stored with associated deck metadata
 
 **Data Storage:**
 - **PostgreSQL Database (Oct 2025):** Production-ready Neon serverless database with Drizzle ORM
