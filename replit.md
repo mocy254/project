@@ -46,10 +46,15 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - ProtectedRoute wrapper component enforces authentication
 
 **Landing Page (Updated Oct 2025):**
-- **Value Propositions:** Emphasizes time-saving (10+ hours/week), hallucination-free AI, and trustworthy content for medical students
-- **Hero Section:** "Study Smarter, Not Harder" messaging with three key benefits (Save Time, No Hallucinations, Customizable)
-- **Feature Section:** 8 cards highlighting medical student-specific features (smart topic analysis, granularity control, Anki export)
-- **CTA Section:** Trust signals (no credit card, free forever, cancel anytime) to reduce friction
+- **Navigation Header:** Sticky nav with smooth scroll to sections (Features, How It Works), backdrop blur on scroll
+- **Hero Section:** "Stop Forgetting. Start Remembering." - focuses on active recall and spaced repetition (learning science), addresses medical student pain points (forgetting, exam stress)
+- **How It Works Section:** 4-step user journey (Upload → AI Extract → Review → Export) with animated arrows, emphasizes "under 3 minutes" speed
+- **Feature Section:** 8 medicine-specific features (Active Recall Engine, Spaced Repetition Ready, Zero Hallucinations, Med School Optimized) with conversational, relatable copy addressing real student struggles
+- **CTA Section:** "Stop Re-Reading. Start Retaining." - emphasizes active recall advantage with trust signals (no credit card, free forever, works with Anki)
+- **Color Scheme:** Calmer teal accent (175 60% 50%) replacing pink for professional, medical aesthetic
+- **Performance:** Optimized animations (fewer gradient orbs, GPU-accelerated properties, viewport-triggered entrance)
+- **Tone:** Friendly, funny, professional - connects with medical student wounds and suffering while maintaining credibility
+- **Text Highlighting:** Strategic emphasis on "active recall", "spaced repetition", "instant flashcards" for key value props
 - **Responsive Design:** Mobile-first with adaptive grids (1/2/4 columns) across breakpoints
 
 ### Backend Architecture
