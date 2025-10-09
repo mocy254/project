@@ -46,6 +46,7 @@ export interface FlashcardGenerationOptions {
   cardTypes: string[];
   granularity: number;
   customInstructions: string;
+  createSubdecks?: boolean;
   onProgress?: (update: {
     stage: string;
     message: string;
@@ -60,6 +61,12 @@ export interface GeneratedFlashcard {
   question: string;
   answer: string;
   cardType: "qa" | "cloze" | "reverse";
+  subtopic?: string;
+}
+
+export interface SubdeckGroup {
+  subtopic: string;
+  flashcards: GeneratedFlashcard[];
 }
 
 interface TopicOutline {
@@ -444,7 +451,7 @@ async function generateFlashcardsForChunk(
   options: FlashcardGenerationOptions,
   chunkContext: string = "Document content"
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions } = options;
+  const { content, cardTypes, granularity, customInstructions, createSubdecks } = options;
 
   // Importance thresholds for each coverage level
   const importanceMapping = {
@@ -488,6 +495,14 @@ async function generateFlashcardsForChunk(
   const cardTypeList = cardTypeDescriptions.join('\n');
   const customInstructionsText = customInstructions 
     ? `\n\n**Custom Instructions:** ${customInstructions}`
+    : '';
+  
+  const subdeckGuidance = createSubdecks 
+    ? `\n\n**SUBTOPIC ORGANIZATION:**
+- You MUST identify and assign each flashcard to a specific subtopic/section
+- Subtopic names should be clear, concise topic labels (e.g., "Pathophysiology", "Clinical Features", "Treatment")
+- Group related flashcards under the same subtopic
+- Use consistent subtopic names throughout the content`
     : '';
 
   const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
@@ -561,7 +576,7 @@ ${cardTypeList}
 
 7. **No Redundancy:** Merge duplicate topics.
 
-**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.`;
+**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.${subdeckGuidance}`;
 
   console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
   
@@ -585,8 +600,11 @@ ${cardTypeList}
                       question: { type: "string" },
                       answer: { type: "string" },
                       cardType: { type: "string" },
+                      ...(createSubdecks ? { subtopic: { type: "string" } } : {}),
                     },
-                    required: ["question", "answer", "cardType"],
+                    required: createSubdecks 
+                      ? ["question", "answer", "cardType", "subtopic"]
+                      : ["question", "answer", "cardType"],
                   },
                 },
               },
@@ -616,7 +634,7 @@ STEP 2 - FILTER by current level (${currentLevel.threshold}):
 
 STEP 3 - GENERATE flashcards:
 - Create ultra-concise cards (2-5 words or bullets)
-- One atomic fact per card
+- One atomic fact per card${createSubdecks ? '\n- Assign each flashcard to a specific subtopic (e.g., "Pathophysiology", "Treatment", "Diagnosis")' : ''}
 - Ensure COMPLETE coverage of all qualifying facts in this section
 
 Content to process:
@@ -650,4 +668,21 @@ ${content}`,
     console.error("Error type:", error instanceof Error ? error.constructor.name : typeof error);
     throw new Error(`Failed to generate flashcards: ${error}`);
   }
+}
+
+export function groupFlashcardsBySubtopic(flashcards: GeneratedFlashcard[]): SubdeckGroup[] {
+  const groups = new Map<string, GeneratedFlashcard[]>();
+  
+  for (const card of flashcards) {
+    const subtopic = card.subtopic || "General";
+    if (!groups.has(subtopic)) {
+      groups.set(subtopic, []);
+    }
+    groups.get(subtopic)!.push(card);
+  }
+  
+  return Array.from(groups.entries()).map(([subtopic, cards]) => ({
+    subtopic,
+    flashcards: cards
+  }));
 }
