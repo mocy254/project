@@ -31,6 +31,7 @@ export default function GenerationForm() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [includeSource, setIncludeSource] = useState(false);
   const [createSubdecks, setCreateSubdecks] = useState(false);
+  const [includeImages, setIncludeImages] = useState(false);
   const { userId} = useUser();
   const { toast } = useToast();
 
@@ -145,6 +146,7 @@ export default function GenerationForm() {
       customInstructions: customInstructions.trim(),
       includeSource: includeSource.toString(),
       createSubdecks: createSubdecks.toString(),
+      includeImages: includeImages.toString(),
     };
 
     if (activeTab === "text") {
@@ -175,6 +177,7 @@ export default function GenerationForm() {
       formData.append("customInstructions", customInstructions.trim());
       formData.append("includeSource", includeSource.toString());
       formData.append("createSubdecks", createSubdecks.toString());
+      formData.append("includeImages", includeImages.toString());
       documentMutation.mutate(formData);
     } else if (activeTab === "youtube") {
       if (!youtubeUrl.trim()) {
@@ -433,6 +436,18 @@ export default function GenerationForm() {
                         checked={createSubdecks}
                         onCheckedChange={setCreateSubdecks}
                         data-testid="switch-create-subdecks"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="include-images" className="font-medium cursor-pointer">Include Images</Label>
+                        <p className="text-xs text-muted-foreground">Extract and include relevant images from documents or videos</p>
+                      </div>
+                      <Switch
+                        id="include-images"
+                        checked={includeImages}
+                        onCheckedChange={setIncludeImages}
+                        data-testid="switch-include-images"
                       />
                     </div>
                   </div>
