@@ -392,7 +392,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
 export async function generateFlashcards(
   options: FlashcardGenerationOptions
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions, onProgress } = options;
+  const { content, cardTypes, granularity, customInstructions, onProgress, createSubdecks, images } = options;
 
   console.log(`=== Starting flashcard generation ===`);
   console.log(`Content length: ${content.length} characters`);
@@ -451,7 +451,9 @@ export async function generateFlashcards(
             content: chunk.content,
             cardTypes,
             granularity,
-            customInstructions
+            customInstructions,
+            createSubdecks,
+            images
           }, chunk.context);
           
           console.log(`Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
@@ -499,6 +501,11 @@ async function generateFlashcardsForChunk(
   chunkContext: string = "Document content"
 ): Promise<GeneratedFlashcard[]> {
   const { content, cardTypes, granularity, customInstructions, createSubdecks, images } = options;
+  
+  // Log image availability for this chunk
+  if (images && images.length > 0) {
+    console.log(`Chunk has ${images.length} images available - imageUrl will be REQUIRED in schema`);
+  }
 
   // Importance thresholds for each coverage level
   const importanceMapping = {
@@ -553,22 +560,24 @@ async function generateFlashcardsForChunk(
     : '';
 
   const imageGuidance = images && images.length > 0
-    ? `\n\n**⚠️ MANDATORY IMAGE INCLUSION - ${images.length} IMAGES AVAILABLE:**
+    ? `\n\n**⚠️ IMAGE SELECTION REQUIRED - ${images.length} IMAGES AVAILABLE:**
 ${images.map((img, idx) => `Image ${idx + 1}${img.pageNumber ? ` (Page ${img.pageNumber})` : ''}: ${img.imageUrl}`).join('\n')}
 
-**CRITICAL IMAGE RULES - YOU MUST FOLLOW:**
-1. EVERY flashcard about visual concepts (anatomy, diagrams, clinical signs, procedures) MUST include imageUrl
-2. Use page number to match content: Page 3 content → use Image 3
-3. Default to INCLUDING images - visual aids dramatically improve medical learning
-4. Copy the EXACT full URL into the "imageUrl" field
-5. Include images for: anatomical structures, diagnostic images, treatment algorithms, clinical findings, procedural steps
+**REQUIRED: Every flashcard MUST include an imageUrl field.**
 
-**EXAMPLES OF WHEN TO USE IMAGES:**
-- "What are the 6 Ps of acute limb ischemia?" → Include the image from the page discussing this
-- "Describe the clinical presentation" → Include relevant clinical image
-- Any anatomy, pathology, or diagnostic question → MUST have imageUrl
+**HOW TO SELECT THE BEST IMAGE FOR EACH FLASHCARD:**
+1. **Match by page number**: If flashcard is about content from page 3, use Image 3's URL
+2. **Match by topic**: Choose the image most relevant to the flashcard's concept
+3. **For text-only content**: If no image is directly relevant, use the first available image from that section
+4. **Copy the EXACT full URL** from above into the "imageUrl" field - no modifications
 
-You have ${images.length} images available. Use them liberally - most flashcards should reference at least one image.`
+**PRIORITY FOR IMAGE SELECTION:**
+- Anatomy/pathology flashcards → Use anatomical diagrams
+- Clinical presentation/signs → Use clinical images or diagnostic images
+- Treatment/procedures → Use flowcharts, algorithms, or procedural diagrams
+- Definitions/mechanisms → Use the most contextually relevant image from that page
+
+Remember: ALL flashcards must have an imageUrl. Choose the most educationally valuable image for each card.`
     : '';
 
   const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
@@ -669,9 +678,12 @@ ${cardTypeList}
                       ...(createSubdecks ? { subtopic: { type: "string" } } : {}),
                       ...(images && images.length > 0 ? { imageUrl: { type: "string" } } : {}),
                     },
-                    required: createSubdecks 
-                      ? ["question", "answer", "cardType", "subtopic"]
-                      : ["question", "answer", "cardType"],
+                    required: (() => {
+                      const baseRequired = ["question", "answer", "cardType"];
+                      if (createSubdecks) baseRequired.push("subtopic");
+                      if (images && images.length > 0) baseRequired.push("imageUrl");
+                      return baseRequired;
+                    })(),
                   },
                 },
               },
@@ -728,6 +740,17 @@ ${content}`,
     
     if (flashcards.length === 0) {
       console.warn(`Warning: Gemini returned 0 flashcards for chunk. This may indicate the content is too short or lacks extractable information.`);
+    }
+    
+    // Validate imageUrl when images were provided
+    if (images && images.length > 0) {
+      const cardsWithoutImages = flashcards.filter((card: GeneratedFlashcard) => !card.imageUrl);
+      if (cardsWithoutImages.length > 0) {
+        console.error(`VALIDATION ERROR: ${cardsWithoutImages.length}/${flashcards.length} flashcards missing imageUrl despite ${images.length} images being available!`);
+        console.error(`Sample cards without images:`, cardsWithoutImages.slice(0, 2));
+      } else {
+        console.log(`✓ All ${flashcards.length} flashcards have imageUrl values`);
+      }
     }
     
     return flashcards;
