@@ -746,6 +746,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/decks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, granularity, cardTypes, customInstructions } = req.body;
+
+      const updateData: any = {};
+      if (title !== undefined) updateData.title = title;
+      if (granularity !== undefined) updateData.granularity = granularity;
+      if (cardTypes !== undefined) updateData.cardTypes = cardTypes;
+      if (customInstructions !== undefined) updateData.customInstructions = customInstructions;
+
+      const updated = await storage.updateDeck(id, updateData);
+
+      if (!updated) {
+        return res.status(404).json({ error: "Deck not found" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/decks/:id", async (req, res) => {
     try {
       const { id } = req.params;
