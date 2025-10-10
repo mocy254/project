@@ -120,7 +120,8 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
   - **fileUrl:** Stores cloud storage path for uploaded documents (format: `/objects/uploads/{uuid}`)
   
 - `flashcards`: Individual flashcards
-  - Fields: id (UUID), deckId (foreign key), question, answer, cardType, position, createdAt
+  - Fields: id (UUID), deckId (foreign key), question, answer, cardType, position, imageUrl (nullable, cloud storage path), createdAt
+  - **imageUrl:** Stores cloud storage path for extracted images (format: `/objects/uploads/{uuid}`)
   - Cascade delete on deck removal
 
 **Relationships:**
@@ -145,6 +146,16 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
     * Level 6 (4-10): Near-comprehensive (most details)
     * Level 7 (1-10): Every detail including rare cases and examples
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
+  - **Include Images Option (Oct 2025):**
+    * **PDF Documents:** Full page rendering with pdf-to-img library for complete diagram context
+    * **YouTube Videos:** High-quality thumbnail extraction with fallback to standard quality
+    * **Storage:** Images uploaded to Replit Object Storage with private ACL policies
+    * **AI Association:** AI automatically associates images with relevant flashcards during generation
+    * **Display:** Images shown in Editor preview and Study mode with responsive styling (max 300px height)
+    * **Export Handling:**
+      - JSON: Includes imageUrl field with cloud storage path
+      - CSV: ImageURL column with cloud storage URLs
+      - Anki: Downloads images, bundles as media files in .apkg, references by local filename
   - **Include Source Option (Oct 2025):**
     * For YouTube videos: Embeds timestamps in transcript (e.g., `[2:45] The mitochondria...`) when enabled
     * Allows AI to reference specific timestamps in flashcard answers
