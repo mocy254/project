@@ -80,11 +80,9 @@ function DeckItem({ deck, subdecks, childDecksMap, level = 0, onDelete, expanded
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href={`/editor/${deck.id}`}>
-                  <a className="flex items-center">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </a>
+                <Link href={`/editor/${deck.id}`} className="flex items-center">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem 

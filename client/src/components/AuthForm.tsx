@@ -129,10 +129,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
             <span className="text-muted-foreground">
               {mode === "login" ? "Don't have an account?" : "Already have an account?"}
             </span>{" "}
-            <Link href={mode === "login" ? "/signup" : "/login"}>
-              <a className="text-primary font-semibold hover:underline" data-testid="link-switch-mode">
-                {mode === "login" ? "Sign Up" : "Sign In"}
-              </a>
+            <Link 
+              href={mode === "login" ? "/signup" : "/login"}
+              className="text-primary font-semibold hover:underline"
+              data-testid="link-switch-mode"
+            >
+              {mode === "login" ? "Sign Up" : "Sign In"}
             </Link>
           </div>
         </CardContent>
