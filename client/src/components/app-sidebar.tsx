@@ -11,7 +11,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "wouter";
-import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
@@ -22,7 +22,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
-  const { logout } = useUser();
+  const { logout } = useAuth();
 
   return (
     <Sidebar>

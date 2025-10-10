@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Upload, Youtube, Type, Sparkles, Loader2, Settings2, FileText } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import GenerationProgressDialog from "./GenerationProgressDialog";
 import { motion } from "framer-motion";
@@ -32,7 +32,8 @@ export default function GenerationForm() {
   const [includeSource, setIncludeSource] = useState(false);
   const [createSubdecks, setCreateSubdecks] = useState(false);
   const [includeImages, setIncludeImages] = useState(false);
-  const { userId} = useUser();
+  const { user } = useAuth();
+  const userId = user?.id;
   const { toast } = useToast();
 
   const textMutation = useMutation({

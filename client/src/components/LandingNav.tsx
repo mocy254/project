@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
-import { Link } from "wouter";
 import { motion, useScroll } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 
 export default function LandingNav() {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated, login } = useAuth();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     return scrollY.on("change", (latest) => {
@@ -18,6 +21,14 @@ export default function LandingNav() {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      setLocation("/dashboard");
+    } else {
+      login();
     }
   };
 
@@ -64,27 +75,39 @@ export default function LandingNav() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/login">
+            {isAuthenticated ? (
               <Button
-                variant="ghost"
+                variant="default"
                 size="sm"
-                className="text-sm font-medium"
-                data-testid="nav-login"
+                onClick={() => setLocation("/dashboard")}
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg shadow-primary/20"
+                data-testid="nav-dashboard"
               >
-                Sign In
+                Dashboard
               </Button>
-            </Link>
-            <Link href="/signup">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+            ) : (
+              <>
                 <Button
+                  variant="ghost"
                   size="sm"
-                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg shadow-primary/20"
-                  data-testid="nav-get-started"
+                  onClick={login}
+                  className="text-sm font-medium"
+                  data-testid="nav-login"
                 >
-                  Get Started
+                  Sign In
                 </Button>
-              </motion.div>
-            </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    size="sm"
+                    onClick={handleGetStarted}
+                    className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg shadow-primary/20"
+                    data-testid="nav-get-started"
+                  >
+                    Get Started
+                  </Button>
+                </motion.div>
+              </>
+            )}
           </div>
         </div>
       </div>

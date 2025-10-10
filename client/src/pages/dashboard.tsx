@@ -4,14 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Layers, Zap, Coins, FileText, Youtube, Type, MoreVertical, Edit, Trash, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 export default function Dashboard() {
-  const { userId } = useUser();
+  const { user } = useAuth();
+  const userId = user?.id;
   const { toast } = useToast();
 
   const { data: decks, isLoading } = useQuery({
