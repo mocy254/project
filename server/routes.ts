@@ -899,7 +899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (deckGroups.size === 1 && deckGroups.has(deck.title)) {
             const apkg = new AnkiExport(deck.title);
             
-            allCards.forEach(card => {
+            allCards.forEach((card: any) => {
               let question = card.question;
               let answer = card.answer;
               
@@ -919,11 +919,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
             res.send(Buffer.from(zipData, 'binary'));
           } else {
-            // Export with hierarchy - create one deck per subdeck with :: notation
+            // Export with subdeck tags for organization
+            // Note: anki-apkg-export creates one deck per .apkg file
+            // We use tags to indicate subdeck membership so users can reorganize in Anki
             const apkg = new AnkiExport(deck.title);
             
-            for (const [deckPath, cards] of deckGroups.entries()) {
-              cards.forEach(card => {
+            for (const [deckPath, cards] of Array.from(deckGroups.entries())) {
+              cards.forEach((card: any) => {
                 let question = card.question;
                 let answer = card.answer;
                 
@@ -935,14 +937,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   }
                 }
                 
-                // Add deck path as a tag or prefix to maintain hierarchy info
-                // Note: anki-apkg-export may not support :: notation directly, 
-                // so we add deck info to the question
-                const fullQuestion = deckPath !== deck.title 
-                  ? `[${deckPath}] ${question}` 
-                  : question;
+                // Use full deck path as tag to preserve hierarchy
+                // Replace :: with _ and normalize spaces for Anki tag format
+                const hierarchyTag = deckPath.replace(/::/g, '_').replace(/\s+/g, '_');
                 
-                apkg.addCard(fullQuestion, answer);
+                // Add card with full hierarchy path as tag
+                apkg.addCard(question, answer, { 
+                  tags: [hierarchyTag] 
+                });
               });
             }
             

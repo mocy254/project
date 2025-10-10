@@ -174,6 +174,23 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 - `youtube-transcript`: YouTube video transcript fetching
 - `multer`: Multipart file upload handling
 
+**Export Functionality (Updated Oct 2025):**
+- **Subdeck Aggregation:** Editor and study modes now aggregate cards from all subdecks recursively
+  - Uses `/api/decks/:id/cards/all` endpoint that traverses entire deck hierarchy
+  - Parent decks display all cards from child subdecks for seamless editing/studying
+- **Export Formats:**
+  - **JSON:** Exports all cards from parent deck and subdecks with deck metadata
+  - **CSV:** Includes "Deck" column with full path (e.g., "Parent::Subdeck") for hierarchy preservation
+  - **Anki (.apkg):**
+    * Single decks: Standard export with deck name
+    * Parent decks with subdecks: Hierarchy information preserved via tags for manual reorganization
+      - Each card tagged with full deck path (e.g., "Parent::Subdeck" → tag "Parent_Subdeck")
+      - Tags prevent collisions and preserve complete hierarchy information
+      - **User Action Required:** In Anki, users must manually create subdecks and move cards using the tag-based organization
+      - **Library Limitation:** anki-apkg-export creates one deck per .apkg file, preventing automatic subdeck creation
+      - **Alternative:** Use CSV export with "Deck" column for easier import into Anki with hierarchy preservation tools
+    * Cloze deletion cards formatted with `{{c1::answer}}` notation for Anki compatibility
+
 **Development Tools:**
 - Replit-specific plugins for runtime error overlay, cartographer, and dev banner
 - TypeScript for full-stack type safety
