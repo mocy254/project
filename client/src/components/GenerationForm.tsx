@@ -57,8 +57,15 @@ export default function GenerationForm() {
 
   const documentMutation = useMutation({
     mutationFn: async (formData: FormData) => {
+      // Get the auth token from supabase
+      const { data: { session } } = await import('@/lib/supabase').then(m => m.supabase.auth.getSession());
+      const token = session?.access_token;
+      
       const res = await fetch("/api/generate/document", {
         method: "POST",
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
         body: formData,
       });
       if (!res.ok) {
@@ -140,7 +147,6 @@ export default function GenerationForm() {
     }
 
     const baseData = {
-      userId,
       title,
       cardTypes: selectedCardTypes,
       granularity: granularity[0],
@@ -171,7 +177,6 @@ export default function GenerationForm() {
       }
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("userId", userId);
       formData.append("title", title);
       formData.append("cardTypes", JSON.stringify(selectedCardTypes));
       formData.append("granularity", granularity[0].toString());

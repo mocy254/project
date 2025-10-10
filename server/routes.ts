@@ -123,11 +123,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up Supabase Auth
   setupAuth(app);
   
-  app.post("/api/generate/text", async (req, res) => {
+  app.post("/api/generate/text", isAuthenticated, async (req, res) => {
     try {
-      const { content, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
+      const { content, cardTypes, granularity, customInstructions, title, includeSource, createSubdecks } = req.body;
+      const userId = (req as any).user.id; // Get userId from authenticated session
 
-      if (!content || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
+      if (!content || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !title) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
@@ -292,13 +293,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/generate/document", upload.single("file"), async (req, res) => {
+  app.post("/api/generate/document", isAuthenticated, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const { cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks, includeImages } = req.body;
+      const { cardTypes, granularity, customInstructions, title, includeSource, createSubdecks, includeImages } = req.body;
+      const userId = (req as any).user.id; // Get userId from authenticated session
       const sessionId = randomUUID();
       
       // Return session ID immediately
@@ -494,11 +496,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/generate/youtube", async (req, res) => {
+  app.post("/api/generate/youtube", isAuthenticated, async (req, res) => {
     try {
-      const { url, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks, includeImages } = req.body;
+      const { url, cardTypes, granularity, customInstructions, title, includeSource, createSubdecks, includeImages } = req.body;
+      const userId = (req as any).user.id; // Get userId from authenticated session
 
-      if (!url || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
+      if (!url || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !title) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
