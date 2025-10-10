@@ -346,18 +346,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let resultDeckId: string;
           let totalCardCount: number;
 
-          // Upload file to Supabase Storage (cleanup handled in helper)
+          // Upload file to Supabase Storage only if includeSource is true
           let fileUrl: string | null = null;
-          try {
-            fileUrl = await uploadFileToStorage(
-              req.file!.path,
-              userId,
-              req.file!.originalname,
-              req.file!.mimetype
-            );
-          } catch (uploadError) {
-            console.error("Failed to upload file to storage:", uploadError);
-            // Continue without fileUrl if upload fails
+          if (includeSource === 'true') {
+            try {
+              console.log('⬆️  Uploading source file to Supabase Storage...');
+              fileUrl = await uploadFileToStorage(
+                req.file!.path,
+                userId,
+                req.file!.originalname,
+                req.file!.mimetype
+              );
+              console.log('✅ Source file uploaded:', fileUrl);
+            } catch (uploadError) {
+              console.error("❌ Failed to upload file to storage:", uploadError);
+              // Continue without fileUrl if upload fails
+            }
+          } else {
+            console.log('⏭️  Skipping source file upload (includeSource is false)');
+            // Clean up temporary file since we're not uploading it
+            try {
+              await unlinkAsync(req.file!.path);
+              console.log('🗑️  Cleaned up temporary file');
+            } catch (cleanupError) {
+              console.error("Failed to clean up temporary file:", req.file!.path, cleanupError);
+            }
           }
 
           if (shouldCreateSubdecks && flashcards.some(c => c.subtopic)) {
