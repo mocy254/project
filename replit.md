@@ -18,7 +18,7 @@ The frontend uses React 18 with TypeScript, Vite, Wouter for routing, TanStack Q
 
 ### Backend
 
-The backend is built with Express.js and Node.js (ESM modules) in TypeScript. It provides RESTful APIs for operations like file uploads (up to 100MB), flashcard generation, and progress tracking. File uploads are handled with Multer and validated for various document types. Content processing involves text extraction from PDFs, DOCX, TXT, and PPT using `pdf-parse` and `mammoth`, and YouTube transcript extraction via `youtubei.js` with intelligent Whisper AI fallback for videos without captions. Token counting for AI is precisely managed using Tiktoken. A key feature is intelligent, topic-aware chunking for large documents, ensuring semantic continuity and context for AI generation, including 200-token overlaps between chunks. Generated flashcards and associated metadata are stored in a PostgreSQL database.
+The backend is built with Express.js and Node.js (ESM modules) in TypeScript. It provides RESTful APIs for operations like file uploads (up to 100MB), flashcard generation, and progress tracking. **All flashcard generation endpoints are protected by Supabase Auth middleware (`isAuthenticated`), ensuring only authenticated users can generate flashcards and user IDs are securely extracted from the session.** File uploads are handled with Multer and validated for various document types. Content processing involves text extraction from PDFs, DOCX, TXT, and PPT using `pdf-parse` and `mammoth`, and YouTube transcript extraction via `youtubei.js` with intelligent Whisper AI fallback for videos without captions. Token counting for AI is precisely managed using Tiktoken. A key feature is intelligent, topic-aware chunking for large documents, ensuring semantic continuity and context for AI generation, including 200-token overlaps between chunks. Generated flashcards and associated metadata are stored in a PostgreSQL database.
 
 ### Database Schema
 
@@ -35,7 +35,7 @@ Relationships include one user to many decks, and one deck to many flashcards, w
 - **Content Processing:** Robust pipeline for text and multimedia extraction. Intelligent topic-aware chunking for large documents ensures contextual integrity for AI. Accurate token counting is critical for AI context management.
 - **Flashcard Generation:** AI-powered generation with customizable parameters including multiple card types, granularity levels (1-7 scale based on importance-based filtering), and custom instructions. Includes an option for automatically associating relevant images from PDFs or YouTube videos and an "Include Source" option for YouTube timestamps.
 - **Subdeck Organization:** AI can automatically detect subtopics and create hierarchical subdecks for better organization, displayed in a file-tree style within the UI.
-- **Data Storage:** Uses a production-ready PostgreSQL database with Drizzle ORM for persistent storage of user data, decks, and flashcards. Uploaded documents are stored in Replit App Storage (Google Cloud Storage) with private ACLs.
+- **Data Storage:** Uses a production-ready PostgreSQL database with Drizzle ORM for persistent storage of user data, decks, and flashcards. Uploaded documents and extracted images are stored in **Supabase Storage** with public bucket access for images and user-organized folder structure (userId/uploads/*, userId/images/*). The system validates bucket configuration on startup and provides clear error messages if misconfigured.
 - **API Design:** RESTful endpoints with HTTP polling for asynchronous generation progress tracking.
 
 ## External Dependencies
@@ -50,5 +50,5 @@ Relationships include one user to many decks, and one deck to many flashcards, w
     - OpenAI Whisper API: As a fallback for AI transcription of videos without captions.
     - `yt-dlp`: For audio extraction for Whisper transcription.
     - `multer`: For multipart file upload handling.
-- **Cloud Storage:** Google Cloud Storage via Replit App Storage for uploaded documents and extracted images.
+- **Cloud Storage:** Supabase Storage for uploaded documents and extracted images. Files are organized by user ID in a hierarchical structure. Requires a public bucket named `flashgenius-uploads` to be created in the Supabase dashboard with appropriate RLS policies for authenticated upload and public read access.
 - **Export Functionality:** Supports JSON, CSV, and Anki (.apkg) formats. CSV and Anki exports handle subdeck hierarchy information.
