@@ -29,9 +29,13 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        const errorMessage = data.error === "Email not confirmed" 
+          ? "Please check your email and click the confirmation link to activate your account."
+          : data.error || "Failed to login";
+        
         toast({
-          title: "Error",
-          description: data.error || "Failed to login",
+          title: data.error === "Email not confirmed" ? "Email not confirmed" : "Error",
+          description: errorMessage,
           variant: "destructive",
         });
       } else {

@@ -40,12 +40,19 @@ export default function Signup() {
         // Set the session in Supabase client
         if (data.session) {
           await supabase.auth.setSession(data.session);
+          toast({
+            title: "Success",
+            description: "Account created successfully!",
+          });
+          setLocation("/dashboard");
+        } else {
+          // Email confirmation is required
+          toast({
+            title: "Check your email",
+            description: "Please check your email and click the confirmation link to complete your registration.",
+          });
+          setLocation("/login");
         }
-        toast({
-          title: "Success",
-          description: "Account created successfully!",
-        });
-        setLocation("/dashboard");
       }
     } catch (error) {
       toast({

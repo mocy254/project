@@ -5,13 +5,12 @@ import { z } from "zod";
 
 // Users table - compatible with Supabase Auth
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id").primaryKey(),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const decks = pgTable("decks", {
@@ -46,7 +45,6 @@ export const flashcards = pgTable("flashcards", {
 
 export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
-  updatedAt: true,
 });
 
 export const insertDeckSchema = createInsertSchema(decks).omit({

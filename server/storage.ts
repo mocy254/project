@@ -53,8 +53,7 @@ export class MemStorage implements IStorage {
       lastName: insertUser.lastName ?? null,
       profileImageUrl: insertUser.profileImageUrl ?? null,
       id,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
     this.users.set(id, user);
     return user;
