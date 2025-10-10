@@ -22,6 +22,23 @@ import { setupAuth, isAuthenticated } from "./supabaseAuth";
 const unlinkAsync = promisify(unlink);
 const readFileAsync = promisify(readFile);
 
+// Helper function to batch database operations to avoid connection pool exhaustion
+async function batchInsert<T, R>(
+  items: T[],
+  insertFn: (item: T) => Promise<R>,
+  batchSize: number = 3
+): Promise<R[]> {
+  const results: R[] = [];
+  
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(insertFn));
+    results.push(...batchResults);
+  }
+  
+  return results;
+}
+
 // Helper function to upload file to Supabase Storage
 async function uploadFileToStorage(
   filePath: string,
@@ -180,17 +197,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 createSubdecks: 'false'
               });
 
-              await Promise.all(
-                group.flashcards.map((card, index) =>
-                  storage.createFlashcard({
-                    deckId: subdeck.id,
-                    question: card.question,
-                    answer: card.answer,
-                    cardType: card.cardType,
-                    position: index,
-                    imageUrl: card.imageUrl || null
-                  })
-                )
+              await batchInsert(
+                group.flashcards.map((card, index) => ({ card, index })),
+                ({ card, index }) => storage.createFlashcard({
+                  deckId: subdeck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index,
+                  imageUrl: card.imageUrl || null
+                }),
+                3 // Batch size of 3 to stay well under 5 connection limit
               );
 
               totalCards += group.flashcards.length;
@@ -212,17 +229,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               createSubdecks: 'false'
             });
 
-            const createdCards = await Promise.all(
-              flashcards.map((card, index) =>
-                storage.createFlashcard({
-                  deckId: deck.id,
-                  question: card.question,
-                  answer: card.answer,
-                  cardType: card.cardType,
-                  position: index,
-                  imageUrl: card.imageUrl || null
-                })
-              )
+            const createdCards = await batchInsert(
+              flashcards.map((card, index) => ({ card, index })),
+              ({ card, index }) => storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index,
+                imageUrl: card.imageUrl || null
+              }),
+              3 // Batch size of 3 to stay well under 5 connection limit
             );
 
             resultDeckId = deck.id;
@@ -415,17 +432,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 createSubdecks: 'false'
               });
 
-              await Promise.all(
-                group.flashcards.map((card, index) =>
-                  storage.createFlashcard({
-                    deckId: subdeck.id,
-                    question: card.question,
-                    answer: card.answer,
-                    cardType: card.cardType,
-                    position: index,
-                    imageUrl: card.imageUrl || null
-                  })
-                )
+              await batchInsert(
+                group.flashcards.map((card, index) => ({ card, index })),
+                ({ card, index }) => storage.createFlashcard({
+                  deckId: subdeck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index,
+                  imageUrl: card.imageUrl || null
+                }),
+                3 // Batch size of 3 to stay well under 5 connection limit
               );
 
               totalCards += group.flashcards.length;
@@ -448,17 +465,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               fileUrl
             });
 
-            const createdCards = await Promise.all(
-              flashcards.map((card, index) =>
-                storage.createFlashcard({
-                  deckId: deck.id,
-                  question: card.question,
-                  answer: card.answer,
-                  cardType: card.cardType,
-                  position: index,
-                  imageUrl: card.imageUrl || null
-                })
-              )
+            const createdCards = await batchInsert(
+              flashcards.map((card, index) => ({ card, index })),
+              ({ card, index }) => storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index,
+                imageUrl: card.imageUrl || null
+              }),
+              3 // Batch size of 3 to stay well under 5 connection limit
             );
 
             resultDeckId = deck.id;
@@ -618,17 +635,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 createSubdecks: 'false'
               });
 
-              await Promise.all(
-                group.flashcards.map((card, index) =>
-                  storage.createFlashcard({
-                    deckId: subdeck.id,
-                    question: card.question,
-                    answer: card.answer,
-                    cardType: card.cardType,
-                    position: index,
-                    imageUrl: card.imageUrl || null
-                  })
-                )
+              await batchInsert(
+                group.flashcards.map((card, index) => ({ card, index })),
+                ({ card, index }) => storage.createFlashcard({
+                  deckId: subdeck.id,
+                  question: card.question,
+                  answer: card.answer,
+                  cardType: card.cardType,
+                  position: index,
+                  imageUrl: card.imageUrl || null
+                }),
+                3 // Batch size of 3 to stay well under 5 connection limit
               );
 
               totalCards += group.flashcards.length;
@@ -650,17 +667,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               createSubdecks: 'false'
             });
 
-            const createdCards = await Promise.all(
-              flashcards.map((card, index) =>
-                storage.createFlashcard({
-                  deckId: deck.id,
-                  question: card.question,
-                  answer: card.answer,
-                  cardType: card.cardType,
-                  position: index,
-                  imageUrl: card.imageUrl || null
-                })
-              )
+            const createdCards = await batchInsert(
+              flashcards.map((card, index) => ({ card, index })),
+              ({ card, index }) => storage.createFlashcard({
+                deckId: deck.id,
+                question: card.question,
+                answer: card.answer,
+                cardType: card.cardType,
+                position: index,
+                imageUrl: card.imageUrl || null
+              }),
+              3 // Batch size of 3 to stay well under 5 connection limit
             );
 
             resultDeckId = deck.id;

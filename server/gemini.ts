@@ -553,11 +553,22 @@ async function generateFlashcardsForChunk(
     : '';
 
   const imageGuidance = images && images.length > 0
-    ? `\n\n**AVAILABLE IMAGES:**
-The following images have been extracted from the content:
+    ? `\n\n**⚠️ MANDATORY IMAGE INCLUSION - ${images.length} IMAGES AVAILABLE:**
 ${images.map((img, idx) => `Image ${idx + 1}${img.pageNumber ? ` (Page ${img.pageNumber})` : ''}: ${img.imageUrl}`).join('\n')}
 
-When a flashcard relates to visual content, diagrams, or concepts that would benefit from an image, include the most relevant image URL in the "imageUrl" field. Only include images that directly support the flashcard's question or answer.`
+**CRITICAL IMAGE RULES - YOU MUST FOLLOW:**
+1. EVERY flashcard about visual concepts (anatomy, diagrams, clinical signs, procedures) MUST include imageUrl
+2. Use page number to match content: Page 3 content → use Image 3
+3. Default to INCLUDING images - visual aids dramatically improve medical learning
+4. Copy the EXACT full URL into the "imageUrl" field
+5. Include images for: anatomical structures, diagnostic images, treatment algorithms, clinical findings, procedural steps
+
+**EXAMPLES OF WHEN TO USE IMAGES:**
+- "What are the 6 Ps of acute limb ischemia?" → Include the image from the page discussing this
+- "Describe the clinical presentation" → Include relevant clinical image
+- Any anatomy, pathology, or diagnostic question → MUST have imageUrl
+
+You have ${images.length} images available. Use them liberally - most flashcards should reference at least one image.`
     : '';
 
   const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
