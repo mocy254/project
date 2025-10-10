@@ -23,22 +23,31 @@ export async function extractImagesFromPDF(
   const extractedImages: ExtractedImage[] = [];
   
   try {
+    console.log(`📄 Starting PDF image extraction from: ${filePath}`);
+    console.log(`  Max images: ${maxImages}`);
+    
     const supabaseStorageService = new SupabaseStorageService();
     const document = await pdf(filePath, { scale: 2 });
+    
+    console.log('✅ PDF document loaded, converting pages to images...');
     
     let pageNumber = 1;
     for await (const imageBuffer of document) {
       if (extractedImages.length >= maxImages) {
+        console.log(`⏸️  Reached max images limit (${maxImages}), stopping extraction`);
         break;
       }
       
       try {
+        console.log(`  📸 Processing page ${pageNumber}...`);
         // Upload image to storage
         const imageUrl = await supabaseStorageService.uploadImageBuffer(
           imageBuffer,
           userId,
           `pdf-page-${pageNumber}.png`
         );
+        
+        console.log(`  ✅ Uploaded page ${pageNumber} to: ${imageUrl}`);
         
         extractedImages.push({
           imageUrl,
@@ -51,9 +60,10 @@ export async function extractImagesFromPDF(
       pageNumber++;
     }
     
+    console.log(`✅ PDF image extraction complete. Extracted ${extractedImages.length} images`);
     return extractedImages;
   } catch (error) {
-    console.error("Error extracting images from PDF:", error);
+    console.error("❌ Error extracting images from PDF:", error);
     return [];
   }
 }

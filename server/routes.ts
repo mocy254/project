@@ -292,7 +292,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Extract images if requested and file is PDF
           let extractedImages: Array<{imageUrl: string, pageNumber: number}> = [];
+          console.log('🔍 Checking image extraction conditions:');
+          console.log('  includeImages:', includeImages, '===', 'true', '?', includeImages === 'true');
+          console.log('  mimetype:', req.file!.mimetype, '===', 'application/pdf', '?', req.file!.mimetype === 'application/pdf');
+          
           if (includeImages === 'true' && req.file!.mimetype === 'application/pdf') {
+            console.log('✅ Starting image extraction from PDF...');
             progressManager.setProgress({
               sessionId,
               stage: "extracting",
@@ -300,6 +305,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               progress: 10
             });
             extractedImages = await extractImagesFromPDF(req.file!.path, userId, 10);
+            console.log(`📸 Extracted ${extractedImages.length} images from PDF`);
+          } else {
+            console.log('⏭️  Skipping image extraction (conditions not met)');
           }
 
           progressManager.setProgress({
