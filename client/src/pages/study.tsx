@@ -217,12 +217,22 @@ export default function Study() {
                   backfaceVisibility: 'hidden',
                 }}
               >
-                <CardContent className="p-8 sm:p-12 text-center w-full">
+                <CardContent className="p-8 sm:p-12 text-center w-full overflow-auto">
                   <div className="mb-6">
                     <Badge variant="outline" className={`text-xs ${getTypeColor(currentCard?.cardType)}`}>
                       {getTypeLabel(currentCard?.cardType)}
                     </Badge>
                   </div>
+                  {currentCard?.imageUrl && (
+                    <div className="mb-6">
+                      <img 
+                        src={currentCard.imageUrl} 
+                        alt="Flashcard visual" 
+                        className="max-w-full max-h-64 mx-auto rounded-md object-contain"
+                        data-testid="image-flashcard"
+                      />
+                    </div>
+                  )}
                   <p className="text-2xl sm:text-3xl md:text-4xl font-medium leading-relaxed whitespace-pre-wrap">
                     {currentCard?.question}
                   </p>

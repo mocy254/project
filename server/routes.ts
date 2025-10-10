@@ -905,13 +905,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
 
         case "csv":
-          const csvRows = ["Deck,Question,Answer,Type"];
+          const csvRows = ["Deck,Question,Answer,Type,ImageURL"];
           allCardsWithDeck.forEach(({ card, deckPath }) => {
             const row = [
               `"${deckPath.replace(/"/g, '""')}"`,
               `"${card.question.replace(/"/g, '""')}"`,
               `"${card.answer.replace(/"/g, '""')}"`,
-              card.cardType
+              card.cardType,
+              card.imageUrl ? `"${card.imageUrl.replace(/"/g, '""')}"` : '""'
             ];
             csvRows.push(row.join(","));
           });
@@ -935,9 +936,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (deckGroups.size === 1 && deckGroups.has(deck.title)) {
             const apkg = new AnkiExport(deck.title);
             
+            // Download and add images to package
+            const imageMap = new Map<string, string>();
+            for (const card of allCards) {
+              if (card.imageUrl && !imageMap.has(card.imageUrl)) {
+                try {
+                  const response = await fetch(card.imageUrl);
+                  if (response.ok) {
+                    const buffer = await response.arrayBuffer();
+                    const imageExtension = card.imageUrl.split('.').pop()?.split('?')[0] || 'jpg';
+                    const filename = `image_${imageMap.size + 1}.${imageExtension}`;
+                    apkg.addMedia(filename, Buffer.from(buffer));
+                    imageMap.set(card.imageUrl, filename);
+                  }
+                } catch (err) {
+                  console.error(`Failed to fetch image ${card.imageUrl}:`, err);
+                }
+              }
+            }
+            
             allCards.forEach((card: any) => {
               let question = card.question;
               let answer = card.answer;
+              
+              // Add image to question if available and downloaded
+              if (card.imageUrl && imageMap.has(card.imageUrl)) {
+                const filename = imageMap.get(card.imageUrl);
+                question = `<img src="${filename}" style="max-width: 100%; max-height: 300px; display: block; margin: 10px auto;" /><br/>${question}`;
+              }
               
               if (card.cardType === "cloze") {
                 const clozeParts = question.split("[blank]");
@@ -960,10 +986,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // We use tags to indicate subdeck membership so users can reorganize in Anki
             const apkg = new AnkiExport(deck.title);
             
+            // Download and add images to package
+            const imageMap = new Map<string, string>();
+            for (const card of allCards) {
+              if (card.imageUrl && !imageMap.has(card.imageUrl)) {
+                try {
+                  const response = await fetch(card.imageUrl);
+                  if (response.ok) {
+                    const buffer = await response.arrayBuffer();
+                    const imageExtension = card.imageUrl.split('.').pop()?.split('?')[0] || 'jpg';
+                    const filename = `image_${imageMap.size + 1}.${imageExtension}`;
+                    apkg.addMedia(filename, Buffer.from(buffer));
+                    imageMap.set(card.imageUrl, filename);
+                  }
+                } catch (err) {
+                  console.error(`Failed to fetch image ${card.imageUrl}:`, err);
+                }
+              }
+            }
+            
             for (const [deckPath, cards] of Array.from(deckGroups.entries())) {
               cards.forEach((card: any) => {
                 let question = card.question;
                 let answer = card.answer;
+                
+                // Add image to question if available and downloaded
+                if (card.imageUrl && imageMap.has(card.imageUrl)) {
+                  const filename = imageMap.get(card.imageUrl);
+                  question = `<img src="${filename}" style="max-width: 100%; max-height: 300px; display: block; margin: 10px auto;" /><br/>${question}`;
+                }
                 
                 if (card.cardType === "cloze") {
                   const clozeParts = question.split("[blank]");

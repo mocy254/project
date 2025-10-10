@@ -7,12 +7,14 @@ interface FlashcardPreviewProps {
   question: string;
   answer: string;
   cardType?: "qa" | "cloze" | "reverse";
+  imageUrl?: string | null;
 }
 
 export default function FlashcardPreview({ 
   question, 
   answer, 
-  cardType = "qa" 
+  cardType = "qa",
+  imageUrl = null
 }: FlashcardPreviewProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -29,7 +31,7 @@ export default function FlashcardPreview({
           }}
         >
           <Card
-            className="absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 cursor-pointer hover-elevate active-elevate-2"
+            className="absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 cursor-pointer hover-elevate active-elevate-2 overflow-auto"
             onClick={() => setIsFlipped(!isFlipped)}
             data-testid="card-front"
             style={{ backfaceVisibility: "hidden" }}
@@ -38,6 +40,16 @@ export default function FlashcardPreview({
               <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-4">
                 {cardType === "qa" ? "Question" : cardType === "cloze" ? "Cloze" : "Term"}
               </div>
+              {imageUrl && (
+                <div className="mb-4">
+                  <img 
+                    src={imageUrl} 
+                    alt="Flashcard visual" 
+                    className="max-w-full max-h-48 mx-auto rounded-md object-contain"
+                    data-testid="image-flashcard"
+                  />
+                </div>
+              )}
               <p className="text-2xl font-display font-semibold leading-relaxed">
                 {question}
               </p>

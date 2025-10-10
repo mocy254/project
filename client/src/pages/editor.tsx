@@ -331,6 +331,7 @@ export default function Editor() {
               question={selectedCard.question}
               answer={selectedCard.answer}
               cardType={selectedCard.cardType}
+              imageUrl={selectedCard.imageUrl}
             />
           )}
         </TabsContent>
