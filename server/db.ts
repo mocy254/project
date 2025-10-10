@@ -12,6 +12,12 @@ if (process.env.NODE_ENV === 'development') {
   neonConfig.poolQueryViaFetch = true;
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Configure pool with connection limits to avoid "Too many connections" errors
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 5, // Limit to 5 concurrent connections (Neon free tier allows ~10)
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
 
 export const db = drizzle(pool, { schema });
