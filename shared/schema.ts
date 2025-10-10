@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -35,6 +35,8 @@ export const flashcards = pgTable("flashcards", {
   answer: text("answer").notNull(),
   cardType: text("card_type").notNull(),
   position: integer("position").notNull(),
+  isLearned: boolean("is_learned").notNull().default(false),
+  learnedAt: timestamp("learned_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
