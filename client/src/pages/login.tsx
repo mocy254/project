@@ -20,19 +20,26 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
+      const data = await response.json();
+
+      if (!response.ok) {
         toast({
           title: "Error",
-          description: error.message,
+          description: data.error || "Failed to login",
           variant: "destructive",
         });
       } else {
-        setLocation("/");
+        // Set the session in Supabase client
+        if (data.session) {
+          await supabase.auth.setSession(data.session);
+        }
+        setLocation("/dashboard");
       }
     } catch (error) {
       toast({

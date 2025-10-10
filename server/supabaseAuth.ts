@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Express, RequestHandler } from 'express';
+import { storage } from './storage';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
@@ -60,6 +61,21 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: error.message });
       }
 
+      // Create user record in our database
+      if (data.user) {
+        try {
+          await storage.createUser({
+            id: data.user.id,
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+          });
+        } catch (dbError) {
+          console.error('Failed to create user in database:', dbError);
+          // Continue anyway - user exists in Supabase
+        }
+      }
+
       res.json({ 
         user: data.user,
         session: data.session,
@@ -86,6 +102,24 @@ export function setupAuth(app: Express) {
 
       if (error) {
         return res.status(400).json({ error: error.message });
+      }
+
+      // Ensure user exists in our database (for users who signed up before sync was added)
+      if (data.user) {
+        try {
+          const existingUser = await storage.getUser(data.user.id);
+          if (!existingUser) {
+            await storage.createUser({
+              id: data.user.id,
+              email: data.user.email || '',
+              firstName: data.user.user_metadata?.first_name,
+              lastName: data.user.user_metadata?.last_name,
+            });
+          }
+        } catch (dbError) {
+          console.error('Failed to sync user to database:', dbError);
+          // Continue anyway - user exists in Supabase
+        }
       }
 
       res.json({

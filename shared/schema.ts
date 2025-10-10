@@ -45,8 +45,8 @@ export const flashcards = pgTable("flashcards", {
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertDeckSchema = createInsertSchema(decks).omit({

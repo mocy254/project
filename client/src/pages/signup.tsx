@@ -22,29 +22,30 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-          },
-        },
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, firstName, lastName }),
       });
 
-      if (error) {
+      const data = await response.json();
+
+      if (!response.ok) {
         toast({
           title: "Error",
-          description: error.message,
+          description: data.error || "Failed to create account",
           variant: "destructive",
         });
       } else {
+        // Set the session in Supabase client
+        if (data.session) {
+          await supabase.auth.setSession(data.session);
+        }
         toast({
           title: "Success",
-          description: "Account created successfully! Please check your email to verify your account.",
+          description: "Account created successfully!",
         });
-        setLocation("/login");
+        setLocation("/dashboard");
       }
     } catch (error) {
       toast({
