@@ -19,9 +19,9 @@ export default function Study() {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const { data: cards, isLoading } = useQuery({
-    queryKey: ['/api/decks', deckId, 'cards'],
+    queryKey: ['/api/decks', deckId, 'cards', 'all'],
     queryFn: async () => {
-      const res = await apiRequest("GET", `/api/decks/${deckId}/cards`);
+      const res = await apiRequest("GET", `/api/decks/${deckId}/cards/all`);
       return await res.json();
     },
     enabled: !!deckId,
@@ -42,7 +42,7 @@ export default function Study() {
       return await res.json();
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['/api/decks', deckId, 'cards'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/decks', deckId, 'cards', 'all'] });
     },
   });
 

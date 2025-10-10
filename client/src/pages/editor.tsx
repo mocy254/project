@@ -35,9 +35,9 @@ export default function Editor() {
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
 
   const { data: cards, isLoading } = useQuery({
-    queryKey: ['/api/decks', deckId, 'cards'],
+    queryKey: ['/api/decks', deckId, 'cards', 'all'],
     queryFn: async () => {
-      const res = await apiRequest("GET", `/api/decks/${deckId}/cards`);
+      const res = await apiRequest("GET", `/api/decks/${deckId}/cards/all`);
       return await res.json();
     },
     enabled: !!deckId,
@@ -62,7 +62,7 @@ export default function Editor() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/decks', deckId, 'cards'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/decks', deckId, 'cards', 'all'] });
       toast({
         title: "Card updated",
         description: "Your changes have been saved",
@@ -82,7 +82,7 @@ export default function Editor() {
       await apiRequest("DELETE", `/api/cards/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/decks', deckId, 'cards'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/decks', deckId, 'cards', 'all'] });
       toast({
         title: "Card deleted",
         description: "The flashcard has been removed",

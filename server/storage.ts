@@ -12,11 +12,13 @@ export interface IStorage {
   getDeck(id: string): Promise<Deck | undefined>;
   getDecksByUserId(userId: string): Promise<Deck[]>;
   getSubdecks(parentDeckId: string): Promise<Deck[]>;
+  getAllSubdecksRecursive(parentDeckId: string): Promise<Deck[]>;
   updateDeck(id: string, deck: Partial<InsertDeck>): Promise<Deck | undefined>;
   deleteDeck(id: string): Promise<void>;
   
   createFlashcard(flashcard: InsertFlashcard): Promise<Flashcard>;
   getFlashcardsByDeckId(deckId: string): Promise<Flashcard[]>;
+  getAllFlashcardsWithSubdecks(deckId: string): Promise<Flashcard[]>;
   updateFlashcard(id: string, flashcard: Partial<InsertFlashcard>): Promise<Flashcard | undefined>;
   deleteFlashcard(id: string): Promise<void>;
 }
@@ -118,6 +120,8 @@ export class MemStorage implements IStorage {
     const flashcard: Flashcard = { 
       ...insertFlashcard,
       id,
+      isLearned: insertFlashcard.isLearned ?? false,
+      learnedAt: insertFlashcard.learnedAt ?? null,
       createdAt: new Date()
     };
     this.flashcards.set(id, flashcard);
@@ -141,6 +145,30 @@ export class MemStorage implements IStorage {
 
   async deleteFlashcard(id: string): Promise<void> {
     this.flashcards.delete(id);
+  }
+
+  async getAllSubdecksRecursive(parentDeckId: string): Promise<Deck[]> {
+    const directSubdecks = await this.getSubdecks(parentDeckId);
+    const allSubdecks: Deck[] = [...directSubdecks];
+    
+    for (const subdeck of directSubdecks) {
+      const childSubdecks = await this.getAllSubdecksRecursive(subdeck.id);
+      allSubdecks.push(...childSubdecks);
+    }
+    
+    return allSubdecks;
+  }
+
+  async getAllFlashcardsWithSubdecks(deckId: string): Promise<Flashcard[]> {
+    const cards = await this.getFlashcardsByDeckId(deckId);
+    const subdecks = await this.getAllSubdecksRecursive(deckId);
+    
+    for (const subdeck of subdecks) {
+      const subdeckCards = await this.getFlashcardsByDeckId(subdeck.id);
+      cards.push(...subdeckCards);
+    }
+    
+    return cards.sort((a, b) => a.position - b.position);
   }
 }
 
@@ -217,6 +245,30 @@ export class DbStorage implements IStorage {
 
   async deleteFlashcard(id: string): Promise<void> {
     await db.delete(flashcards).where(eq(flashcards.id, id));
+  }
+
+  async getAllSubdecksRecursive(parentDeckId: string): Promise<Deck[]> {
+    const directSubdecks = await this.getSubdecks(parentDeckId);
+    const allSubdecks: Deck[] = [...directSubdecks];
+    
+    for (const subdeck of directSubdecks) {
+      const childSubdecks = await this.getAllSubdecksRecursive(subdeck.id);
+      allSubdecks.push(...childSubdecks);
+    }
+    
+    return allSubdecks;
+  }
+
+  async getAllFlashcardsWithSubdecks(deckId: string): Promise<Flashcard[]> {
+    const cards = await this.getFlashcardsByDeckId(deckId);
+    const subdecks = await this.getAllSubdecksRecursive(deckId);
+    
+    for (const subdeck of subdecks) {
+      const subdeckCards = await this.getFlashcardsByDeckId(subdeck.id);
+      cards.push(...subdeckCards);
+    }
+    
+    return cards.sort((a, b) => a.position - b.position);
   }
 }
 

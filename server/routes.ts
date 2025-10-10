@@ -716,6 +716,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/decks/:id/cards/all", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const cards = await storage.getAllFlashcardsWithSubdecks(id);
+      res.json(cards);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.put("/api/cards/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -811,23 +821,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id, format } = req.params;
       const deck = await storage.getDeck(id);
-      const cards = await storage.getFlashcardsByDeckId(id);
 
       if (!deck) {
         return res.status(404).json({ error: "Deck not found" });
       }
 
+      // Helper to build deck path for hierarchy
+      const buildDeckPath = async (deckId: string): Promise<string> => {
+        const currentDeck = await storage.getDeck(deckId);
+        if (!currentDeck) return "";
+        
+        if (currentDeck.parentDeckId) {
+          const parentPath = await buildDeckPath(currentDeck.parentDeckId);
+          return parentPath ? `${parentPath}::${currentDeck.title}` : currentDeck.title;
+        }
+        
+        return currentDeck.title;
+      };
+
+      // Get all cards including from subdecks with deck info
+      const getCardsWithDeckInfo = async (deckId: string): Promise<Array<{ card: any; deckPath: string }>> => {
+        const currentDeck = await storage.getDeck(deckId);
+        if (!currentDeck) return [];
+        
+        const deckPath = await buildDeckPath(deckId);
+        const directCards = await storage.getFlashcardsByDeckId(deckId);
+        const cardsWithDeck = directCards.map(card => ({ card, deckPath }));
+        
+        // Get cards from all subdecks recursively
+        const subdecks = await storage.getSubdecks(deckId);
+        for (const subdeck of subdecks) {
+          const subdeckCards = await getCardsWithDeckInfo(subdeck.id);
+          cardsWithDeck.push(...subdeckCards);
+        }
+        
+        return cardsWithDeck;
+      };
+
+      const allCardsWithDeck = await getCardsWithDeckInfo(id);
+      const allCards = allCardsWithDeck.map(item => item.card);
+
       switch (format) {
         case "json":
           res.setHeader("Content-Type", "application/json");
           res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.json"`);
-          res.json({ deck, flashcards: cards });
+          res.json({ deck, flashcards: allCards });
           break;
 
         case "csv":
-          const csvRows = ["Question,Answer,Type"];
-          cards.forEach(card => {
+          const csvRows = ["Deck,Question,Answer,Type"];
+          allCardsWithDeck.forEach(({ card, deckPath }) => {
             const row = [
+              `"${deckPath.replace(/"/g, '""')}"`,
               `"${card.question.replace(/"/g, '""')}"`,
               `"${card.answer.replace(/"/g, '""')}"`,
               card.cardType
@@ -840,34 +885,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
 
         case "anki":
-          const apkg = new AnkiExport(deck.title);
+          // Group cards by deck path to preserve hierarchy
+          const deckGroups = new Map<string, any[]>();
           
-          // Add all flashcards to the package
-          cards.forEach(card => {
-            // Format the question and answer based on card type
-            let question = card.question;
-            let answer = card.answer;
+          allCardsWithDeck.forEach(({ card, deckPath }) => {
+            if (!deckGroups.has(deckPath)) {
+              deckGroups.set(deckPath, []);
+            }
+            deckGroups.get(deckPath)!.push(card);
+          });
+
+          // If there's only one deck (no subdecks), use simple export
+          if (deckGroups.size === 1 && deckGroups.has(deck.title)) {
+            const apkg = new AnkiExport(deck.title);
             
-            // For cloze deletion cards, format them properly for Anki
-            if (card.cardType === "cloze") {
-              // Replace [blank] with {{c1::answer}} format for Anki
-              const clozeParts = question.split("[blank]");
-              if (clozeParts.length > 1) {
-                question = clozeParts[0] + `{{c1::${answer}}}` + clozeParts.slice(1).join("[blank]");
-                answer = ""; // Cloze cards don't need separate answer
+            allCards.forEach(card => {
+              let question = card.question;
+              let answer = card.answer;
+              
+              if (card.cardType === "cloze") {
+                const clozeParts = question.split("[blank]");
+                if (clozeParts.length > 1) {
+                  question = clozeParts[0] + `{{c1::${answer}}}` + clozeParts.slice(1).join("[blank]");
+                  answer = "";
+                }
               }
+              
+              apkg.addCard(question, answer);
+            });
+            
+            const zipData = await apkg.save();
+            res.setHeader("Content-Type", "application/octet-stream");
+            res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
+            res.send(Buffer.from(zipData, 'binary'));
+          } else {
+            // Export with hierarchy - create one deck per subdeck with :: notation
+            const apkg = new AnkiExport(deck.title);
+            
+            for (const [deckPath, cards] of deckGroups.entries()) {
+              cards.forEach(card => {
+                let question = card.question;
+                let answer = card.answer;
+                
+                if (card.cardType === "cloze") {
+                  const clozeParts = question.split("[blank]");
+                  if (clozeParts.length > 1) {
+                    question = clozeParts[0] + `{{c1::${answer}}}` + clozeParts.slice(1).join("[blank]");
+                    answer = "";
+                  }
+                }
+                
+                // Add deck path as a tag or prefix to maintain hierarchy info
+                // Note: anki-apkg-export may not support :: notation directly, 
+                // so we add deck info to the question
+                const fullQuestion = deckPath !== deck.title 
+                  ? `[${deckPath}] ${question}` 
+                  : question;
+                
+                apkg.addCard(fullQuestion, answer);
+              });
             }
             
-            apkg.addCard(question, answer);
-          });
-          
-          // Generate the .apkg file
-          const zipData = await apkg.save();
-          
-          // Set proper headers for Anki package download
-          res.setHeader("Content-Type", "application/octet-stream");
-          res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
-          res.send(Buffer.from(zipData, 'binary'));
+            const zipData = await apkg.save();
+            res.setHeader("Content-Type", "application/octet-stream");
+            res.setHeader("Content-Disposition", `attachment; filename="${deck.title}.apkg"`);
+            res.send(Buffer.from(zipData, 'binary'));
+          }
           break;
 
         default:
