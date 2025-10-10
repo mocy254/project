@@ -1,5 +1,5 @@
 import { pdf } from "pdf-to-img";
-import { ObjectStorageService } from "./objectStorage";
+import { SupabaseStorageService } from "./supabaseStorage";
 import { Innertube } from "youtubei.js";
 import { spawn } from "child_process";
 import { writeFileSync, unlinkSync, mkdirSync } from "fs";
@@ -23,7 +23,7 @@ export async function extractImagesFromPDF(
   const extractedImages: ExtractedImage[] = [];
   
   try {
-    const objectStorageService = new ObjectStorageService();
+    const supabaseStorageService = new SupabaseStorageService();
     const document = await pdf(filePath, { scale: 2 });
     
     let pageNumber = 1;
@@ -34,7 +34,7 @@ export async function extractImagesFromPDF(
       
       try {
         // Upload image to storage
-        const imageUrl = await objectStorageService.uploadImageBuffer(
+        const imageUrl = await supabaseStorageService.uploadImageBuffer(
           imageBuffer,
           userId,
           `pdf-page-${pageNumber}.png`
@@ -86,13 +86,13 @@ export async function extractYouTubeThumbnail(
         return null;
       }
       const buffer = Buffer.from(await fallbackResponse.arrayBuffer());
-      const objectStorageService = new ObjectStorageService();
-      return await objectStorageService.uploadImageBuffer(buffer, userId, `youtube-${videoId}.jpg`);
+      const supabaseStorageService = new SupabaseStorageService();
+      return await supabaseStorageService.uploadImageBuffer(buffer, userId, `youtube-${videoId}.jpg`);
     }
     
     const buffer = Buffer.from(await response.arrayBuffer());
-    const objectStorageService = new ObjectStorageService();
-    return await objectStorageService.uploadImageBuffer(buffer, userId, `youtube-${videoId}.jpg`);
+    const supabaseStorageService = new SupabaseStorageService();
+    return await supabaseStorageService.uploadImageBuffer(buffer, userId, `youtube-${videoId}.jpg`);
   } catch (error) {
     console.error("Error extracting YouTube thumbnail:", error);
     return null;
@@ -173,8 +173,8 @@ export async function extractYouTubeFrames(
         });
       });
 
-      // Upload extracted frames to object storage
-      const objectStorageService = new ObjectStorageService();
+      // Upload extracted frames to Supabase Storage
+      const supabaseStorageService = new SupabaseStorageService();
       const fs = await import('fs/promises');
       const files = await fs.readdir(tempDir);
       
@@ -182,7 +182,7 @@ export async function extractYouTubeFrames(
         if (file.endsWith('.jpg')) {
           try {
             const frameBuffer = await fs.readFile(join(tempDir, file));
-            const imageUrl = await objectStorageService.uploadImageBuffer(
+            const imageUrl = await supabaseStorageService.uploadImageBuffer(
               frameBuffer,
               userId,
               `youtube-${videoId}-${file}`

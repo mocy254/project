@@ -10,7 +10,7 @@ import { extractImagesFromPDF, extractYouTubeThumbnail, extractYouTubeFrames } f
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
-import { ObjectStorageService } from "./objectStorage";
+import { SupabaseStorageService } from "./supabaseStorage";
 import { readFile, unlink } from "fs";
 import { promisify } from "util";
 // @ts-ignore - No type definitions available
@@ -22,63 +22,28 @@ import { setupAuth, isAuthenticated } from "./supabaseAuth";
 const unlinkAsync = promisify(unlink);
 const readFileAsync = promisify(readFile);
 
-// Helper function to upload file to Object Storage
+// Helper function to upload file to Supabase Storage
 async function uploadFileToStorage(
   filePath: string,
-  userId: string
+  userId: string,
+  fileName: string,
+  contentType: string
 ): Promise<string> {
   try {
-    const objectStorageService = new ObjectStorageService();
+    const supabaseStorageService = new SupabaseStorageService();
     
-    // Get upload URL
-    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-    
-    // Read file into buffer before uploading (ensures file is fully read before cleanup)
+    // Read file into buffer before uploading
     const fileBuffer = await readFileAsync(filePath);
     
-    // Upload file buffer
-    const response = await fetch(uploadURL, {
-      method: 'PUT',
-      body: fileBuffer,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to upload file to storage: ${response.statusText}`);
-    }
-
-    // Set ACL policy and get path
-    const aclResponse = await objectStorageService.trySetObjectEntityAclPolicy(
-      uploadURL,
-      {
-        owner: userId,
-        visibility: "private"
-      }
+    // Upload file buffer to Supabase Storage
+    const storagePath = await supabaseStorageService.uploadFile(
+      fileBuffer,
+      userId,
+      fileName,
+      contentType
     );
 
-    // Validate ACL response before normalization
-    if (!aclResponse || typeof aclResponse !== 'string') {
-      throw new Error("ACL response missing canonical object path - normalization failed");
-    }
-
-    const trimmedResponse = aclResponse.trim();
-    if (!trimmedResponse) {
-      throw new Error("ACL response missing canonical object path - normalization failed");
-    }
-
-    // Normalize to canonical /objects/... format
-    let objectPath: string;
-    try {
-      objectPath = objectStorageService.normalizeObjectEntityPath(trimmedResponse);
-    } catch (normError) {
-      throw new Error(`ACL response normalization failed: ${normError instanceof Error ? normError.message : 'unknown error'}`);
-    }
-
-    // Validate the normalized path
-    if (!objectPath || typeof objectPath !== 'string' || !objectPath.startsWith("/objects/")) {
-      throw new Error("ACL response missing canonical object path - normalization failed");
-    }
-
-    return objectPath;
+    return storagePath;
   } finally {
     // Always clean up local file, even if upload fails
     try {
@@ -374,10 +339,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let resultDeckId: string;
           let totalCardCount: number;
 
-          // Upload file to Object Storage (cleanup handled in helper)
+          // Upload file to Supabase Storage (cleanup handled in helper)
           let fileUrl: string | null = null;
           try {
-            fileUrl = await uploadFileToStorage(req.file!.path, userId);
+            fileUrl = await uploadFileToStorage(
+              req.file!.path,
+              userId,
+              req.file!.originalname,
+              req.file!.mimetype
+            );
           } catch (uploadError) {
             console.error("Failed to upload file to storage:", uploadError);
             // Continue without fileUrl if upload fails
