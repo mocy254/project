@@ -1,5 +1,10 @@
 import { pdf } from "pdf-to-img";
 import { ObjectStorageService } from "./objectStorage";
+import { Innertube } from "youtubei.js";
+import { spawn } from "child_process";
+import { writeFileSync, unlinkSync, mkdirSync } from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
 
 export interface ExtractedImage {
   imageUrl: string;
@@ -91,6 +96,112 @@ export async function extractYouTubeThumbnail(
   } catch (error) {
     console.error("Error extracting YouTube thumbnail:", error);
     return null;
+  }
+}
+
+/**
+ * Extract frames from YouTube video at regular intervals
+ * Returns array of image URLs uploaded to object storage
+ */
+export async function extractYouTubeFrames(
+  videoUrl: string,
+  userId: string,
+  maxFrames: number = 10,
+  intervalSeconds: number = 30
+): Promise<string[]> {
+  const extractedFrames: string[] = [];
+  const videoId = extractYouTubeVideoId(videoUrl);
+  
+  if (!videoId) {
+    console.error("Invalid YouTube URL");
+    return [];
+  }
+
+  try {
+    // Initialize Innertube client
+    const youtube = await Innertube.create();
+    const info = await youtube.getInfo(videoId);
+    
+    // Get best video format (preferably with both video and audio)
+    const format = info.chooseFormat({ 
+      quality: 'medium',
+      type: 'video+audio'
+    });
+    
+    if (!format.decipher(youtube.session.player)) {
+      console.error("Could not decipher video URL");
+      return [];
+    }
+
+    const streamUrl = format.url;
+    if (!streamUrl) {
+      console.error("No stream URL available");
+      return [];
+    }
+
+    // Create temp directory for frames
+    const tempDir = join(tmpdir(), `youtube-frames-${videoId}-${Date.now()}`);
+    mkdirSync(tempDir, { recursive: true });
+
+    // Calculate frame extraction rate (1 frame every intervalSeconds)
+    const fps = `1/${intervalSeconds}`;
+    
+    // Use ffmpeg to extract frames
+    await new Promise<void>((resolve, reject) => {
+      const ffmpeg = spawn('ffmpeg', [
+        '-i', streamUrl,
+        '-vf', `fps=${fps}`,
+        '-frames:v', maxFrames.toString(),
+        '-q:v', '2', // High quality
+        join(tempDir, 'frame-%03d.jpg')
+      ]);
+
+      let errorOutput = '';
+      ffmpeg.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      ffmpeg.on('close', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`ffmpeg exited with code ${code}: ${errorOutput}`));
+        }
+      });
+
+      ffmpeg.on('error', (err) => {
+        reject(err);
+      });
+    });
+
+    // Upload extracted frames to object storage
+    const objectStorageService = new ObjectStorageService();
+    const fs = await import('fs/promises');
+    const files = await fs.readdir(tempDir);
+    
+    for (const file of files.sort()) {
+      if (file.endsWith('.jpg')) {
+        try {
+          const frameBuffer = await fs.readFile(join(tempDir, file));
+          const imageUrl = await objectStorageService.uploadImageBuffer(
+            frameBuffer,
+            userId,
+            `youtube-${videoId}-${file}`
+          );
+          extractedFrames.push(imageUrl);
+        } catch (uploadError) {
+          console.error(`Failed to upload frame ${file}:`, uploadError);
+        }
+      }
+    }
+
+    // Cleanup temp directory
+    await fs.rm(tempDir, { recursive: true, force: true });
+
+    return extractedFrames;
+  } catch (error) {
+    console.error("Error extracting YouTube frames:", error);
+    return [];
   }
 }
 

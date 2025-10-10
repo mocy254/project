@@ -6,7 +6,7 @@ import { randomUUID } from "crypto";
 import { storage } from "./storage";
 import { generateFlashcards, groupFlashcardsBySubtopic } from "./gemini";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
-import { extractImagesFromPDF, extractYouTubeThumbnail } from "./imageExtractor";
+import { extractImagesFromPDF, extractYouTubeThumbnail, extractYouTubeFrames } from "./imageExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
@@ -516,19 +516,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const shouldIncludeTimestamps = includeSource === 'true';
           const content = await extractYouTubeTranscript(url, shouldIncludeTimestamps);
 
-          // Extract YouTube thumbnail if requested
+          // Extract YouTube frames if requested
           let extractedImages: Array<{imageUrl: string}> = [];
           if (includeImages === 'true') {
             progressManager.setProgress({
               sessionId,
               stage: "extracting",
-              message: "Extracting video thumbnail...",
+              message: "Extracting video frames...",
               progress: 10
             });
-            const thumbnailUrl = await extractYouTubeThumbnail(url, userId);
-            if (thumbnailUrl) {
-              extractedImages.push({ imageUrl: thumbnailUrl });
-            }
+            const frameUrls = await extractYouTubeFrames(url, userId, 10, 30);
+            extractedImages = frameUrls.map((imageUrl: string) => ({ imageUrl }));
           }
 
           progressManager.setProgress({
