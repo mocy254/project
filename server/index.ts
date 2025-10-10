@@ -39,6 +39,17 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Validate Supabase Storage configuration on startup
+  try {
+    const { SupabaseStorageService } = await import('./supabaseStorage');
+    const storageService = new SupabaseStorageService();
+    await storageService.validateBucket();
+    log('Supabase Storage bucket validated successfully');
+  } catch (error) {
+    console.error('Supabase Storage validation failed:', error);
+    console.error('File uploads and image extraction will not work until the bucket is properly configured');
+  }
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

@@ -7,11 +7,40 @@ export class SupabaseStorageService {
   constructor() {}
 
   /**
+   * Validate that the storage bucket exists and is properly configured
+   * @returns True if bucket is ready, throws error otherwise
+   */
+  async validateBucket(): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.storage.getBucket(STORAGE_BUCKET);
+      
+      if (error) {
+        throw new Error(
+          `Supabase Storage bucket '${STORAGE_BUCKET}' not found. ` +
+          `Please create it in your Supabase dashboard: https://supabase.com/dashboard/project/_/storage/buckets`
+        );
+      }
+
+      if (!data.public) {
+        console.warn(
+          `Warning: Bucket '${STORAGE_BUCKET}' is not public. ` +
+          `Image URLs may not be accessible. Consider making the bucket public in Supabase dashboard.`
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Supabase Storage bucket validation failed:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Upload a file buffer to Supabase Storage
    * @param filePath - Local file path to upload
    * @param userId - User ID for organizing files
    * @param fileName - Name for the stored file
-   * @returns The public URL or storage path for the uploaded file
+   * @returns The public URL for the uploaded file
    */
   async uploadFile(
     fileBuffer: Buffer,
@@ -36,8 +65,12 @@ export class SupabaseStorageService {
         throw new Error(`Failed to upload file to Supabase Storage: ${error.message}`);
       }
 
-      // Return the storage path (for private files) or public URL
-      return data.path;
+      // Return the public URL
+      const { data: urlData } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(data.path);
+
+      return urlData.publicUrl;
     } catch (error) {
       console.error('Supabase Storage upload error:', error);
       throw error;
