@@ -268,6 +268,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req as any).user.id; // Get userId from authenticated session
       const sessionId = randomUUID();
       
+      // Debug logging
+      console.log('📄 Document upload received:');
+      console.log('  File:', req.file.originalname, '(', req.file.mimetype, ')');
+      console.log('  includeImages:', includeImages, '(type:', typeof includeImages, ')');
+      console.log('  includeSource:', includeSource, '(type:', typeof includeSource, ')');
+      console.log('  createSubdecks:', createSubdecks, '(type:', typeof createSubdecks, ')');
+      
       // Return session ID immediately
       res.json({ sessionId });
 
