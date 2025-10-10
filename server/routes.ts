@@ -746,6 +746,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/cards/:id/learned", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const learnedSchema = z.object({
+        isLearned: z.boolean()
+      });
+      
+      const validatedData = learnedSchema.parse(req.body);
+
+      const updated = await storage.updateFlashcard(id, {
+        isLearned: validatedData.isLearned,
+        learnedAt: validatedData.isLearned ? new Date() : null
+      });
+
+      if (!updated) {
+        return res.status(404).json({ error: "Card not found" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid request data", details: error.errors });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.put("/api/decks/:id", async (req, res) => {
     try {
       const { id } = req.params;
