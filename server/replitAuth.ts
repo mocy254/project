@@ -93,7 +93,8 @@ export async function setupAuth(app: Express) {
         config,
         scope: "openid email profile offline_access",
         callbackURL: `https://${domain}/api/callback`,
-      },
+        usePKCE: "S256", // Required for Replit Auth public clients
+      } as any, // Type assertion: usePKCE is supported but not in type definitions
       verify,
     );
     passport.use(strategy);
