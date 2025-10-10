@@ -2,6 +2,7 @@ import { pdf } from "pdf-parse";
 import mammoth from "mammoth";
 import { Innertube } from "youtubei.js";
 import * as fs from "fs";
+import { transcribeYouTubeVideo } from "./audioExtractor";
 
 export async function extractPDFText(filePath: string): Promise<string> {
   try {
@@ -39,16 +40,20 @@ export async function extractPPTText(filePath: string): Promise<string> {
   }
 }
 
-export async function extractYouTubeTranscript(url: string, includeTimestamps: boolean = false): Promise<string> {
+export async function extractYouTubeTranscript(
+  url: string, 
+  includeTimestamps: boolean = false,
+  onWhisperFallback?: () => void
+): Promise<string> {
+  const videoId = extractYouTubeVideoId(url);
+  
+  if (!videoId) {
+    throw new Error("Invalid YouTube URL");
+  }
+
   try {
     console.log(`Extracting transcript from YouTube URL: ${url}`);
-    
-    const videoId = extractYouTubeVideoId(url);
     console.log(`Extracted video ID: ${videoId}`);
-    
-    if (!videoId) {
-      throw new Error("Invalid YouTube URL");
-    }
 
     console.log(`Initializing YouTube client...`);
     const youtube = await Innertube.create();
@@ -61,7 +66,7 @@ export async function extractYouTubeTranscript(url: string, includeTimestamps: b
     
     if (!transcriptData || !transcriptData.transcript || !transcriptData.transcript.content || 
         !transcriptData.transcript.content.body || !transcriptData.transcript.content.body.initial_segments) {
-      throw new Error("This video doesn't have subtitles/captions available. Please choose a different video with captions enabled.");
+      throw new Error("NO_CAPTIONS");
     }
     
     // Extract text from transcript segments
@@ -104,9 +109,35 @@ export async function extractYouTubeTranscript(url: string, includeTimestamps: b
     return content;
   } catch (error: any) {
     console.error(`YouTube transcript extraction error:`, error);
-    if (error.message?.includes("Transcript is disabled") || error.message?.includes("Transcript not available")) {
-      throw new Error("This video doesn't have subtitles/captions enabled. Please choose a video with available transcripts.");
+    
+    // Check if captions are unavailable - fallback to Whisper transcription
+    if (error.message?.includes("NO_CAPTIONS") || 
+        error.message?.includes("Transcript is disabled") || 
+        error.message?.includes("Transcript not available") ||
+        error.message?.includes("doesn't have subtitles")) {
+      
+      console.log(`No captions available, falling back to Whisper transcription for video ${videoId}`);
+      
+      // Notify caller that we're using Whisper (for progress updates)
+      if (onWhisperFallback) {
+        onWhisperFallback();
+      }
+      
+      try {
+        const whisperTranscript = await transcribeYouTubeVideo(videoId);
+        
+        if (!whisperTranscript || whisperTranscript.trim().length === 0) {
+          throw new Error("Whisper transcription returned empty text");
+        }
+        
+        console.log(`Whisper transcription successful: ${whisperTranscript.length} characters`);
+        return whisperTranscript;
+      } catch (whisperError: any) {
+        console.error(`Whisper transcription failed:`, whisperError);
+        throw new Error(`This video has no captions and AI transcription failed: ${whisperError.message}`);
+      }
     }
+    
     throw new Error(`Failed to extract YouTube transcript: ${error.message || error}`);
   }
 }

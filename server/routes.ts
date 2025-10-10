@@ -514,7 +514,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           const shouldIncludeTimestamps = includeSource === 'true';
-          const content = await extractYouTubeTranscript(url, shouldIncludeTimestamps);
+          const content = await extractYouTubeTranscript(url, shouldIncludeTimestamps, () => {
+            // Callback when Whisper fallback is triggered
+            progressManager.setProgress({
+              sessionId,
+              stage: "extracting",
+              message: "No captions found - transcribing audio with AI (this may take a minute)...",
+              progress: 10
+            });
+          });
 
           // Extract YouTube frames if requested
           let extractedImages: Array<{imageUrl: string}> = [];
