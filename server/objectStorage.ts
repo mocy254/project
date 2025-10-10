@@ -238,6 +238,53 @@ export class ObjectStorageService {
       requestedPermission: requestedPermission ?? ObjectPermission.READ,
     });
   }
+
+  // Upload image buffer to object storage
+  async uploadImageBuffer(
+    imageBuffer: Buffer,
+    userId: string,
+    imageName: string = "image.png"
+  ): Promise<string> {
+    try {
+      // Get upload URL
+      const uploadURL = await this.getObjectEntityUploadURL();
+      
+      // Upload image buffer
+      const response = await fetch(uploadURL, {
+        method: 'PUT',
+        body: imageBuffer,
+        headers: {
+          'Content-Type': 'image/png',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload image to storage: ${response.statusText}`);
+      }
+
+      // Set ACL policy and get path
+      const aclResponse = await this.trySetObjectEntityAclPolicy(
+        uploadURL,
+        {
+          owner: userId,
+          visibility: "public" // Images need to be publicly accessible for flashcards
+        }
+      );
+
+      // Normalize to canonical /objects/... format
+      const objectPath = this.normalizeObjectEntityPath(aclResponse);
+
+      // Validate the normalized path
+      if (!objectPath || typeof objectPath !== 'string' || !objectPath.startsWith("/objects/")) {
+        throw new Error("Image upload failed - invalid object path");
+      }
+
+      return objectPath;
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      throw error;
+    }
+  }
 }
 
 function parseObjectPath(path: string): {

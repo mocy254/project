@@ -51,6 +51,7 @@ export interface FlashcardGenerationOptions {
   granularity: number;
   customInstructions: string;
   createSubdecks?: boolean;
+  images?: Array<{imageUrl: string, pageNumber?: number}>;
   onProgress?: (update: {
     stage: string;
     message: string;
@@ -66,6 +67,7 @@ export interface GeneratedFlashcard {
   answer: string;
   cardType: "qa" | "cloze" | "reverse";
   subtopic?: string;
+  imageUrl?: string;
 }
 
 export interface SubdeckGroup {
@@ -496,7 +498,7 @@ async function generateFlashcardsForChunk(
   options: FlashcardGenerationOptions,
   chunkContext: string = "Document content"
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions, createSubdecks } = options;
+  const { content, cardTypes, granularity, customInstructions, createSubdecks, images } = options;
 
   // Importance thresholds for each coverage level
   const importanceMapping = {
@@ -548,6 +550,14 @@ async function generateFlashcardsForChunk(
 - Subtopic names should be clear, concise topic labels (e.g., "Pathophysiology", "Clinical Features", "Treatment")
 - Group related flashcards under the same subtopic
 - Use consistent subtopic names throughout the content`
+    : '';
+
+  const imageGuidance = images && images.length > 0
+    ? `\n\n**AVAILABLE IMAGES:**
+The following images have been extracted from the content:
+${images.map((img, idx) => `Image ${idx + 1}${img.pageNumber ? ` (Page ${img.pageNumber})` : ''}: ${img.imageUrl}`).join('\n')}
+
+When a flashcard relates to visual content, diagrams, or concepts that would benefit from an image, include the most relevant image URL in the "imageUrl" field. Only include images that directly support the flashcard's question or answer.`
     : '';
 
   const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
@@ -621,7 +631,7 @@ ${cardTypeList}
 
 7. **No Redundancy:** Merge duplicate topics.
 
-**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.${subdeckGuidance}`;
+**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.${subdeckGuidance}${imageGuidance}`;
 
   console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
   
@@ -646,6 +656,7 @@ ${cardTypeList}
                       answer: { type: "string" },
                       cardType: { type: "string" },
                       ...(createSubdecks ? { subtopic: { type: "string" } } : {}),
+                      ...(images && images.length > 0 ? { imageUrl: { type: "string" } } : {}),
                     },
                     required: createSubdecks 
                       ? ["question", "answer", "cardType", "subtopic"]

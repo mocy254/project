@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { storage } from "./storage";
 import { generateFlashcards, groupFlashcardsBySubtopic } from "./gemini";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
+import { extractImagesFromPDF, extractYouTubeThumbnail } from "./imageExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
 import { z } from "zod";
 import { progressManager } from "./progressManager";
@@ -216,7 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     question: card.question,
                     answer: card.answer,
                     cardType: card.cardType,
-                    position: index
+                    position: index,
+                    imageUrl: card.imageUrl || null
                   })
                 )
               );
@@ -247,7 +249,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   question: card.question,
                   answer: card.answer,
                   cardType: card.cardType,
-                  position: index
+                  position: index,
+                  imageUrl: card.imageUrl || null
                 })
               )
             );
@@ -291,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const { cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
+      const { cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks, includeImages } = req.body;
       const sessionId = randomUUID();
       
       // Return session ID immediately
@@ -309,6 +312,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           const content = await extractContentFromFile(req.file!.path, req.file!.mimetype);
 
+          // Extract images if requested and file is PDF
+          let extractedImages: Array<{imageUrl: string, pageNumber: number}> = [];
+          if (includeImages === 'true' && req.file!.mimetype === 'application/pdf') {
+            progressManager.setProgress({
+              sessionId,
+              stage: "extracting",
+              message: "Extracting images from PDF...",
+              progress: 10
+            });
+            extractedImages = await extractImagesFromPDF(req.file!.path, userId, 10);
+          }
+
           progressManager.setProgress({
             sessionId,
             stage: "analyzing",
@@ -324,6 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             granularity: parseInt(granularity),
             customInstructions: customInstructions || "",
             createSubdecks: shouldCreateSubdecks,
+            images: extractedImages.length > 0 ? extractedImages : undefined,
             onProgress: (update) => {
               progressManager.setProgress({
                 sessionId,
@@ -402,7 +418,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     question: card.question,
                     answer: card.answer,
                     cardType: card.cardType,
-                    position: index
+                    position: index,
+                    imageUrl: card.imageUrl || null
                   })
                 )
               );
@@ -434,7 +451,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   question: card.question,
                   answer: card.answer,
                   cardType: card.cardType,
-                  position: index
+                  position: index,
+                  imageUrl: card.imageUrl || null
                 })
               )
             );
@@ -474,7 +492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/generate/youtube", async (req, res) => {
     try {
-      const { url, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks } = req.body;
+      const { url, cardTypes, granularity, customInstructions, userId, title, includeSource, createSubdecks, includeImages } = req.body;
 
       if (!url || !cardTypes || !Array.isArray(cardTypes) || cardTypes.length === 0 || granularity === undefined || !userId || !title) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -498,6 +516,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const shouldIncludeTimestamps = includeSource === 'true';
           const content = await extractYouTubeTranscript(url, shouldIncludeTimestamps);
 
+          // Extract YouTube thumbnail if requested
+          let extractedImages: Array<{imageUrl: string}> = [];
+          if (includeImages === 'true') {
+            progressManager.setProgress({
+              sessionId,
+              stage: "extracting",
+              message: "Extracting video thumbnail...",
+              progress: 10
+            });
+            const thumbnailUrl = await extractYouTubeThumbnail(url, userId);
+            if (thumbnailUrl) {
+              extractedImages.push({ imageUrl: thumbnailUrl });
+            }
+          }
+
           progressManager.setProgress({
             sessionId,
             stage: "analyzing",
@@ -512,6 +545,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             granularity,
             customInstructions: customInstructions || "",
             createSubdecks: shouldCreateSubdecks,
+            images: extractedImages.length > 0 ? extractedImages : undefined,
             onProgress: (update) => {
               progressManager.setProgress({
                 sessionId,
@@ -580,7 +614,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     question: card.question,
                     answer: card.answer,
                     cardType: card.cardType,
-                    position: index
+                    position: index,
+                    imageUrl: card.imageUrl || null
                   })
                 )
               );
@@ -611,7 +646,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   question: card.question,
                   answer: card.answer,
                   cardType: card.cardType,
-                  position: index
+                  position: index,
+                  imageUrl: card.imageUrl || null
                 })
               )
             );
