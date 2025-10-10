@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, FileText, Youtube, Type, MoreVertical, Edit, Trash, Loader2, ChevronRight, ChevronDown, Folder, FolderOpen } from "lucide-react";
+import { Search, Plus, FileText, Youtube, Type, MoreVertical, Edit, Trash, Loader2, ChevronRight, ChevronDown, Folder, FolderOpen, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useUser } from "@/contexts/UserContext";
@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import DeckSettingsDialog from "@/components/DeckSettingsDialog";
 
 interface DeckItemProps {
   deck: any;
@@ -23,6 +24,7 @@ interface DeckItemProps {
 }
 
 function DeckItem({ deck, subdecks, childDecksMap, level = 0, onDelete, expandedDecks, toggleExpanded }: DeckItemProps) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const isExpanded = expandedDecks.has(deck.id);
   const hasSubdecks = subdecks.length > 0;
   const isParentDeck = deck.createSubdecks === 'true' || hasSubdecks;
@@ -82,8 +84,15 @@ function DeckItem({ deck, subdecks, childDecksMap, level = 0, onDelete, expanded
               <DropdownMenuItem asChild>
                 <Link href={`/editor/${deck.id}`} className="flex items-center">
                   <Edit className="w-4 h-4 mr-2" />
-                  Edit
+                  Edit Cards
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSettingsOpen(true)}
+                data-testid={`menu-settings-${deck.id}`}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => onDelete(deck.id)}
@@ -109,6 +118,12 @@ function DeckItem({ deck, subdecks, childDecksMap, level = 0, onDelete, expanded
           </CardContent>
         )}
       </Card>
+
+      <DeckSettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        deck={{ ...deck, userId: deck.userId }}
+      />
 
       <AnimatePresence>
         {isExpanded && hasSubdecks && (
