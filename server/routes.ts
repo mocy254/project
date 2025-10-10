@@ -16,6 +16,8 @@ import { promisify } from "util";
 // @ts-ignore - No type definitions available
 import AnkiExportModule from 'anki-apkg-export';
 const AnkiExport = (AnkiExportModule as any).default || AnkiExportModule;
+// Replit Auth (from blueprint:javascript_log_in_with_replit)
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 const unlinkAsync = promisify(unlink);
 const readFileAsync = promisify(readFile);
@@ -118,6 +120,8 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up Replit Auth (from blueprint:javascript_log_in_with_replit)
+  await setupAuth(app);
   
   app.post("/api/generate/text", async (req, res) => {
     try {
@@ -1056,58 +1060,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Authentication routes
-  app.post("/api/auth/signup", async (req, res) => {
+  // Replit Auth - Get current user (from blueprint:javascript_log_in_with_replit)
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const { email, password, name } = req.body;
-
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
-      }
-
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ error: "User already exists" });
-      }
-
-      // Create new user
-      const user = await storage.createUser({
-        email,
-        password, // In production, hash this password!
-        name: name || null
-      });
-
-      res.json({ 
-        userId: user.id, 
-        name: user.name || email.split("@")[0] 
-      });
-    } catch (error: any) {
-      console.error("Signup error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
-      }
-
-      const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-
-      res.json({ 
-        userId: user.id, 
-        name: user.name || email.split("@")[0] 
-      });
-    } catch (error: any) {
-      console.error("Login error:", error);
-      res.status(500).json({ error: error.message });
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
