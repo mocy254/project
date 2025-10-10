@@ -35,6 +35,7 @@ export const flashcards = pgTable("flashcards", {
   answer: text("answer").notNull(),
   cardType: text("card_type").notNull(),
   position: integer("position").notNull(),
+  imageUrl: text("image_url"),
   isLearned: boolean("is_learned").notNull().default(false),
   learnedAt: timestamp("learned_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
