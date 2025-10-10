@@ -3,18 +3,7 @@ import { pgTable, text, varchar, timestamp, integer, json, boolean, jsonb, index
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth (from blueprint:javascript_log_in_with_replit)
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// Users table updated for Replit Auth (from blueprint:javascript_log_in_with_replit)
+// Users table - compatible with Supabase Auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
@@ -75,7 +64,6 @@ export const insertFlashcardSchema = createInsertSchema(flashcards).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type UpsertUser = typeof users.$inferInsert; // For Replit Auth (from blueprint:javascript_log_in_with_replit)
 export type InsertDeck = z.infer<typeof insertDeckSchema>;
 export type Deck = typeof decks.$inferSelect;
 export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;

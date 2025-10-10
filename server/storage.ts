@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, type Deck, type InsertDeck, type Flashcard, type InsertFlashcard, users, decks, flashcards } from "@shared/schema";
+import { type User, type InsertUser, type Deck, type InsertDeck, type Flashcard, type InsertFlashcard, users, decks, flashcards } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, and, asc, sql } from "drizzle-orm";
@@ -7,7 +7,6 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  upsertUser(user: UpsertUser): Promise<User>; // For Replit Auth (from blueprint:javascript_log_in_with_replit)
   
   createDeck(deck: InsertDeck): Promise<Deck>;
   getDeck(id: string): Promise<Deck | undefined>;
@@ -61,35 +60,6 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  // Upsert user for Replit Auth (from blueprint:javascript_log_in_with_replit)
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const existingUser = userData.id ? this.users.get(userData.id) : undefined;
-    const now = new Date();
-    
-    if (existingUser) {
-      const updatedUser: User = {
-        ...existingUser,
-        ...userData,
-        updatedAt: now,
-      };
-      this.users.set(existingUser.id, updatedUser);
-      return updatedUser;
-    } else {
-      const id = userData.id || randomUUID();
-      const user: User = {
-        ...userData,
-        id,
-        email: userData.email ?? null,
-        firstName: userData.firstName ?? null,
-        lastName: userData.lastName ?? null,
-        profileImageUrl: userData.profileImageUrl ?? null,
-        createdAt: now,
-        updatedAt: now,
-      };
-      this.users.set(id, user);
-      return user;
-    }
-  }
 
   async createDeck(insertDeck: InsertDeck): Promise<Deck> {
     const id = randomUUID();
@@ -222,22 +192,6 @@ export class DbStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await db.insert(users).values(insertUser).returning();
     return result[0];
-  }
-
-  // Upsert user for Replit Auth (from blueprint:javascript_log_in_with_replit)
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
   }
 
   async createDeck(insertDeck: InsertDeck): Promise<Deck> {

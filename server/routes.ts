@@ -16,8 +16,8 @@ import { promisify } from "util";
 // @ts-ignore - No type definitions available
 import AnkiExportModule from 'anki-apkg-export';
 const AnkiExport = (AnkiExportModule as any).default || AnkiExportModule;
-// Replit Auth (from blueprint:javascript_log_in_with_replit)
-import { setupAuth, isAuthenticated } from "./replitAuth";
+// Supabase Auth
+import { setupAuth, isAuthenticated } from "./supabaseAuth";
 
 const unlinkAsync = promisify(unlink);
 const readFileAsync = promisify(readFile);
@@ -120,8 +120,8 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up Replit Auth (from blueprint:javascript_log_in_with_replit)
-  await setupAuth(app);
+  // Set up Supabase Auth
+  setupAuth(app);
   
   app.post("/api/generate/text", async (req, res) => {
     try {
