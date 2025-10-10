@@ -148,9 +148,13 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
   - Custom instructions allow users to specify generation preferences (e.g., "focus on definitions, skip dates")
   - **Include Images Option (Oct 2025):**
     * **PDF Documents:** Full page rendering with pdf-to-img library for complete diagram context
-    * **YouTube Videos:** High-quality thumbnail extraction with fallback to standard quality
+    * **YouTube Videos:** Intelligent frame extraction using youtubei.js + ffmpeg
+      - Extracts 10 frames at 30-second intervals from actual video content
+      - Captures key visual moments (diagrams, slides, demonstrations) throughout the video
+      - AI selects most relevant frames for each flashcard
+      - Provides much richer visual context than static thumbnails
     * **Storage:** Images uploaded to Replit Object Storage with private ACL policies
-    * **AI Association:** AI automatically associates images with relevant flashcards during generation
+    * **AI Association:** AI automatically analyzes all extracted images and associates most relevant ones with flashcards
     * **Display:** Images shown in Editor preview and Study mode with responsive styling (max 300px height)
     * **Export Handling:**
       - JSON: Includes imageUrl field with cloud storage path

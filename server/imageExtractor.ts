@@ -128,14 +128,12 @@ export async function extractYouTubeFrames(
       type: 'video+audio'
     });
     
-    if (!format.decipher(youtube.session.player)) {
-      console.error("Could not decipher video URL");
-      return [];
-    }
-
+    // Decipher the stream URL
+    format.decipher(youtube.session.player);
+    
     const streamUrl = format.url;
     if (!streamUrl) {
-      console.error("No stream URL available");
+      console.error("No stream URL available after deciphering");
       return [];
     }
 
@@ -143,62 +141,69 @@ export async function extractYouTubeFrames(
     const tempDir = join(tmpdir(), `youtube-frames-${videoId}-${Date.now()}`);
     mkdirSync(tempDir, { recursive: true });
 
-    // Calculate frame extraction rate (1 frame every intervalSeconds)
-    const fps = `1/${intervalSeconds}`;
-    
-    // Use ffmpeg to extract frames
-    await new Promise<void>((resolve, reject) => {
-      const ffmpeg = spawn('ffmpeg', [
-        '-i', streamUrl,
-        '-vf', `fps=${fps}`,
-        '-frames:v', maxFrames.toString(),
-        '-q:v', '2', // High quality
-        join(tempDir, 'frame-%03d.jpg')
-      ]);
+    try {
+      // Calculate frame extraction rate (1 frame every intervalSeconds)
+      const fps = `1/${intervalSeconds}`;
+      
+      // Use ffmpeg to extract frames
+      await new Promise<void>((resolve, reject) => {
+        const ffmpeg = spawn('ffmpeg', [
+          '-i', streamUrl,
+          '-vf', `fps=${fps}`,
+          '-frames:v', maxFrames.toString(),
+          '-q:v', '2', // High quality
+          join(tempDir, 'frame-%03d.jpg')
+        ]);
 
-      let errorOutput = '';
-      ffmpeg.stderr.on('data', (data) => {
-        errorOutput += data.toString();
+        let errorOutput = '';
+        ffmpeg.stderr.on('data', (data) => {
+          errorOutput += data.toString();
+        });
+
+        ffmpeg.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`ffmpeg exited with code ${code}: ${errorOutput}`));
+          }
+        });
+
+        ffmpeg.on('error', (err) => {
+          reject(err);
+        });
       });
 
-      ffmpeg.on('close', (code) => {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(new Error(`ffmpeg exited with code ${code}: ${errorOutput}`));
-        }
-      });
-
-      ffmpeg.on('error', (err) => {
-        reject(err);
-      });
-    });
-
-    // Upload extracted frames to object storage
-    const objectStorageService = new ObjectStorageService();
-    const fs = await import('fs/promises');
-    const files = await fs.readdir(tempDir);
-    
-    for (const file of files.sort()) {
-      if (file.endsWith('.jpg')) {
-        try {
-          const frameBuffer = await fs.readFile(join(tempDir, file));
-          const imageUrl = await objectStorageService.uploadImageBuffer(
-            frameBuffer,
-            userId,
-            `youtube-${videoId}-${file}`
-          );
-          extractedFrames.push(imageUrl);
-        } catch (uploadError) {
-          console.error(`Failed to upload frame ${file}:`, uploadError);
+      // Upload extracted frames to object storage
+      const objectStorageService = new ObjectStorageService();
+      const fs = await import('fs/promises');
+      const files = await fs.readdir(tempDir);
+      
+      for (const file of files.sort()) {
+        if (file.endsWith('.jpg')) {
+          try {
+            const frameBuffer = await fs.readFile(join(tempDir, file));
+            const imageUrl = await objectStorageService.uploadImageBuffer(
+              frameBuffer,
+              userId,
+              `youtube-${videoId}-${file}`
+            );
+            extractedFrames.push(imageUrl);
+          } catch (uploadError) {
+            console.error(`Failed to upload frame ${file}:`, uploadError);
+          }
         }
       }
+
+      return extractedFrames;
+    } finally {
+      // Cleanup temp directory (runs on success or failure)
+      try {
+        const fs = await import('fs/promises');
+        await fs.rm(tempDir, { recursive: true, force: true });
+      } catch (cleanupError) {
+        console.error(`Failed to cleanup temp directory ${tempDir}:`, cleanupError);
+      }
     }
-
-    // Cleanup temp directory
-    await fs.rm(tempDir, { recursive: true, force: true });
-
-    return extractedFrames;
   } catch (error) {
     console.error("Error extracting YouTube frames:", error);
     return [];
