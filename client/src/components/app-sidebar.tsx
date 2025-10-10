@@ -11,7 +11,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
@@ -21,8 +21,12 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const [location] = useLocation();
-  const { logout } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setLocation("/");
+  };
 
   return (
     <Sidebar>
@@ -58,7 +62,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={logout} data-testid="button-logout" className="py-3 px-3">
+            <SidebarMenuButton onClick={handleLogout} data-testid="button-logout" className="py-3 px-3">
               <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">Logout</span>
             </SidebarMenuButton>

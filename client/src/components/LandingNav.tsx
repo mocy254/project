@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 export default function LandingNav() {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function LandingNav() {
     if (isAuthenticated) {
       setLocation("/dashboard");
     } else {
-      login();
+      setLocation("/login");
     }
   };
 
@@ -90,7 +90,7 @@ export default function LandingNav() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={login}
+                  onClick={() => setLocation("/login")}
                   className="text-sm font-medium"
                   data-testid="nav-login"
                 >

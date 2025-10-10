@@ -1,36 +1,42 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import type { User } from '@shared/schema';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
 
-// From blueprint:javascript_log_in_with_replit
 export function useAuth() {
-  // Fetch current user
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ['/api/auth/user'],
+  const queryClient = useQueryClient();
+
+  const { data: session, isLoading } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
     retry: false,
-    staleTime: Infinity,
   });
 
-  // Login mutation
-  const loginMutation = useMutation({
-    mutationFn: async () => {
-      window.location.href = '/api/login';
-    },
-  });
+  // Listen for auth state changes
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      queryClient.setQueryData(["session"], session);
+    });
 
-  // Logout mutation
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      window.location.href = '/api/logout';
-    },
-  });
+    return () => subscription.unsubscribe();
+  }, [queryClient]);
+
+  const user = session?.user ? {
+    id: session.user.id,
+    email: session.user.email,
+    firstName: session.user.user_metadata?.first_name,
+    lastName: session.user.user_metadata?.last_name,
+    profileImageUrl: session.user.user_metadata?.avatar_url,
+  } : null;
 
   return {
     user,
+    session,
     isLoading,
-    isAuthenticated: !!user,
-    login: () => loginMutation.mutate(),
-    logout: () => logoutMutation.mutate(),
-    isLoggingOut: logoutMutation.isPending,
+    isAuthenticated: !!session,
   };
 }
