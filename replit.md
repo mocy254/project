@@ -14,7 +14,7 @@ Flashcard answer format: Ultra-concise (bullet points or few words, NOT complete
 
 ### Frontend
 
-The frontend uses React 18 with TypeScript, Vite, Wouter for routing, TanStack Query for server state management, and Shadcn UI with Tailwind CSS for styling. The design system is medical student-focused, featuring a calming color palette (Medical blue, Soft teal, warm neutrals), Inter and Poppins typography, and smooth Framer Motion animations. State management combines UserContext for authentication and React Query for data. Routing includes public and protected routes, with a `ProtectedRoute` component for authentication enforcement. The landing page emphasizes active recall and spaced repetition, targeting medical students with a friendly, professional tone and responsive design.
+The frontend uses React 18 with TypeScript, Vite, Wouter for routing, TanStack Query for server state management, and Shadcn UI with Tailwind CSS for styling. The design system is medical student-focused, featuring a calming color palette (Medical blue, Soft teal, warm neutrals), Inter and Poppins typography, and smooth Framer Motion animations. Authentication is handled via Replit Auth with a custom `useAuth` hook for state management. Routing includes public and protected routes, with a `ProtectedRoute` component for authentication enforcement. The landing page emphasizes active recall and spaced repetition, targeting medical students with a friendly, professional tone and responsive design.
 
 ### Backend
 
@@ -22,8 +22,9 @@ The backend is built with Express.js and Node.js (ESM modules) in TypeScript. It
 
 ### Database Schema
 
-The system uses a PostgreSQL database (Neon serverless with Drizzle ORM) with tables for `users`, `decks`, and `flashcards`.
-- `users`: Stores user account information (id, email, password, name).
+The system uses a PostgreSQL database (Neon serverless with Drizzle ORM) with tables for `users`, `sessions`, `decks`, and `flashcards`.
+- `users`: Stores user account information (id, email, firstName, lastName, profileImageUrl). Authentication is handled via Replit Auth (OpenID Connect).
+- `sessions`: Stores session data for Replit Auth using connect-pg-simple session store.
 - `decks`: Stores flashcard deck containers, supporting hierarchical structures via `parentDeckId`. It also includes `fileUrl` for cloud storage paths of uploaded documents.
 - `flashcards`: Stores individual flashcards, linked to decks, including question, answer, card type, and `imageUrl` for associated images.
 
