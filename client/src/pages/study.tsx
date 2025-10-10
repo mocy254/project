@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, RotateCw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCw, X, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function Study() {
   const params = useParams();
@@ -34,7 +36,18 @@ export default function Study() {
     enabled: !!deckId,
   });
 
+  const toggleLearnedMutation = useMutation({
+    mutationFn: async ({ cardId, isLearned }: { cardId: string; isLearned: boolean }) => {
+      const res = await apiRequest("PUT", `/api/cards/${cardId}/learned`, { isLearned });
+      return await res.json();
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ['/api/decks', deckId, 'cards'] });
+    },
+  });
+
   const currentCard = cards?.[currentIndex];
+  const learnedCount = cards?.filter((card: any) => card.isLearned).length || 0;
   const progress = cards ? ((currentIndex + 1) / cards.length) * 100 : 0;
 
   const handleFlip = useCallback(() => {
@@ -63,6 +76,15 @@ export default function Study() {
   const handleExit = useCallback(() => {
     setLocation(`/editor/${deckId}`);
   }, [deckId, setLocation]);
+
+  const handleToggleLearned = useCallback((checked: boolean) => {
+    if (currentCard) {
+      toggleLearnedMutation.mutate({
+        cardId: currentCard.id,
+        isLearned: checked,
+      });
+    }
+  }, [currentCard, toggleLearnedMutation]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -145,9 +167,14 @@ export default function Study() {
               </Button>
               <div>
                 <h1 className="text-xl font-display font-bold">{deck?.title || "Study Mode"}</h1>
-                <p className="text-sm text-muted-foreground">
-                  Card {currentIndex + 1} of {cards.length}
-                </p>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <span>Card {currentIndex + 1} of {cards.length}</span>
+                  <span className="text-muted-foreground/50">•</span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                    {learnedCount} learned
+                  </span>
+                </div>
               </div>
             </div>
             <Button
@@ -233,32 +260,51 @@ export default function Study() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              data-testid="button-previous"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Previous
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              <kbd className="px-2 py-1 bg-muted rounded text-xs">←</kbd>
-              {" "}/{" "}
-              <kbd className="px-2 py-1 bg-muted rounded text-xs">→</kbd>
+          <div className="flex flex-col items-center gap-4 mt-8">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handlePrevious}
+                disabled={currentIndex === 0}
+                data-testid="button-previous"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Previous
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                <kbd className="px-2 py-1 bg-muted rounded text-xs">←</kbd>
+                {" "}/{" "}
+                <kbd className="px-2 py-1 bg-muted rounded text-xs">→</kbd>
+              </div>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleNext}
+                disabled={currentIndex === cards.length - 1}
+                data-testid="button-next"
+              >
+                Next
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleNext}
-              disabled={currentIndex === cards.length - 1}
-              data-testid="button-next"
-            >
-              Next
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+
+            {/* Mark as Learned */}
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="learned-checkbox"
+                checked={currentCard?.isLearned || false}
+                onCheckedChange={handleToggleLearned}
+                disabled={toggleLearnedMutation.isPending}
+                data-testid="checkbox-learned"
+              />
+              <Label
+                htmlFor="learned-checkbox"
+                className="text-sm text-muted-foreground cursor-pointer select-none"
+              >
+                Mark as learned
+              </Label>
+            </div>
           </div>
         </div>
       </div>
