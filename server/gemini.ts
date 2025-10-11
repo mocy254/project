@@ -489,11 +489,12 @@ export async function generateFlashcards(
     // Calculate dynamic concurrency based on document size and tier
     // Tier 1: Conservative (max 5 concurrent)
     // Tier 2+: Aggressive (max 20 concurrent)
+    // Logic: More chunks = MORE parallelism (up to tier limit)
     const CONCURRENCY = Math.min(
       config.maxConcurrency,
-      semanticChunks.length <= 5 ? config.maxConcurrency :
-      semanticChunks.length <= 15 ? Math.floor(config.maxConcurrency * 0.6) :
-      Math.floor(config.maxConcurrency * 0.4)
+      semanticChunks.length <= 5 ? Math.min(3, semanticChunks.length) :  // Small docs: 3 max
+      semanticChunks.length <= 15 ? Math.floor(config.maxConcurrency * 0.6) :  // Medium docs: 60% of max (12 for T2+)
+      config.maxConcurrency  // Large docs: Use full tier limit (20 for T2+)
     );
     
     console.log(`Using concurrency level: ${CONCURRENCY} (Tier ${GEMINI_TIER}, ${semanticChunks.length} chunks)`);
