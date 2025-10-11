@@ -397,7 +397,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
       content: currentChunk.trim(),
       topics: [...currentTopics],
       context: currentTopics.length > 0 
-        ? `Topics: ${currentTopics.join(', ')}`
+        ? `Topics: ${currentTopics.join(' - ')}`
         : "Final section"
     });
   }
