@@ -844,18 +844,24 @@ ${content}`,
 }
 
 export function groupFlashcardsBySubtopic(flashcards: GeneratedFlashcard[]): SubdeckGroup[] {
-  const groups = new Map<string, GeneratedFlashcard[]>();
+  const groups = new Map<string, { displayName: string; cards: GeneratedFlashcard[] }>();
   
   for (const card of flashcards) {
     const subtopic = card.subtopic || "General";
-    if (!groups.has(subtopic)) {
-      groups.set(subtopic, []);
+    // Use lowercase for case-insensitive grouping
+    const key = subtopic.toLowerCase();
+    
+    if (!groups.has(key)) {
+      groups.set(key, { displayName: subtopic, cards: [] });
     }
-    groups.get(subtopic)!.push(card);
+    groups.get(key)!.cards.push(card);
   }
   
-  return Array.from(groups.entries()).map(([subtopic, cards]) => ({
-    subtopic,
-    flashcards: cards
-  }));
+  // Sort groups alphabetically by display name
+  return Array.from(groups.entries())
+    .sort(([keyA, groupA], [keyB, groupB]) => groupA.displayName.localeCompare(groupB.displayName))
+    .map(([key, group]) => ({
+      subtopic: group.displayName,
+      flashcards: group.cards
+    }));
 }
