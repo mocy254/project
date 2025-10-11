@@ -449,8 +449,16 @@ export async function generateFlashcards(
     const failedChunks: number[] = [];
     const emptyChunks: number[] = [];
     
-    // Process chunks in parallel with concurrency limit
-    const CONCURRENCY = 3;
+    // Calculate dynamic concurrency based on document size
+    // Fewer chunks = higher concurrency for speed
+    // More chunks = lower concurrency to avoid API limits
+    const CONCURRENCY = 
+      semanticChunks.length <= 5 ? 5 :
+      semanticChunks.length <= 15 ? 3 :
+      2;
+    
+    console.log(`Using concurrency level: ${CONCURRENCY} (based on ${semanticChunks.length} chunks)`);
+    
     const chunkGroups: SemanticChunk[][] = [];
     
     for (let i = 0; i < semanticChunks.length; i += CONCURRENCY) {
