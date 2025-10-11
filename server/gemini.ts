@@ -145,8 +145,11 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
     
     if (currentTokens + lineTokens > maxTokensPerPass && currentChunk) {
       chunks.push(currentChunk.trim());
-      currentChunk = line + '\n';
-      currentTokens = lineTokens;
+      
+      // Add 200-token overlap for context continuity
+      const overlap = getOverlapText(currentChunk, 200);
+      currentChunk = overlap + (overlap ? '\n' : '') + line + '\n';
+      currentTokens = countTokens(currentChunk);
     } else {
       currentChunk += line + '\n';
       currentTokens += lineTokens;
