@@ -6,6 +6,44 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 // Initialize tiktoken encoder for accurate token counting (cl100k_base encoding used by GPT-4/Gemini)
 const encoder = get_encoding("cl100k_base");
 
+// Tier-based configuration
+const GEMINI_TIER = process.env.GEMINI_TIER || "1";
+const TIER_CONFIG = {
+  "1": {
+    // Tier 1 - Conservative settings for rate limits
+    maxConcurrency: 5,
+    retryAttempts: 2,
+    retryDelay: 2000,
+    timeouts: {
+      small: 120000,  // 2 minutes
+      medium: 210000, // 3.5 minutes
+      large: 300000   // 5 minutes
+    },
+    thinkingMode: false,
+    thinkingBudget: 0
+  },
+  "2": {
+    // Tier 2+ - Optimized settings for higher rate limits
+    maxConcurrency: 20,
+    retryAttempts: 3,
+    retryDelay: 1000,
+    timeouts: {
+      small: 60000,   // 1 minute
+      medium: 120000, // 2 minutes
+      large: 180000   // 3 minutes
+    },
+    thinkingMode: true,
+    thinkingBudget: 8192 // Default high budget for medical accuracy
+  }
+};
+
+const config = TIER_CONFIG[GEMINI_TIER as keyof typeof TIER_CONFIG] || TIER_CONFIG["1"];
+console.log(`Gemini API using Tier ${GEMINI_TIER} configuration:`, {
+  maxConcurrency: config.maxConcurrency,
+  retryAttempts: config.retryAttempts,
+  thinkingMode: config.thinkingMode
+});
+
 // Timeout wrapper for async operations
 async function withTimeout<T>(
   promise: Promise<T>,
