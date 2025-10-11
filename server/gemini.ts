@@ -22,7 +22,7 @@ const TIER_CONFIG = {
     thinkingMode: false,
     thinkingBudget: 0
   },
-  "2": {
+  "2+": {
     // Tier 2+ - Optimized settings for higher rate limits
     maxConcurrency: 20,
     retryAttempts: 3,
@@ -37,8 +37,10 @@ const TIER_CONFIG = {
   }
 };
 
-const config = TIER_CONFIG[GEMINI_TIER as keyof typeof TIER_CONFIG] || TIER_CONFIG["1"];
-console.log(`Gemini API using Tier ${GEMINI_TIER} configuration:`, {
+// Normalize tier: treat any tier >= 2 as Tier 2+
+const normalizedTier = parseInt(GEMINI_TIER) >= 2 ? "2+" : "1";
+const config = TIER_CONFIG[normalizedTier as keyof typeof TIER_CONFIG];
+console.log(`Gemini API using Tier ${GEMINI_TIER} (normalized to ${normalizedTier}) configuration:`, {
   maxConcurrency: config.maxConcurrency,
   retryAttempts: config.retryAttempts,
   thinkingMode: config.thinkingMode
