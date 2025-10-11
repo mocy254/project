@@ -147,13 +147,15 @@ function getOverlapText(text: string, targetTokens: number = 200): string {
   const lines = text.split('\n');
   const overlapLines: string[] = [];
   let overlapTokens = 0;
+  const minLines = 3; // Ensure minimum context even if it exceeds target
   
   // Work backwards from the end to collect ~targetTokens
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i];
     const lineTokens = countTokens(line);
     
-    if (overlapTokens + lineTokens > targetTokens && overlapLines.length > 0) {
+    // Stop if we exceed target AND have enough lines for context
+    if (overlapTokens + lineTokens > targetTokens && overlapLines.length >= minLines) {
       break;
     }
     
