@@ -849,8 +849,8 @@ ${content}`,
         timeout, // Dynamic timeout based on chunk size
         "Gemini API request timed out"
       ),
-      3, // 3 retries
-      1000 // 1 second initial delay
+      config.retryAttempts, // Use tier-based retry count
+      config.retryDelay // Use tier-based retry delay
     );
 
     const rawJson = response.text;
