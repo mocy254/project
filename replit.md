@@ -4,6 +4,20 @@
 
 FlashGenius is an educational productivity application designed to convert various content formats (text, documents, YouTube videos) into AI-generated flashcards for studying. It aims to provide trusted, hallucination-free flashcards with support for multiple card types (Q&A, cloze deletion, reverse cards) and adjustable content coverage, offering precise control over flashcard generation. The project's ambition is to address medical student pain points like forgetting and exam stress by promoting active recall and spaced repetition, making studying more efficient and effective.
 
+## Recent Changes
+
+**October 11, 2025 - Gemini API Bug Fixes:**
+1. Fixed hardcoded retry values that ignored tier configuration (lines 854-855)
+   - Now correctly uses `config.retryAttempts` (Tier 1: 2, Tier 2+: 3)
+   - Now correctly uses `config.retryDelay` (Tier 1: 2000ms, Tier 2+: 1000ms)
+2. Improved expected card count estimation for better truncation detection (lines 884-888)
+   - Granularity 6-7: ~1 card per 2000 tokens (was 4000)
+   - Granularity 4-5: ~1 card per 4000 tokens (unchanged)
+   - Granularity 1-3: ~1 card per 10000 tokens (unchanged)
+3. Fixed overlap text boundary issue in chunking (line 150)
+   - Now ensures minimum 3 lines for context continuity even if exceeding 200-token target
+   - Prevents inadequate overlap when encountering very long lines (tables, code blocks)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
