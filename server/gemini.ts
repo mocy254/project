@@ -95,7 +95,8 @@ function countTokens(text: string): number {
   } catch (error) {
     console.error("Error counting tokens, falling back to estimation:", error);
     // Fallback to estimation if tiktoken fails
-    return Math.ceil(text.length / 4);
+    // Use 3.5 chars/token for better accuracy with technical/medical content
+    return Math.ceil(text.length / 3.5);
   }
 }
 
