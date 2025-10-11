@@ -201,20 +201,23 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
     chunks.push(currentChunk.trim());
   }
 
-  const allTopics: Array<{ title: string; subtopics?: string[] }> = [];
+  const allTopics: Array<{ title: string; subtopics?: string[]; sectionIndex: number }> = [];
   
   for (let i = 0; i < chunks.length; i++) {
     console.log(`Analyzing section ${i + 1}/${chunks.length} for topics...`);
     const chunkOutline = await extractTopicsFromChunk(chunks[i]);
-    allTopics.push(...chunkOutline.topics);
+    // Tag each topic with its section index to prevent merging distinct sections
+    allTopics.push(...chunkOutline.topics.map(t => ({ ...t, sectionIndex: i })));
   }
 
-  const uniqueTopics = new Map<string, { title: string; subtopics?: string[] }>();
+  // Deduplicate using both title AND section index to preserve distinct sections
+  const uniqueTopics = new Map<string, { title: string; subtopics?: string[]; sectionIndex: number }>();
   for (const topic of allTopics) {
-    if (!uniqueTopics.has(topic.title)) {
-      uniqueTopics.set(topic.title, topic);
+    const key = `${topic.title}__section${topic.sectionIndex}`;
+    if (!uniqueTopics.has(key)) {
+      uniqueTopics.set(key, topic);
     } else if (topic.subtopics && topic.subtopics.length > 0) {
-      const existing = uniqueTopics.get(topic.title)!;
+      const existing = uniqueTopics.get(key)!;
       if (!existing.subtopics) existing.subtopics = [];
       // Deduplicate subtopics using Set
       const existingSet = new Set(existing.subtopics);
@@ -544,8 +547,10 @@ export async function generateFlashcards(
           } catch (error) {
             lastError = error as Error;
             if (attempt < MAX_CHUNK_RETRIES) {
-              console.warn(`⚠️  Chunk ${chunkIndex + 1} failed, will retry...`);
-              await new Promise(resolve => setTimeout(resolve, config.retryDelay));
+              // Exponential backoff: delay doubles with each attempt (1x, 2x, 4x...)
+              const backoffDelay = config.retryDelay * Math.pow(2, attempt);
+              console.warn(`⚠️  Chunk ${chunkIndex + 1} failed, will retry in ${backoffDelay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, backoffDelay));
             }
           }
         }
@@ -767,8 +772,9 @@ ${cardTypeList}
   
   // Calculate timeout based on chunk size and tier configuration
   const chunkTokens = countTokens(content);
+  // For small chunks with thinking mode enabled, use medium timeout to account for overhead
   const timeout = 
-    chunkTokens < 30000 ? config.timeouts.small :
+    chunkTokens < 30000 ? (config.thinkingMode ? config.timeouts.medium : config.timeouts.small) :
     chunkTokens < 70000 ? config.timeouts.medium :
     config.timeouts.large;
   

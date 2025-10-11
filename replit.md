@@ -6,7 +6,9 @@ FlashGenius is an educational productivity application designed to convert vario
 
 ## Recent Changes
 
-**October 11, 2025 - Gemini API Bug Fixes:**
+**October 11, 2025 - Gemini API Bug Fixes & Optimizations:**
+
+*Bug Fixes:*
 1. Fixed hardcoded retry values that ignored tier configuration (lines 854-855)
    - Now correctly uses `config.retryAttempts` (Tier 1: 2, Tier 2+: 3)
    - Now correctly uses `config.retryDelay` (Tier 1: 2000ms, Tier 2+: 1000ms)
@@ -17,6 +19,18 @@ FlashGenius is an educational productivity application designed to convert vario
 3. Fixed overlap text boundary issue in chunking (line 150)
    - Now ensures minimum 3 lines for context continuity even if exceeding 200-token target
    - Prevents inadequate overlap when encountering very long lines (tables, code blocks)
+
+*Performance Optimizations:*
+4. Enhanced subdeck deduplication with section index tracking (lines 207-230)
+   - Topics now tagged with sectionIndex to prevent merging distinct sections with identical names
+   - Preserves separate "Introduction" sections while still deduplicating within sections
+5. Optimized Tier 2+ timeout for thinking mode (lines 777-780)
+   - Small chunks (<30k tokens) now use medium timeout (120s) when thinking mode is enabled
+   - Accounts for thinking mode processing overhead on Tier 2+
+6. Implemented exponential backoff for chunk retries (lines 553-556)
+   - Changed from fixed to exponential delay: `config.retryDelay * Math.pow(2, attempt)`
+   - Tier 1: 2s, 4s, 8s retries | Tier 2+: 1s, 2s, 4s retries
+   - Better rate limit handling and API-friendly retry behavior
 
 ## User Preferences
 
