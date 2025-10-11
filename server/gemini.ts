@@ -78,8 +78,6 @@ export interface SubdeckGroup {
 interface TopicOutline {
   topics: Array<{
     title: string;
-    startLine: number;
-    endLine: number;
     subtopics?: string[];
   }>;
 }
@@ -185,8 +183,6 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
   return {
     topics: Array.from(uniqueTopics.values()).map((topic, index) => ({
       title: topic.title,
-      startLine: 0,
-      endLine: 0,
       // Ensure final deduplication of subtopics
       subtopics: topic.subtopics ? Array.from(new Set(topic.subtopics)) : undefined
     }))
