@@ -114,6 +114,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      // Validate content length
+      if (content.trim().length === 0) {
+        return res.status(400).json({ error: "Content cannot be empty" });
+      }
+      
+      if (content.trim().length < 50) {
+        return res.status(400).json({ error: "Content is too short (minimum 50 characters required)" });
+      }
+
       const sessionId = randomUUID();
       
       // Return session ID immediately
@@ -306,6 +315,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           const content = await extractContentFromFile(req.file!.path, req.file!.mimetype);
+
+          // Validate extracted content
+          if (!content || content.trim().length === 0) {
+            throw new Error("The document appears to be empty. Please check the file and try again.");
+          }
+          
+          if (content.trim().length < 50) {
+            throw new Error("The document content is too short (less than 50 characters). Please provide a document with more content.");
+          }
 
           // Extract images if requested and file is PDF
           let extractedImages: Array<{imageUrl: string, pageNumber: number}> = [];
@@ -545,6 +563,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               progress: 10
             });
           });
+
+          // Validate extracted transcript
+          if (!content || content.trim().length === 0) {
+            throw new Error("The video transcript appears to be empty. Please try a different video.");
+          }
+          
+          if (content.trim().length < 50) {
+            throw new Error("The video transcript is too short (less than 50 characters). Please try a longer video.");
+          }
 
           // Extract YouTube frames if requested
           let extractedImages: Array<{imageUrl: string}> = [];

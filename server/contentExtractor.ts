@@ -64,13 +64,14 @@ export async function extractYouTubeTranscript(
     console.log(`Fetching transcript...`);
     const transcriptData = await info.getTranscript();
     
-    if (!transcriptData || !transcriptData.transcript || !transcriptData.transcript.content || 
-        !transcriptData.transcript.content.body || !transcriptData.transcript.content.body.initial_segments) {
+    // Use optional chaining for safer access
+    const segments = transcriptData?.transcript?.content?.body?.initial_segments;
+    
+    if (!segments || !Array.isArray(segments) || segments.length === 0) {
       throw new Error("NO_CAPTIONS");
     }
     
-    // Extract text from transcript segments
-    const segments = transcriptData.transcript.content.body.initial_segments;
+    // Extract text from transcript segments (segments is now validated)
     let content: string;
     
     if (includeTimestamps) {

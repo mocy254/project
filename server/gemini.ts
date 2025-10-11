@@ -236,9 +236,18 @@ ${content}`
       throw new Error("Empty response from topic extraction");
     }
     const outline = JSON.parse(rawText);
+    
+    // Validate that we got topics
+    if (!outline || !outline.topics || outline.topics.length === 0) {
+      console.warn("⚠️  Topic extraction returned 0 topics - will use simple chunking");
+    }
+    
     return outline as TopicOutline;
   } catch (error) {
-    console.error("Topic extraction failed, using fallback:", error);
+    console.error("❌ Topic extraction FAILED:", error);
+    console.error("Error details:", error instanceof Error ? error.message : error);
+    console.warn("⚠️  Falling back to simple chunking without topic detection");
+    console.warn("This may result in less optimal chunk boundaries but generation will continue");
     return { topics: [] };
   }
 }
@@ -430,6 +439,8 @@ export async function generateFlashcards(
     });
     
     const allFlashcards: GeneratedFlashcard[] = [];
+    const failedChunks: number[] = [];
+    const emptyChunks: number[] = [];
     
     // Process chunks in parallel with concurrency limit
     const CONCURRENCY = 3;
@@ -456,12 +467,19 @@ export async function generateFlashcards(
             images
           }, chunk.context);
           
-          console.log(`Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
+          if (chunkFlashcards.length === 0) {
+            console.warn(`⚠️  Chunk ${chunkIndex + 1} produced 0 flashcards - may indicate an issue or very low coverage level`);
+            emptyChunks.push(chunkIndex + 1);
+          } else {
+            console.log(`✓ Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
+          }
+          
           return chunkFlashcards;
         } catch (error) {
-          console.error(`Error processing chunk ${chunkIndex + 1}:`, error);
+          console.error(`❌ ERROR processing chunk ${chunkIndex + 1}:`, error);
           console.error(`Error details:`, error instanceof Error ? error.message : error);
           console.error(`Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
+          failedChunks.push(chunkIndex + 1);
           // Return empty array on error, but don't fail entire generation
           return [];
         }
@@ -483,7 +501,25 @@ export async function generateFlashcards(
       });
     }
     
-    console.log(`Generated ${allFlashcards.length} total flashcards from ${semanticChunks.length} chunks`);
+    // Report summary
+    console.log(`\n=== CHUNK PROCESSING SUMMARY ===`);
+    console.log(`Total chunks: ${semanticChunks.length}`);
+    console.log(`Total flashcards generated: ${allFlashcards.length}`);
+    
+    if (failedChunks.length > 0) {
+      console.error(`❌ ${failedChunks.length} chunk(s) FAILED: ${failedChunks.join(', ')}`);
+      console.error(`These chunks were skipped - some content may be missing from flashcards`);
+    }
+    
+    if (emptyChunks.length > 0) {
+      console.warn(`⚠️  ${emptyChunks.length} chunk(s) produced 0 cards: ${emptyChunks.join(', ')}`);
+      console.warn(`This may be normal for low coverage levels, or could indicate an issue`);
+    }
+    
+    if (failedChunks.length === 0 && emptyChunks.length === 0) {
+      console.log(`✓ All chunks processed successfully`);
+    }
+    
     return allFlashcards;
   }
   

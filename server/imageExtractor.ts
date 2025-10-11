@@ -21,6 +21,8 @@ export async function extractImagesFromPDF(
   maxImages: number = 5
 ): Promise<ExtractedImage[]> {
   const extractedImages: ExtractedImage[] = [];
+  const failedPages: number[] = [];
+  let totalPagesProcessed = 0;
   
   try {
     console.log(`📄 Starting PDF image extraction from: ${filePath}`);
@@ -33,6 +35,8 @@ export async function extractImagesFromPDF(
     
     let pageNumber = 1;
     for await (const imageBuffer of document) {
+      totalPagesProcessed++;
+      
       if (extractedImages.length >= maxImages) {
         console.log(`⏸️  Reached max images limit (${maxImages}), stopping extraction`);
         break;
@@ -40,12 +44,31 @@ export async function extractImagesFromPDF(
       
       try {
         console.log(`  📸 Processing page ${pageNumber}...`);
-        // Upload image to storage
-        const imageUrl = await supabaseStorageService.uploadImageBuffer(
-          imageBuffer,
-          userId,
-          `pdf-page-${pageNumber}.png`
-        );
+        
+        // Upload image to storage with one retry on failure
+        let imageUrl: string | null = null;
+        let lastError: any = null;
+        
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            imageUrl = await supabaseStorageService.uploadImageBuffer(
+              imageBuffer,
+              userId,
+              `pdf-page-${pageNumber}.png`
+            );
+            break; // Success, exit retry loop
+          } catch (err) {
+            lastError = err;
+            if (attempt === 0) {
+              console.log(`  ⚠️  Upload failed for page ${pageNumber}, retrying...`);
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+            }
+          }
+        }
+        
+        if (!imageUrl) {
+          throw lastError || new Error('Upload failed after retries');
+        }
         
         console.log(`  ✅ Uploaded page ${pageNumber} to: ${imageUrl}`);
         
@@ -54,16 +77,32 @@ export async function extractImagesFromPDF(
           pageNumber
         });
       } catch (uploadError) {
-        console.error(`Failed to upload image for page ${pageNumber}:`, uploadError);
+        console.error(`  ❌ Failed to upload image for page ${pageNumber} after retries:`, uploadError);
+        failedPages.push(pageNumber);
       }
       
       pageNumber++;
     }
     
-    console.log(`✅ PDF image extraction complete. Extracted ${extractedImages.length} images`);
+    // Report summary
+    console.log(`\n=== PDF IMAGE EXTRACTION SUMMARY ===`);
+    console.log(`Total pages processed: ${totalPagesProcessed}`);
+    console.log(`Successfully extracted: ${extractedImages.length} images`);
+    
+    if (failedPages.length > 0) {
+      console.error(`❌ Failed to extract ${failedPages.length} images from pages: ${failedPages.join(', ')}`);
+    }
+    
+    if (extractedImages.length === 0 && totalPagesProcessed > 0) {
+      console.error(`⚠️  WARNING: All image extractions failed! No images available for flashcards.`);
+    } else if (extractedImages.length > 0) {
+      console.log(`✓ Image extraction completed successfully`);
+    }
+    
     return extractedImages;
   } catch (error) {
-    console.error("❌ Error extracting images from PDF:", error);
+    console.error("❌ CRITICAL ERROR extracting images from PDF:", error);
+    console.error("No images will be available for this generation");
     return [];
   }
 }

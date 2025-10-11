@@ -71,8 +71,17 @@ export function setupAuth(app: Express) {
             lastName: lastName,
           });
         } catch (dbError) {
-          console.error('Failed to create user in database:', dbError);
-          // Continue anyway - user exists in Supabase
+          console.error('❌ CRITICAL: Failed to create user in database:', dbError);
+          console.error('User was created in Supabase Auth but NOT in database - orphaned user!');
+          console.error('User ID:', data.user.id);
+          console.error('Email:', email);
+          
+          // Note: Cannot rollback Supabase Auth user without service-role key
+          // User will exist in Auth but not in database - they won't be able to use the app
+          
+          return res.status(500).json({ 
+            error: 'Failed to complete user registration. Please contact support with this error.' 
+          });
         }
       }
 
