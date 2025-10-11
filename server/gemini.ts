@@ -856,12 +856,30 @@ ${content}`,
       throw new Error("Empty response from Gemini");
     }
 
+    // Output token cap detection (8,192 token limit)
+    const responseTokens = countTokens(rawJson);
+    const OUTPUT_TOKEN_LIMIT = 8192;
+    const OUTPUT_WARNING_THRESHOLD = 7500; // 92% of limit
+    
+    if (responseTokens >= OUTPUT_WARNING_THRESHOLD) {
+      console.warn(`⚠️  Response near output token limit: ${responseTokens}/${OUTPUT_TOKEN_LIMIT} tokens`);
+      if (responseTokens >= OUTPUT_TOKEN_LIMIT * 0.98) {
+        console.error(`❌ CRITICAL: Response may be truncated! At ${responseTokens} tokens (limit: ${OUTPUT_TOKEN_LIMIT})`);
+      }
+    }
+
     const data = JSON.parse(rawJson);
     const flashcards = data.flashcards || [];
-    console.log(`Gemini API returned ${flashcards.length} flashcards for chunk: ${chunkContext.substring(0, 50)}...`);
+    console.log(`Gemini API returned ${flashcards.length} flashcards (${responseTokens} output tokens) for chunk: ${chunkContext.substring(0, 50)}...`);
+    
+    // Estimate expected cards based on granularity and content size
+    const expectedMinCards = granularity >= 5 ? Math.floor(chunkTokens / 4000) : Math.floor(chunkTokens / 10000);
     
     if (flashcards.length === 0) {
       console.warn(`Warning: Gemini returned 0 flashcards for chunk. This may indicate the content is too short or lacks extractable information.`);
+    } else if (flashcards.length < expectedMinCards && responseTokens >= OUTPUT_WARNING_THRESHOLD) {
+      console.warn(`⚠️  POSSIBLE TRUNCATION: Expected ~${expectedMinCards}+ cards, got ${flashcards.length}. Response at ${responseTokens} tokens.`);
+      console.warn(`   Consider splitting this ${chunkTokens}-token chunk into smaller pieces.`);
     }
     
     // Validate flashcard fields
