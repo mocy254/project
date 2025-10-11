@@ -58,11 +58,11 @@ async function withTimeout<T>(
   ]);
 }
 
-// Retry wrapper with exponential backoff
+// Retry wrapper with exponential backoff (uses tier configuration)
 async function withRetry<T>(
   fn: () => Promise<T>,
-  maxRetries: number = 2,
-  initialDelayMs: number = 1000
+  maxRetries: number = config.retryAttempts,
+  initialDelayMs: number = config.retryDelay
 ): Promise<T> {
   let lastError: Error | undefined;
   
@@ -509,8 +509,8 @@ export async function generateFlashcards(
         const chunkIndex = processedChunks + idx;
         console.log(`Processing chunk ${chunkIndex + 1}/${semanticChunks.length} - ${chunk.context}`);
         
-        // Retry failed chunks up to 2 times
-        const MAX_CHUNK_RETRIES = 2;
+        // Retry failed chunks using tier configuration
+        const MAX_CHUNK_RETRIES = config.retryAttempts;
         let lastError: Error | undefined;
         
         for (let attempt = 0; attempt <= MAX_CHUNK_RETRIES; attempt++) {
@@ -540,7 +540,7 @@ export async function generateFlashcards(
             lastError = error as Error;
             if (attempt < MAX_CHUNK_RETRIES) {
               console.warn(`⚠️  Chunk ${chunkIndex + 1} failed, will retry...`);
-              await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay before retry
+              await new Promise(resolve => setTimeout(resolve, config.retryDelay));
             }
           }
         }
