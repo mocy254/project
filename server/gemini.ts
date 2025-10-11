@@ -484,15 +484,17 @@ export async function generateFlashcards(
     const failedChunks: number[] = [];
     const emptyChunks: number[] = [];
     
-    // Calculate dynamic concurrency based on document size
-    // Fewer chunks = higher concurrency for speed
-    // More chunks = lower concurrency to avoid API limits
-    const CONCURRENCY = 
-      semanticChunks.length <= 5 ? 5 :
-      semanticChunks.length <= 15 ? 3 :
-      2;
+    // Calculate dynamic concurrency based on document size and tier
+    // Tier 1: Conservative (max 5 concurrent)
+    // Tier 2+: Aggressive (max 20 concurrent)
+    const CONCURRENCY = Math.min(
+      config.maxConcurrency,
+      semanticChunks.length <= 5 ? config.maxConcurrency :
+      semanticChunks.length <= 15 ? Math.floor(config.maxConcurrency * 0.6) :
+      Math.floor(config.maxConcurrency * 0.4)
+    );
     
-    console.log(`Using concurrency level: ${CONCURRENCY} (based on ${semanticChunks.length} chunks)`);
+    console.log(`Using concurrency level: ${CONCURRENCY} (Tier ${GEMINI_TIER}, ${semanticChunks.length} chunks)`);
     
     const chunkGroups: SemanticChunk[][] = [];
     
