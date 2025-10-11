@@ -760,14 +760,14 @@ ${cardTypeList}
 
   console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
   
-  // Calculate timeout based on chunk size
+  // Calculate timeout based on chunk size and tier configuration
   const chunkTokens = countTokens(content);
   const timeout = 
-    chunkTokens < 30000 ? 120000 :  // Small chunks: 2 minutes
-    chunkTokens < 70000 ? 210000 :  // Medium chunks: 3.5 minutes
-    300000;                          // Large chunks: 5 minutes
+    chunkTokens < 30000 ? config.timeouts.small :
+    chunkTokens < 70000 ? config.timeouts.medium :
+    config.timeouts.large;
   
-  console.log(`Chunk size: ${chunkTokens} tokens, timeout: ${timeout / 1000}s`);
+  console.log(`Chunk size: ${chunkTokens} tokens, timeout: ${timeout / 1000}s (Tier ${GEMINI_TIER})`);
   
   try {
     const response = await withRetry(
