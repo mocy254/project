@@ -468,32 +468,49 @@ export async function generateFlashcards(
         const chunkIndex = processedChunks + idx;
         console.log(`Processing chunk ${chunkIndex + 1}/${semanticChunks.length} - ${chunk.context}`);
         
-        try {
-          const chunkFlashcards = await generateFlashcardsForChunk({
-            content: chunk.content,
-            cardTypes,
-            granularity,
-            customInstructions,
-            createSubdecks,
-            images
-          }, chunk.context);
-          
-          if (chunkFlashcards.length === 0) {
-            console.warn(`⚠️  Chunk ${chunkIndex + 1} produced 0 flashcards - may indicate an issue or very low coverage level`);
-            emptyChunks.push(chunkIndex + 1);
-          } else {
-            console.log(`✓ Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
+        // Retry failed chunks up to 2 times
+        const MAX_CHUNK_RETRIES = 2;
+        let lastError: Error | undefined;
+        
+        for (let attempt = 0; attempt <= MAX_CHUNK_RETRIES; attempt++) {
+          try {
+            if (attempt > 0) {
+              console.log(`Retrying chunk ${chunkIndex + 1} (attempt ${attempt + 1}/${MAX_CHUNK_RETRIES + 1})...`);
+            }
+            
+            const chunkFlashcards = await generateFlashcardsForChunk({
+              content: chunk.content,
+              cardTypes,
+              granularity,
+              customInstructions,
+              createSubdecks,
+              images
+            }, chunk.context);
+            
+            if (chunkFlashcards.length === 0) {
+              console.warn(`⚠️  Chunk ${chunkIndex + 1} produced 0 flashcards - may indicate an issue or very low coverage level`);
+              emptyChunks.push(chunkIndex + 1);
+            } else {
+              console.log(`✓ Chunk ${chunkIndex + 1} generated ${chunkFlashcards.length} flashcards`);
+            }
+            
+            return chunkFlashcards;
+          } catch (error) {
+            lastError = error as Error;
+            if (attempt < MAX_CHUNK_RETRIES) {
+              console.warn(`⚠️  Chunk ${chunkIndex + 1} failed, will retry...`);
+              await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay before retry
+            }
           }
-          
-          return chunkFlashcards;
-        } catch (error) {
-          console.error(`❌ ERROR processing chunk ${chunkIndex + 1}:`, error);
-          console.error(`Error details:`, error instanceof Error ? error.message : error);
-          console.error(`Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
-          failedChunks.push(chunkIndex + 1);
-          // Return empty array on error, but don't fail entire generation
-          return [];
         }
+        
+        // All retries failed
+        console.error(`❌ ERROR: Chunk ${chunkIndex + 1} failed after ${MAX_CHUNK_RETRIES + 1} attempts:`, lastError);
+        console.error(`Error details:`, lastError instanceof Error ? lastError.message : lastError);
+        console.error(`Error stack:`, lastError instanceof Error ? lastError.stack : 'No stack trace');
+        failedChunks.push(chunkIndex + 1);
+        // Return empty array on error, but don't fail entire generation
+        return [];
       });
       
       const results = await Promise.all(promises);
