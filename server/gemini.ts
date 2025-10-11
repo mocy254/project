@@ -876,7 +876,14 @@ ${content}`,
     console.log(`Gemini API returned ${flashcards.length} flashcards (${responseTokens} output tokens) for chunk: ${chunkContext.substring(0, 50)}...`);
     
     // Estimate expected cards based on granularity and content size
-    const expectedMinCards = granularity >= 5 ? Math.floor(chunkTokens / 4000) : Math.floor(chunkTokens / 10000);
+    // Granularity 6-7 (comprehensive): ~1 card per 2000 tokens
+    // Granularity 4-5 (balanced): ~1 card per 4000 tokens
+    // Granularity 1-3 (selective): ~1 card per 10000 tokens
+    const expectedMinCards = granularity >= 6 
+      ? Math.floor(chunkTokens / 2000)
+      : granularity >= 4
+      ? Math.floor(chunkTokens / 4000)
+      : Math.floor(chunkTokens / 10000);
     
     if (flashcards.length === 0) {
       console.warn(`Warning: Gemini returned 0 flashcards for chunk. This may indicate the content is too short or lacks extractable information.`);
