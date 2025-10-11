@@ -767,7 +767,10 @@ ${cardTypeList}
     chunkTokens < 70000 ? config.timeouts.medium :
     config.timeouts.large;
   
-  console.log(`Chunk size: ${chunkTokens} tokens, timeout: ${timeout / 1000}s (Tier ${GEMINI_TIER})`);
+  // Calculate thinking budget based on granularity (Tier 2+ only)
+  const thinkingBudget = config.thinkingMode ? (granularity >= 5 ? 8192 : 4096) : 0;
+  
+  console.log(`Chunk size: ${chunkTokens} tokens, timeout: ${timeout / 1000}s, thinking budget: ${thinkingBudget} (Tier ${GEMINI_TIER})`);
   
   try {
     const response = await withRetry(
@@ -778,6 +781,11 @@ ${cardTypeList}
             systemInstruction: systemPrompt,
             responseMimeType: "application/json",
             temperature: 0.25,
+            ...(config.thinkingMode && { 
+              thinkingConfig: { 
+                thinkingBudget 
+              } 
+            }),
             responseSchema: {
               type: "object",
               properties: {
