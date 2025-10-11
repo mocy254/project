@@ -175,7 +175,10 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
     } else if (topic.subtopics && topic.subtopics.length > 0) {
       const existing = uniqueTopics.get(topic.title)!;
       if (!existing.subtopics) existing.subtopics = [];
-      existing.subtopics.push(...topic.subtopics);
+      // Deduplicate subtopics using Set
+      const existingSet = new Set(existing.subtopics);
+      topic.subtopics.forEach(sub => existingSet.add(sub));
+      existing.subtopics = Array.from(existingSet);
     }
   }
 
@@ -184,7 +187,8 @@ async function extractTopicOutline(content: string): Promise<TopicOutline> {
       title: topic.title,
       startLine: 0,
       endLine: 0,
-      subtopics: topic.subtopics
+      // Ensure final deduplication of subtopics
+      subtopics: topic.subtopics ? Array.from(new Set(topic.subtopics)) : undefined
     }))
   };
 }
