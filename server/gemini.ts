@@ -781,6 +781,41 @@ ${content}`,
       console.warn(`Warning: Gemini returned 0 flashcards for chunk. This may indicate the content is too short or lacks extractable information.`);
     }
     
+    // Validate flashcard fields
+    const validCardTypes = ['qa', 'cloze', 'reverse'];
+    const invalidCards: Array<{ index: number; issues: string[] }> = [];
+    
+    flashcards.forEach((card: GeneratedFlashcard, index: number) => {
+      const issues: string[] = [];
+      
+      // Validate cardType
+      if (!validCardTypes.includes(card.cardType)) {
+        issues.push(`Invalid cardType "${card.cardType}" (must be: qa, cloze, or reverse)`);
+        // Auto-fix: default to 'qa'
+        card.cardType = 'qa' as any;
+      }
+      
+      // Validate imageUrl format when present
+      if (card.imageUrl) {
+        try {
+          new URL(card.imageUrl);
+        } catch {
+          issues.push(`Invalid imageUrl format: "${card.imageUrl}"`);
+        }
+      }
+      
+      if (issues.length > 0) {
+        invalidCards.push({ index, issues });
+      }
+    });
+    
+    if (invalidCards.length > 0) {
+      console.warn(`⚠️  ${invalidCards.length} flashcard(s) had validation issues (auto-fixed where possible):`);
+      invalidCards.slice(0, 3).forEach(({ index, issues }) => {
+        console.warn(`  Card ${index + 1}: ${issues.join(', ')}`);
+      });
+    }
+    
     // Validate imageUrl when images were provided
     if (images && images.length > 0) {
       const cardsWithoutImages = flashcards.filter((card: GeneratedFlashcard) => !card.imageUrl);
