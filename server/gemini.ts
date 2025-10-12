@@ -108,6 +108,9 @@ export interface GeneratedFlashcard {
   cardType: "qa" | "cloze" | "reverse";
   subtopic?: string;
   imageUrl?: string;
+  sourceExcerpt?: string;
+  verificationScore?: number;
+  needsReview?: boolean;
 }
 
 export interface SubdeckGroup {
@@ -164,6 +167,37 @@ function getOverlapText(text: string, targetTokens: number = 200): string {
   }
   
   return overlapLines.join('\n');
+}
+
+// Simple fact verification: check if key medical terms from the answer exist in the source
+function verifyFlashcard(flashcard: GeneratedFlashcard, sourceChunk: string): { score: number; needsReview: boolean } {
+  const answer = flashcard.answer.toLowerCase();
+  const source = sourceChunk.toLowerCase();
+  
+  // Extract key medical terms (words 4+ chars, excluding common words)
+  const commonWords = new Set(['that', 'this', 'with', 'from', 'have', 'been', 'were', 'will', 'what', 'when', 'where', 'which', 'their', 'there', 'these', 'those', 'would', 'could', 'should', 'about', 'after', 'before', 'through', 'during', 'between']);
+  
+  const keyTerms = answer
+    .split(/\s+/)
+    .filter(word => {
+      const cleaned = word.replace(/[^\w]/g, '');
+      return cleaned.length >= 4 && !commonWords.has(cleaned);
+    })
+    .map(word => word.replace(/[^\w]/g, ''));
+  
+  if (keyTerms.length === 0) {
+    // No key terms to verify, consider it verified
+    return { score: 100, needsReview: false };
+  }
+  
+  // Check how many key terms appear in the source
+  const foundTerms = keyTerms.filter(term => source.includes(term));
+  const verificationScore = Math.round((foundTerms.length / keyTerms.length) * 100);
+  
+  // Flag for review if less than 70% of key terms are found
+  const needsReview = verificationScore < 70;
+  
+  return { score: verificationScore, needsReview };
 }
 
 async function extractTopicOutline(content: string): Promise<TopicOutline> {
@@ -945,6 +979,23 @@ ${content}`,
         console.log(`✓ All ${flashcards.length} flashcards have imageUrl values`);
       }
     }
+    
+    // Add source verification and excerpt to each flashcard
+    const sourceExcerpt = content.substring(0, 200) + (content.length > 200 ? '...' : '');
+    
+    flashcards.forEach((card: GeneratedFlashcard) => {
+      // Store source excerpt
+      card.sourceExcerpt = sourceExcerpt;
+      
+      // Run verification
+      const verification = verifyFlashcard(card, content);
+      card.verificationScore = verification.score;
+      card.needsReview = verification.needsReview;
+      
+      if (verification.needsReview) {
+        console.warn(`⚠️  Card needs review (${verification.score}% verified): "${card.question.substring(0, 50)}..."`);
+      }
+    });
     
     return flashcards;
   } catch (error) {
