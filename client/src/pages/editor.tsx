@@ -332,6 +332,9 @@ export default function Editor() {
               answer={selectedCard.answer}
               cardType={selectedCard.cardType}
               imageUrl={selectedCard.imageUrl}
+              verificationScore={selectedCard.verificationScore}
+              needsReview={selectedCard.needsReview}
+              sourceReference={selectedCard.sourceReference}
             />
           )}
         </TabsContent>
