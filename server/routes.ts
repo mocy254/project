@@ -214,7 +214,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   answer: card.answer,
                   cardType: card.cardType,
                   position: index,
-                  imageUrl: card.imageUrl || null
+                  imageUrl: card.imageUrl || null,
+                  sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                  verificationScore: card.verificationScore ?? null,
+                  needsReview: card.needsReview ?? false
                 }),
                 3 // Batch size of 3 to stay well under 5 connection limit
               );
@@ -246,7 +249,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 answer: card.answer,
                 cardType: card.cardType,
                 position: index,
-                imageUrl: card.imageUrl || null
+                imageUrl: card.imageUrl || null,
+                sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                verificationScore: card.verificationScore ?? null,
+                needsReview: card.needsReview ?? false
               }),
               3 // Batch size of 3 to stay well under 5 connection limit
             );
@@ -458,7 +464,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   answer: card.answer,
                   cardType: card.cardType,
                   position: index,
-                  imageUrl: card.imageUrl || null
+                  imageUrl: card.imageUrl || null,
+                  sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                  verificationScore: card.verificationScore ?? null,
+                  needsReview: card.needsReview ?? false
                 }),
                 3 // Batch size of 3 to stay well under 5 connection limit
               );
@@ -491,7 +500,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 answer: card.answer,
                 cardType: card.cardType,
                 position: index,
-                imageUrl: card.imageUrl || null
+                imageUrl: card.imageUrl || null,
+                sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                verificationScore: card.verificationScore ?? null,
+                needsReview: card.needsReview ?? false
               }),
               3 // Batch size of 3 to stay well under 5 connection limit
             );
@@ -670,7 +682,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   answer: card.answer,
                   cardType: card.cardType,
                   position: index,
-                  imageUrl: card.imageUrl || null
+                  imageUrl: card.imageUrl || null,
+                  sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                  verificationScore: card.verificationScore ?? null,
+                  needsReview: card.needsReview ?? false
                 }),
                 3 // Batch size of 3 to stay well under 5 connection limit
               );
@@ -702,7 +717,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 answer: card.answer,
                 cardType: card.cardType,
                 position: index,
-                imageUrl: card.imageUrl || null
+                imageUrl: card.imageUrl || null,
+                sourceReference: card.sourceExcerpt ? { excerpt: card.sourceExcerpt } : null,
+                verificationScore: card.verificationScore ?? null,
+                needsReview: card.needsReview ?? false
               }),
               3 // Batch size of 3 to stay well under 5 connection limit
             );
