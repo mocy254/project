@@ -6,6 +6,25 @@ FlashGenius is an educational productivity application designed to convert vario
 
 ## Recent Changes
 
+**October 12, 2025 - Verification & Citation Layer:**
+
+*Hallucination Detection System:*
+1. Added verification fields to flashcards database schema:
+   - `sourceReference` (jsonb): Stores 200-char source excerpt from content
+   - `verificationScore` (integer): % of key terms verified in source (0-100)
+   - `needsReview` (boolean): Flags cards with <70% verification score
+2. Implemented fact verification function in Gemini generation:
+   - Extracts medical terms (≥4 chars, excluding common words) from answers
+   - Calculates verification score via substring matching against source chunks
+   - 70% threshold for medical content - cards below threshold flagged for review
+3. UI components for transparency:
+   - Verification badges: "Verified ✓" (green) or "Needs Review ⚠️" (red)
+   - Expandable source reference sections showing 200-char source excerpts
+   - Smart click handling prevents card flip when interacting with source
+4. Fixed critical bug: Changed `||` to `??` for verificationScore persistence
+   - Zero scores now properly stored (was being coerced to null)
+   - All 6 createFlashcard calls use nullish coalescing
+
 **October 11, 2025 - Gemini API Bug Fixes & Optimizations:**
 
 *Bug Fixes:*
