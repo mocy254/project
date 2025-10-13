@@ -16,7 +16,8 @@ export async function extractPDFText(filePath: string, includePageNumbers: boole
     // For page numbers, we need to process the PDF again to get per-page text
     // Split the extracted text by common page break indicators
     const fullText = data.text;
-    const numPages = (data as any).pages || (data as any).total;
+    const pagesArray = (data as any).pages;
+    const numPages = Array.isArray(pagesArray) ? pagesArray.length : ((data as any).total || 1);
     
     console.log(`📄 PDF extraction with page numbers - text length: ${fullText?.length || 0}, pages: ${numPages}`);
     
