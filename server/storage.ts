@@ -220,8 +220,13 @@ export class DbStorage implements IStorage {
   }
 
   async getSubdecks(parentDeckId: string): Promise<Deck[]> {
-    const result = await db.select().from(decks).where(eq(decks.parentDeckId, parentDeckId)).orderBy(asc(decks.createdAt));
-    return result || [];
+    try {
+      const result = await db.select().from(decks).where(eq(decks.parentDeckId, parentDeckId)).orderBy(asc(decks.createdAt));
+      return Array.isArray(result) ? result : [];
+    } catch (error) {
+      console.error('[getSubdecks] Error for parentDeckId:', parentDeckId, error);
+      return [];
+    }
   }
 
   async updateDeck(id: string, updateData: Partial<InsertDeck>): Promise<Deck | undefined> {
@@ -258,10 +263,18 @@ export class DbStorage implements IStorage {
         .from(flashcards)
         .where(eq(flashcards.deckId, deckId))
         .orderBy(asc(flashcards.position));
-      return result || [];
+      return Array.isArray(result) ? result : [];
     } catch (error) {
-      console.error('[getFlashcardsByDeckId] Error:', error);
-      return [];
+      console.error('[getFlashcardsByDeckId] Error for deckId:', deckId, error);
+      try {
+        const fallbackResult = await db.execute(
+          sql`SELECT * FROM flashcards WHERE deck_id = ${deckId} ORDER BY position ASC`
+        );
+        return Array.isArray(fallbackResult.rows) ? fallbackResult.rows as Flashcard[] : [];
+      } catch (fallbackError) {
+        console.error('[getFlashcardsByDeckId] Fallback also failed:', fallbackError);
+        return [];
+      }
     }
   }
 
@@ -291,20 +304,32 @@ export class DbStorage implements IStorage {
   }
 
   async getAllFlashcardsWithSubdecks(deckId: string): Promise<Flashcard[]> {
-    console.log('[Storage] getAllFlashcardsWithSubdecks - deckId:', deckId);
-    const cards = await this.getFlashcardsByDeckId(deckId);
-    console.log('[Storage] Direct cards count:', cards?.length || 0);
+    const allCards: Flashcard[] = [];
+    
+    const deck = await this.getDeck(deckId);
+    if (!deck) {
+      return [];
+    }
+    
+    const isParentDeck = deck.createSubdecks === 'true';
+    
+    if (!isParentDeck) {
+      const directCards = await this.getFlashcardsByDeckId(deckId);
+      if (directCards && directCards.length > 0) {
+        allCards.push(...directCards);
+      }
+    }
+    
     const subdecks = await this.getAllSubdecksRecursive(deckId);
-    console.log('[Storage] Subdecks count:', subdecks?.length || 0);
     
     for (const subdeck of subdecks) {
       const subdeckCards = await this.getFlashcardsByDeckId(subdeck.id);
-      console.log('[Storage] Subdeck cards count:', subdeckCards?.length || 0);
-      cards.push(...subdeckCards);
+      if (subdeckCards && subdeckCards.length > 0) {
+        allCards.push(...subdeckCards);
+      }
     }
     
-    console.log('[Storage] Total cards before sort:', cards?.length || 0);
-    return cards.sort((a, b) => a.position - b.position);
+    return allCards.sort((a, b) => a.position - b.position);
   }
 }
 
