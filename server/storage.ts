@@ -125,6 +125,9 @@ export class MemStorage implements IStorage {
       ...insertFlashcard,
       id,
       imageUrl: insertFlashcard.imageUrl ?? null,
+      sourceReference: insertFlashcard.sourceReference ?? null,
+      verificationScore: insertFlashcard.verificationScore ?? null,
+      needsReview: insertFlashcard.needsReview ?? false,
       isLearned: insertFlashcard.isLearned ?? false,
       learnedAt: insertFlashcard.learnedAt ?? null,
       createdAt: new Date()
@@ -194,8 +197,16 @@ export class DbStorage implements IStorage {
   }
 
   async createDeck(insertDeck: InsertDeck): Promise<Deck> {
-    const result = await db.insert(decks).values(insertDeck).returning();
-    return result[0];
+    const id = randomUUID();
+    const now = new Date();
+    const deckWithId = { 
+      ...insertDeck,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    await db.insert(decks).values(deckWithId);
+    return deckWithId as Deck;
   }
 
   async getDeck(id: string): Promise<Deck | undefined> {
@@ -227,8 +238,15 @@ export class DbStorage implements IStorage {
   }
 
   async createFlashcard(insertFlashcard: InsertFlashcard): Promise<Flashcard> {
-    const result = await db.insert(flashcards).values(insertFlashcard).returning();
-    return result[0];
+    const id = randomUUID();
+    const now = new Date();
+    const flashcardWithId = { 
+      ...insertFlashcard,
+      id,
+      createdAt: now
+    };
+    await db.insert(flashcards).values(flashcardWithId);
+    return flashcardWithId as Flashcard;
   }
 
   async getFlashcardsByDeckId(deckId: string): Promise<Flashcard[]> {
