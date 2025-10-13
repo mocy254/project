@@ -11,7 +11,10 @@ export async function extractPDFText(filePath: string, includePageNumbers: boole
     
     console.log(`📄 PDF extraction - includePageNumbers: ${includePageNumbers}`);
     console.log(`📄 PDF extraction - text length: ${data.text?.length || 0}`);
-    console.log(`📄 PDF extraction - num pages: ${(data as any).numpages}`);
+    console.log(`📄 PDF extraction - data properties:`, Object.keys(data));
+    console.log(`📄 PDF extraction - numpages: ${(data as any).numpages}`);
+    console.log(`📄 PDF extraction - numPages: ${(data as any).numPages}`);
+    console.log(`📄 PDF extraction - info:`, (data as any).info);
     
     if (!includePageNumbers) {
       return data.text;
