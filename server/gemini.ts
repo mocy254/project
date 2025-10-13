@@ -826,11 +826,19 @@ ${cardTypeList}
   
   // Calculate timeout based on chunk size and tier configuration
   const chunkTokens = countTokens(content);
-  // For small chunks with thinking mode enabled, use medium timeout to account for overhead
-  const timeout = 
+  
+  // Base timeout calculation
+  let timeout = 
     chunkTokens < 30000 ? (config.thinkingMode ? config.timeouts.medium : config.timeouts.small) :
     chunkTokens < 70000 ? config.timeouts.medium :
     config.timeouts.large;
+  
+  // When images are included, AI needs extra time to select the right image for each card
+  // Add 50% more time when images are present (e.g., 120s -> 180s)
+  if (images && images.length > 0) {
+    timeout = Math.floor(timeout * 1.5);
+    console.log(`⏰ Extended timeout by 50% for image selection (${images.length} images available)`);
+  }
   
   // Calculate thinking budget based on granularity (Tier 2+ only)
   const thinkingBudget = config.thinkingMode ? (granularity >= 5 ? 8192 : 4096) : 0;
