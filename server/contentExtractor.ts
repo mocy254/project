@@ -7,43 +7,49 @@ import { transcribeYouTubeVideo } from "./audioExtractor";
 export async function extractPDFText(filePath: string, includePageNumbers: boolean = false): Promise<string> {
   try {
     const dataBuffer = fs.readFileSync(filePath);
+    const data = await pdf(dataBuffer);
     
     if (!includePageNumbers) {
-      const data = await pdf(dataBuffer);
       return data.text;
     }
     
-    // Extract text with page numbers
-    const pageTexts: Array<{ page: number; text: string }> = [];
+    // For page numbers, we need to process the PDF again to get per-page text
+    // Split the extracted text by common page break indicators
+    const fullText = data.text;
+    const numPages = (data as any).numpages;
     
-    // @ts-ignore - pdf-parse types don't include pagerender option but it works
-    await pdf(dataBuffer, {
-      pagerender: (pageData: any) => {
-        return pageData.getTextContent()
-          .then((textContent: any) => {
-            const pageText = textContent.items
-              .map((item: any) => item.str)
-              .join(' ')
-              .replace(/\s+/g, ' ')
-              .trim();
-            
-            pageTexts.push({
-              page: pageData.pageNumber,
-              text: pageText
-            });
-            
-            return pageText;
-          });
+    // Estimate text per page by dividing total text by number of pages
+    const textLength = fullText.length;
+    const avgCharsPerPage = Math.floor(textLength / numPages);
+    
+    // Split text into approximate pages
+    let result = '';
+    let currentPos = 0;
+    
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const isLastPage = pageNum === numPages;
+      const endPos = isLastPage ? textLength : Math.min(currentPos + avgCharsPerPage, textLength);
+      
+      // Find a natural break point (sentence end) near the estimated page boundary
+      let actualEndPos = endPos;
+      if (!isLastPage) {
+        // Look for sentence end within 100 chars of the boundary
+        const searchText = fullText.substring(endPos - 50, Math.min(endPos + 50, textLength));
+        const sentenceEndMatch = searchText.match(/[.!?]\s+/);
+        if (sentenceEndMatch && sentenceEndMatch.index !== undefined) {
+          actualEndPos = endPos - 50 + sentenceEndMatch.index + sentenceEndMatch[0].length;
+        }
       }
-    });
+      
+      const pageText = fullText.substring(currentPos, actualEndPos).trim();
+      if (pageText) {
+        result += `[Page ${pageNum}] ${pageText} `;
+      }
+      
+      currentPos = actualEndPos;
+    }
     
-    // Format with page markers like "[Page 3] text..."
-    const textWithPageNumbers = pageTexts
-      .map(({ page, text }) => text ? `[Page ${page}] ${text}` : '')
-      .filter(text => text.length > 0)
-      .join(' ');
-    
-    return textWithPageNumbers;
+    return result.trim();
   } catch (error) {
     throw new Error(`Failed to extract PDF text: ${error}`);
   }
