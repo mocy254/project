@@ -18,6 +18,10 @@ const pool = new Pool({
   max: 5, // Limit to 5 concurrent connections (Neon free tier allows ~10)
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
+  // In development, keep encryption but bypass certificate verification
+  ssl: process.env.NODE_ENV === 'development' 
+    ? { rejectUnauthorized: false } 
+    : { rejectUnauthorized: true }
 });
 
 export const db = drizzle(pool, { schema });
