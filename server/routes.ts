@@ -367,6 +367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             granularity: parseInt(granularity),
             customInstructions: customInstructions || "",
             createSubdecks: shouldCreateSubdecks,
+            includeSource: includeSource,
             images: extractedImages.length > 0 ? extractedImages : undefined,
             onProgress: (update) => {
               progressManager.setProgress({
