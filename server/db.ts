@@ -1,27 +1,19 @@
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import * as schema from '@shared/schema';
-import WebSocket from 'ws';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-// In development, configure WebSocket with SSL verification disabled
+// Always use fetch adapter and disable WebSocket to avoid SSL issues
+neonConfig.fetchConnectionCache = true;
+neonConfig.poolQueryViaFetch = true;
+
+// In development, globally disable SSL verification 
+// This is safe for development as we're only connecting to our own database
 if (process.env.NODE_ENV === 'development') {
-  // Create WebSocket constructor with SSL options that ignore certificate errors
-  neonConfig.webSocketConstructor = class extends WebSocket {
-    constructor(address: string, protocols?: string | string[]) {
-      super(address, protocols, {
-        rejectUnauthorized: false
-      });
-    }
-  } as any;
-  
-  neonConfig.wsProxy = (host) => `${host}?sslmode=require`;
-  neonConfig.useSecureWebSocket = true;
-  neonConfig.pipelineTLS = true;
-  neonConfig.pipelineConnect = false;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
 // Configure pool with connection limits
