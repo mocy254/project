@@ -6,8 +6,10 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-// In development, use fetch adapter instead of WebSocket to avoid SSL issues
+// In development, disable TLS certificate verification for Neon's fetch adapter
+// This bypasses self-signed certificate errors while keeping encryption enabled
 if (process.env.NODE_ENV === 'development') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   neonConfig.fetchConnectionCache = true;
   neonConfig.poolQueryViaFetch = true;
 }
@@ -18,10 +20,6 @@ const pool = new Pool({
   max: 5, // Limit to 5 concurrent connections (Neon free tier allows ~10)
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
-  // In development, keep encryption but bypass certificate verification
-  ssl: process.env.NODE_ENV === 'development' 
-    ? { rejectUnauthorized: false } 
-    : { rejectUnauthorized: true }
 });
 
 export const db = drizzle(pool, { schema });
