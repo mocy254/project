@@ -815,6 +815,15 @@ ${cardTypeList}
 
   console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
   
+  // Debug: Check if page markers are in content
+  if (includeSource === 'true') {
+    const pageMarkerCount = (content.match(/\[Page \d+\]/g) || []).length;
+    console.log(`📍 Page markers in content: ${pageMarkerCount} found`);
+    if (pageMarkerCount === 0) {
+      console.warn(`⚠️  WARNING: includeSource is true but NO page markers found in content!`);
+    }
+  }
+  
   // Calculate timeout based on chunk size and tier configuration
   const chunkTokens = countTokens(content);
   // For small chunks with thinking mode enabled, use medium timeout to account for overhead
