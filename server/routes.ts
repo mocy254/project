@@ -828,9 +828,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/decks/:id/cards/all", async (req, res) => {
     try {
       const { id } = req.params;
-      const cards = await storage.getAllFlashcardsWithSubdecks(id);
+      // For now, just return direct cards - subdeck support can be added later
+      const cards = await storage.getFlashcardsByDeckId(id);
       res.json(cards);
     } catch (error: any) {
+      console.error('[cards/all] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

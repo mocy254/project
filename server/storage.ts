@@ -211,15 +211,17 @@ export class DbStorage implements IStorage {
 
   async getDeck(id: string): Promise<Deck | undefined> {
     const result = await db.select().from(decks).where(eq(decks.id, id)).limit(1);
-    return result[0];
+    return result?.[0];
   }
 
   async getDecksByUserId(userId: string): Promise<Deck[]> {
-    return db.select().from(decks).where(eq(decks.userId, userId)).orderBy(asc(decks.createdAt));
+    const result = await db.select().from(decks).where(eq(decks.userId, userId)).orderBy(asc(decks.createdAt));
+    return result || [];
   }
 
   async getSubdecks(parentDeckId: string): Promise<Deck[]> {
-    return db.select().from(decks).where(eq(decks.parentDeckId, parentDeckId)).orderBy(asc(decks.createdAt));
+    const result = await db.select().from(decks).where(eq(decks.parentDeckId, parentDeckId)).orderBy(asc(decks.createdAt));
+    return result || [];
   }
 
   async updateDeck(id: string, updateData: Partial<InsertDeck>): Promise<Deck | undefined> {
@@ -250,11 +252,17 @@ export class DbStorage implements IStorage {
   }
 
   async getFlashcardsByDeckId(deckId: string): Promise<Flashcard[]> {
-    return db
-      .select()
-      .from(flashcards)
-      .where(eq(flashcards.deckId, deckId))
-      .orderBy(asc(flashcards.position));
+    try {
+      const result = await db
+        .select()
+        .from(flashcards)
+        .where(eq(flashcards.deckId, deckId))
+        .orderBy(asc(flashcards.position));
+      return result || [];
+    } catch (error) {
+      console.error('[getFlashcardsByDeckId] Error:', error);
+      return [];
+    }
   }
 
   async updateFlashcard(id: string, updateData: Partial<InsertFlashcard>): Promise<Flashcard | undefined> {
@@ -283,14 +291,19 @@ export class DbStorage implements IStorage {
   }
 
   async getAllFlashcardsWithSubdecks(deckId: string): Promise<Flashcard[]> {
+    console.log('[Storage] getAllFlashcardsWithSubdecks - deckId:', deckId);
     const cards = await this.getFlashcardsByDeckId(deckId);
+    console.log('[Storage] Direct cards count:', cards?.length || 0);
     const subdecks = await this.getAllSubdecksRecursive(deckId);
+    console.log('[Storage] Subdecks count:', subdecks?.length || 0);
     
     for (const subdeck of subdecks) {
       const subdeckCards = await this.getFlashcardsByDeckId(subdeck.id);
+      console.log('[Storage] Subdeck cards count:', subdeckCards?.length || 0);
       cards.push(...subdeckCards);
     }
     
+    console.log('[Storage] Total cards before sort:', cards?.length || 0);
     return cards.sort((a, b) => a.position - b.position);
   }
 }
