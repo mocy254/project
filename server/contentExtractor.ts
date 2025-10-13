@@ -9,13 +9,6 @@ export async function extractPDFText(filePath: string, includePageNumbers: boole
     const dataBuffer = fs.readFileSync(filePath);
     const data = await pdf(dataBuffer);
     
-    console.log(`📄 PDF extraction - includePageNumbers: ${includePageNumbers}`);
-    console.log(`📄 PDF extraction - text length: ${data.text?.length || 0}`);
-    console.log(`📄 PDF extraction - data properties:`, Object.keys(data));
-    console.log(`📄 PDF extraction - numpages: ${(data as any).numpages}`);
-    console.log(`📄 PDF extraction - numPages: ${(data as any).numPages}`);
-    console.log(`📄 PDF extraction - info:`, (data as any).info);
-    
     if (!includePageNumbers) {
       return data.text;
     }
@@ -23,7 +16,9 @@ export async function extractPDFText(filePath: string, includePageNumbers: boole
     // For page numbers, we need to process the PDF again to get per-page text
     // Split the extracted text by common page break indicators
     const fullText = data.text;
-    const numPages = (data as any).numpages;
+    const numPages = (data as any).pages || (data as any).total;
+    
+    console.log(`📄 PDF extraction with page numbers - text length: ${fullText?.length || 0}, pages: ${numPages}`);
     
     // Estimate text per page by dividing total text by number of pages
     const textLength = fullText.length;
