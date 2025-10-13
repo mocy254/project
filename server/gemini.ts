@@ -91,6 +91,7 @@ export interface FlashcardGenerationOptions {
   granularity: number;
   customInstructions: string;
   createSubdecks?: boolean;
+  includeSource?: string;
   images?: Array<{imageUrl: string, pageNumber?: number}>;
   onProgress?: (update: {
     stage: string;
@@ -484,7 +485,7 @@ function chunkContentByTopics(content: string, outline: TopicOutline, maxTokens:
 export async function generateFlashcards(
   options: FlashcardGenerationOptions
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions, onProgress, createSubdecks, images } = options;
+  const { content, cardTypes, granularity, customInstructions, onProgress, createSubdecks, includeSource, images } = options;
 
   console.log(`=== Starting flashcard generation ===`);
   console.log(`Content length: ${content.length} characters`);
@@ -649,7 +650,7 @@ async function generateFlashcardsForChunk(
   options: FlashcardGenerationOptions,
   chunkContext: string = "Document content"
 ): Promise<GeneratedFlashcard[]> {
-  const { content, cardTypes, granularity, customInstructions, createSubdecks, images } = options;
+  const { content, cardTypes, granularity, customInstructions, createSubdecks, includeSource, images } = options;
   
   // Log image availability for this chunk
   if (images && images.length > 0) {
@@ -729,6 +730,16 @@ ${images.map((img, idx) => `Image ${idx + 1}${img.pageNumber ? ` (Page ${img.pag
 Remember: ALL flashcards must have an imageUrl. Choose the most educationally valuable image for each card.`
     : '';
 
+  const sourceGuidance = includeSource === 'true'
+    ? `\n\n**📍 SOURCE CITATION REQUIRED:**
+The content includes page markers like [Page 3] or timestamps like [1:23].
+**You MUST cite the source in your answers** when relevant:
+- Include page references naturally in the answer (e.g., "Page 3: definition", "(Page 5)", "See Page 7")
+- Use brief citations that don't bloat the answer
+- Cite the most relevant page if the answer spans multiple pages
+- Make citations feel natural, not forced`
+    : '';
+
   const systemPrompt = `You are a medical education AI that generates flashcards using an importance-based filtering system.
 
 **TWO-STAGE PROCESS:**
@@ -800,7 +811,7 @@ ${cardTypeList}
 
 7. **No Redundancy:** Merge duplicate topics.
 
-**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.${subdeckGuidance}${imageGuidance}`;
+**Critical:** At Level 1, if content has 50 facts, maybe only 3-5 have importance ≥9. Create ONLY those 3-5 cards. Do not generate more by lowering standards.${subdeckGuidance}${imageGuidance}${sourceGuidance}`;
 
   console.log(`Calling Gemini API for chunk: ${chunkContext.substring(0, 50)}...`);
   
