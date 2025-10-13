@@ -320,7 +320,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             progress: 5
           });
 
-          const content = await extractContentFromFile(req.file!.path, req.file!.mimetype);
+          const shouldIncludePageNumbers = includeSource === 'true';
+          const content = await extractContentFromFile(req.file!.path, req.file!.mimetype, shouldIncludePageNumbers);
 
           // Validate extracted content
           if (!content || content.trim().length === 0) {

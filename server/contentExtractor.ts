@@ -4,11 +4,46 @@ import { Innertube } from "youtubei.js";
 import * as fs from "fs";
 import { transcribeYouTubeVideo } from "./audioExtractor";
 
-export async function extractPDFText(filePath: string): Promise<string> {
+export async function extractPDFText(filePath: string, includePageNumbers: boolean = false): Promise<string> {
   try {
     const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdf(dataBuffer);
-    return data.text;
+    
+    if (!includePageNumbers) {
+      const data = await pdf(dataBuffer);
+      return data.text;
+    }
+    
+    // Extract text with page numbers
+    const pageTexts: Array<{ page: number; text: string }> = [];
+    
+    // @ts-ignore - pdf-parse types don't include pagerender option but it works
+    await pdf(dataBuffer, {
+      pagerender: (pageData: any) => {
+        return pageData.getTextContent()
+          .then((textContent: any) => {
+            const pageText = textContent.items
+              .map((item: any) => item.str)
+              .join(' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+            
+            pageTexts.push({
+              page: pageData.pageNumber,
+              text: pageText
+            });
+            
+            return pageText;
+          });
+      }
+    });
+    
+    // Format with page markers like "[Page 3] text..."
+    const textWithPageNumbers = pageTexts
+      .map(({ page, text }) => text ? `[Page ${page}] ${text}` : '')
+      .filter(text => text.length > 0)
+      .join(' ');
+    
+    return textWithPageNumbers;
   } catch (error) {
     throw new Error(`Failed to extract PDF text: ${error}`);
   }
@@ -161,13 +196,14 @@ function extractYouTubeVideoId(url: string): string | null {
 
 export async function extractContentFromFile(
   filePath: string,
-  mimeType: string
+  mimeType: string,
+  includePageNumbers: boolean = false
 ): Promise<string> {
   const extension = filePath.split(".").pop()?.toLowerCase();
 
   switch (extension) {
     case "pdf":
-      return extractPDFText(filePath);
+      return extractPDFText(filePath, includePageNumbers);
     case "docx":
     case "doc":
       return extractDOCXText(filePath);
