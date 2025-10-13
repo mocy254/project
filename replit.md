@@ -6,6 +6,19 @@ FlashGenius is an educational productivity application designed to convert vario
 
 ## Recent Changes
 
+**October 13, 2025 - PDF Page Number Tracking:**
+
+*Include Source Feature for Documents:*
+1. Enhanced PDF extraction with page number tracking:
+   - Added `includePageNumbers` parameter to `extractPDFText()` function
+   - Uses pdf-parse `pagerender` callback to track page numbers during extraction
+   - Inserts `[Page N]` markers at the start of each page's text (matching YouTube timestamp format)
+2. Updated document upload flow:
+   - `extractContentFromFile()` now accepts `includePageNumbers` parameter
+   - Document upload route passes `includeSource === 'true'` to enable page tracking
+   - Page markers are preserved in chunks and passed to AI for natural citation
+3. Implementation verified by architect review - ready for user testing
+
 **October 12, 2025 - Verification & Citation Layer:**
 
 *Hallucination Detection System:*
