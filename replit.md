@@ -130,6 +130,11 @@ The system supports tiered performance optimization via the `GPT_TIER` environme
 - Timeouts: 1min (small), 2min (medium), 3min (large chunks)
 - Best for: Paid tier with higher rate limits
 
+**Context Window & Output Capacity:**
+- **Input**: 272,000 tokens (massive context for large documents)
+- **Output**: 128,000 tokens (16x larger than Gemini's 8,192 limit - eliminates truncation)
+- **Total**: 400,000 token context window
+
 **Key Features:**
 - **Structured Outputs**: OpenAI's `json_schema` with `strict: true` provides 100% schema adherence (no validation errors)
 - **Dynamic Concurrency**: Automatically adjusts based on document size to maximize speed while respecting API limits
@@ -138,7 +143,7 @@ The system supports tiered performance optimization via the `GPT_TIER` environme
 
 **Performance Impact (Tier 2+ vs Tier 1):**
 - Large documents (40+ chunks): 3-5x faster generation
-- More reliable structured outputs with GPT-5 mini
+- No truncation issues - 128K output handles largest documents
 - Faster failure recovery (reduced retry delays)
 
 ## External Dependencies
