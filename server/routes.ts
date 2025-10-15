@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import { randomUUID } from "crypto";
 import { storage } from "./storage";
-import { generateFlashcards, groupFlashcardsBySubtopic } from "./gemini";
+import { generateFlashcards, groupFlashcardsBySubtopic } from "./openai";
 import { extractContentFromFile, extractYouTubeTranscript } from "./contentExtractor";
 import { extractImagesFromPDF, extractYouTubeThumbnail, extractYouTubeFrames } from "./imageExtractor";
 import { insertDeckSchema, insertFlashcardSchema } from "@shared/schema";
