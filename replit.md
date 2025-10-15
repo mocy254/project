@@ -6,6 +6,22 @@ FlashGenius is an educational productivity application designed to convert vario
 
 ## Recent Changes
 
+**October 15, 2025 - Migration to OpenAI GPT-5 Mini:**
+
+*AI Service Provider Change:*
+1. Migrated from Gemini 2.5 Flash to OpenAI GPT-5 mini:
+   - Replaced `@google/genai` SDK with OpenAI SDK
+   - Updated `server/gemini.ts` to `server/openai.ts` with GPT-5 mini model
+   - Implemented OpenAI's structured outputs using `json_schema` with `strict: true` for 100% schema adherence
+2. Image handling updated for OpenAI compatibility:
+   - Images now converted to base64 before sending to API (downloads from Supabase, encodes in-memory)
+   - OpenAI receives images directly in message content instead of URLs
+3. Simplified tier configuration:
+   - Removed Gemini-specific "thinking mode" feature (not available in GPT-5 mini)
+   - Kept tier-based concurrency, retry, and timeout settings for performance optimization
+   - Updated environment variable from `GEMINI_TIER` to `GPT_TIER`
+4. All chunking, verification, and token counting logic preserved unchanged
+
 **October 13, 2025 - PDF Page Number Tracking:**
 
 *Include Source Feature for Documents:*
@@ -98,40 +114,37 @@ Relationships include one user to many decks, and one deck to many flashcards, w
 - **Data Storage:** Uses a production-ready PostgreSQL database with Drizzle ORM for persistent storage of user data, decks, and flashcards. Uploaded documents and extracted images are stored in **Supabase Storage** with public bucket access for images and user-organized folder structure (userId/uploads/*, userId/images/*). The system validates bucket configuration on startup and provides clear error messages if misconfigured.
 - **API Design:** RESTful endpoints with HTTP polling for asynchronous generation progress tracking.
 
-## Gemini API Tier Configuration
+## OpenAI GPT Tier Configuration
 
-The system supports tiered performance optimization via the `GEMINI_TIER` environment variable:
+The system supports tiered performance optimization via the `GPT_TIER` environment variable:
 
 **Tier 1 (Default - Conservative for Rate Limits):**
 - Max Concurrency: 5 parallel chunks
 - Retry Attempts: 2 with 2-second delays
 - Timeouts: 2min (small), 3.5min (medium), 5min (large chunks)
-- Thinking Mode: Disabled (no additional reasoning tokens)
-- Best for: Free tier or low rate limit accounts (250 RPD)
+- Best for: Free tier or low rate limit accounts
 
 **Tier 2+ (Optimized for Higher Rate Limits):**
 - Max Concurrency: 20 parallel chunks (adaptive: 20/12/8 based on doc size)
 - Retry Attempts: 3 with 1-second delays
 - Timeouts: 1min (small), 2min (medium), 3min (large chunks)
-- Thinking Mode: Enabled with dynamic budget (8192 tokens for granularity 5-7, 4096 for 1-4)
-- Output Cap Protection: Detects truncation at 8k token output limit with auto-warnings
-- Best for: Paid tier with higher rate limits (360+ RPM)
+- Best for: Paid tier with higher rate limits
 
 **Key Features:**
-- **Thinking Mode**: Improves accuracy by 15-25% for medical content through deeper reasoning (Tier 2+ only)
+- **Structured Outputs**: OpenAI's `json_schema` with `strict: true` provides 100% schema adherence (no validation errors)
 - **Dynamic Concurrency**: Automatically adjusts based on document size to maximize speed while respecting API limits
-- **Output Protection**: Monitors response token count and warns if approaching 8,192 token output limit to prevent truncation
+- **Base64 Image Support**: Images converted to base64 for seamless multimodal processing
 - **Token Estimation**: Uses 3.5 chars/token fallback for technical content when Tiktoken unavailable
 
 **Performance Impact (Tier 2+ vs Tier 1):**
 - Large documents (40+ chunks): 3-5x faster generation
-- Better accuracy on complex medical content (thinking mode)
+- More reliable structured outputs with GPT-5 mini
 - Faster failure recovery (reduced retry delays)
 
 ## External Dependencies
 
 - **Authentication:** Supabase Auth (`@supabase/supabase-js`) for email/password authentication. Requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment variables for frontend, and `SUPABASE_URL` and `SUPABASE_ANON_KEY` for backend. User sessions use Bearer token authentication.
-- **AI Service:** `@google/genai` SDK (Gemini 2.5 Flash) for advanced AI capabilities, requiring a `GEMINI_API_KEY`. Supports customized generation parameters like card types, granularity, custom instructions, image inclusion (using `pdf-to-img`, `youtubei.js`, `ffmpeg`), source inclusion for YouTube videos, and thinking mode for enhanced reasoning. Set `GEMINI_TIER=2` environment variable to enable optimized settings for higher rate limit tiers.
+- **AI Service:** `openai` SDK (GPT-5 mini) for advanced AI capabilities, requiring an `OPENAI_API_KEY`. Supports customized generation parameters like card types, granularity, custom instructions, image inclusion (using base64-encoded images from `pdf-to-img`, `youtubei.js`, `ffmpeg`), and source inclusion for YouTube videos. Set `GPT_TIER=2` environment variable to enable optimized settings for higher rate limit tiers.
 - **Database:** Neon PostgreSQL serverless database via `@neondatabase/serverless` and Drizzle ORM.
 - **File Processing Libraries:**
     - `pdf-parse`: For PDF text extraction.
